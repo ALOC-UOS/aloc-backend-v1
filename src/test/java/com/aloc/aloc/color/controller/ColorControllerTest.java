@@ -48,7 +48,11 @@ public class ColorControllerTest {
             "userDiscord",
             2,
             "userNotion",
-            Course.FULL);
+            Course.FULL,
+            "oauthId",
+            "userId",
+            "nickname",
+            "profileImageUrl");
     user.setAuthority(Authority.ROLE_USER);
     UserDetails userDetails =
         new org.springframework.security.core.userdetails.User(

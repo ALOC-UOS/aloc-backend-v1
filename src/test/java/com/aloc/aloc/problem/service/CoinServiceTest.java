@@ -72,7 +72,11 @@ class CoinServiceTest {
             "discordId",
             10,
             "notionEmail",
-            Course.FULL);
+            Course.FULL,
+            "oauthId",
+            "userId",
+            "nickname",
+            "profileImageUrl");
   }
 
   @Test

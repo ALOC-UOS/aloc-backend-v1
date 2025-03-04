@@ -34,13 +34,18 @@ public class User extends AuditingTimeEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false)
+  //  @Column(nullable = false)
   private String username;
 
-  @Column(nullable = false)
+  private String oauthId;
+  private String userId;
+  private String nickname;
+  private String profileImageUrl;
+
+  //  @Column(nullable = false)
   private String baekjoonId;
 
-  @Column(nullable = false)
+  //  @Column(nullable = false)
   private String githubId;
 
   private Integer rank;
@@ -48,7 +53,7 @@ public class User extends AuditingTimeEntity {
   @Enumerated(EnumType.STRING)
   private Course course;
 
-  @Column(nullable = false)
+  //  @Column(nullable = false)
   private String password = "password";
 
   @Enumerated(EnumType.STRING)
@@ -96,7 +101,11 @@ public class User extends AuditingTimeEntity {
       String discordId,
       Integer rank,
       String notionEmail,
-      Course course) {
+      Course course,
+      String oauthId,
+      String userId,
+      String nickname,
+      String profileImageUrl) {
     this.username = username;
     this.baekjoonId = baekjoonId;
     this.githubId = githubId;
@@ -104,6 +113,10 @@ public class User extends AuditingTimeEntity {
     this.course = course;
     this.authority = Authority.ROLE_GUEST;
     this.rank = rank;
+    this.oauthId = oauthId;
+    this.userId = userId;
+    this.nickname = nickname;
+    this.profileImageUrl = profileImageUrl;
     this.userProfile =
         UserProfile.builder()
             .user(this)
@@ -113,5 +126,21 @@ public class User extends AuditingTimeEntity {
             .discordId(discordId)
             .notionEmail(notionEmail)
             .build();
+  }
+
+  public User update(String userId, String nickname, String profileImageUrl) {
+    this.userId = userId;
+    this.nickname = nickname;
+    this.profileImageUrl = profileImageUrl;
+    return this;
+  }
+
+  public static User create(UserOAuthProfile userOAuthProfile) {
+    return User.builder()
+        .userId(userOAuthProfile.userId())
+        .oauthId(userOAuthProfile.oauthId())
+        .nickname(userOAuthProfile.nickname())
+        .profileImageUrl(userOAuthProfile.profileImageUrl())
+        .build();
   }
 }

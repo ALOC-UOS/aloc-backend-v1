@@ -51,7 +51,11 @@ public class ProblemServiceTest {
             "discord",
             15,
             "notion",
-            Course.FULL);
+            Course.FULL,
+            "oauthId",
+            "userId",
+            "nickname",
+            "profileImageUrl");
     user1.setId(1L);
     user2 =
         new User(
@@ -63,7 +67,11 @@ public class ProblemServiceTest {
             "discord",
             15,
             "notion",
-            Course.FULL);
+            Course.FULL,
+            "oauthId",
+            "userId",
+            "nickname",
+            "profileImageUrl");
     user2.setId(2L);
 
     problemType = ProblemType.builder().course(Course.FULL).routine(Routine.DAILY).build();

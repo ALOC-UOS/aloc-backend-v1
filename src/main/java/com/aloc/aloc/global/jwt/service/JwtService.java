@@ -5,13 +5,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 public interface JwtService {
-  String createAccessToken(String githubId);
+  String createAccessToken(String oauthId);
 
   String createRefreshToken();
 
-  void updateRefreshToken(String githubId, String refreshToken);
+  void updateRefreshToken(String oauthId, String refreshToken);
 
-  void destroyRefreshToken(String githubId);
+  void destroyRefreshToken(String refreshToken);
 
   void sendAccessAndRefreshToken(
       HttpServletResponse response, String accessToken, String refreshToken);
@@ -22,7 +22,7 @@ public interface JwtService {
 
   Optional<String> extractRefreshToken(HttpServletRequest request);
 
-  Optional<String> extractGithubId(String accessToken);
+  Optional<String> extractOauthId(String accessToken);
 
   void setAccessTokenHeader(HttpServletResponse response, String accessToken);
 

@@ -35,7 +35,7 @@ public class UserProfile {
   @Column(nullable = false)
   private String profileColor;
 
-  @Column(nullable = false)
+  //  @Column(nullable = false)
   private String studentId;
 
   private String discordId;

@@ -1,9 +1,9 @@
 package com.aloc.aloc.global.jwt.service;
 
-import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.repository.UserRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,17 +40,17 @@ public class JwtServiceImpl implements JwtService {
 
   private static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
   private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
-  private static final String USERNAME_CLAIM = "githubId";
+  private static final String USERNAME_CLAIM = "oauthId";
   private static final String BEARER = "Bearer ";
 
   private final UserRepository userRepository;
 
   @Override
-  public String createAccessToken(String githubId) {
+  public String createAccessToken(String oauthId) {
     return JWT.create()
         .withSubject(ACCESS_TOKEN_SUBJECT)
         .withExpiresAt(new Date(System.currentTimeMillis() + accessTokenValidityInSeconds * 1000))
-        .withClaim(USERNAME_CLAIM, githubId)
+        .withClaim(USERNAME_CLAIM, oauthId)
         .sign(Algorithm.HMAC512(secret));
   }
 
@@ -63,24 +63,32 @@ public class JwtServiceImpl implements JwtService {
   }
 
   @Override
-  public void updateRefreshToken(String githubId, String refreshToken) {
+  public void updateRefreshToken(String oauthId, String refreshToken) {
     userRepository
-        .findByGithubId(githubId)
+        .findByOauthId(oauthId)
         .ifPresentOrElse(
             users -> users.updateRefreshToken(refreshToken), () -> new Exception("회원 조회 실패"));
   }
 
   @Override
-  public void destroyRefreshToken(String githubId) {
+  public void destroyRefreshToken(String refreshToken) {
     userRepository
-        .findByGithubId(githubId)
-        .ifPresentOrElse(User::destroyRefreshToken, () -> new Exception("회원 조회 실패"));
+        .findByRefreshToken(refreshToken)
+        .ifPresent(
+            user -> {
+              user.destroyRefreshToken(); // ✅ DB에서 Refresh Token 삭제
+              userRepository.save(user); // ✅ 변경사항 반영
+            });
   }
 
   @Override
   public void sendAccessAndRefreshToken(
       HttpServletResponse response, String accessToken, String refreshToken) {
+
+    log.info("🔹 sendAccessAndRefreshToken() 호출됨");
     response.setStatus(HttpServletResponse.SC_OK);
+    response.setContentType("application/json"); // ✅ JSON 응답 설정
+    response.setCharacterEncoding("UTF-8");
 
     setAccessTokenHeader(response, accessToken);
     setRefreshTokenCookie(response, refreshToken);
@@ -88,9 +96,17 @@ public class JwtServiceImpl implements JwtService {
     log.info("✅ Setting Access Token Header: '{}'", accessToken.trim());
     log.info("✅ Setting Refresh Token Header: '{}'", refreshToken.trim());
 
-    Map<String, String> tokenMap = new HashMap<>();
-    tokenMap.put(ACCESS_TOKEN_SUBJECT, accessToken);
-    tokenMap.put(REFRESH_TOKEN_SUBJECT, refreshToken);
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      Map<String, String> tokenMap = new HashMap<>();
+      tokenMap.put("accessToken", accessToken);
+      tokenMap.put("refreshToken", refreshToken);
+
+      response.getWriter().write(objectMapper.writeValueAsString(tokenMap)); // ✅ JSON 응답 보내기
+      response.getWriter().flush();
+    } catch (Exception e) {
+      log.error("❌ OAuth 로그인 후 토큰 응답 실패", e);
+    }
   }
 
   @Override
@@ -124,7 +140,7 @@ public class JwtServiceImpl implements JwtService {
   }
 
   @Override
-  public Optional<String> extractGithubId(String accessToken) {
+  public Optional<String> extractOauthId(String accessToken) {
     try {
       return Optional.ofNullable(
           JWT.require(Algorithm.HMAC512(secret))

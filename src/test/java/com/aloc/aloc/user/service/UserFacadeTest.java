@@ -42,7 +42,11 @@ public class UserFacadeTest {
             "adminDiscord",
             1,
             "adminNotion",
-            Course.FULL);
+            Course.FULL,
+            "oauthId",
+            "userId",
+            "nickname",
+            "profileImageUrl");
     User user2 =
         new User(
             "user",
@@ -53,7 +57,11 @@ public class UserFacadeTest {
             "userDiscord",
             2,
             "userNotion",
-            Course.FULL);
+            Course.FULL,
+            "oauthId",
+            "userId",
+            "nickname",
+            "profileImageUrl");
 
     testUsers = Arrays.asList(user1, user2);
 

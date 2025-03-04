@@ -19,8 +19,8 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -84,9 +84,41 @@ public class SecurityConfig {
                         (request, response, accessDeniedException) ->
                             response.sendError(
                                 HttpServletResponse.SC_FORBIDDEN, "Forbidden: Missing token")))
-        .logout((logout) -> logout.logoutSuccessUrl("/api2/logout").invalidateHttpSession(true))
-        .sessionManagement(
-            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        .logout(
+            logout ->
+                logout
+                    .logoutUrl("/api2/logout")
+                    .logoutSuccessHandler(
+                        (request, response, authentication) -> {
+                          // ✅ Refresh Token 삭제 로직 추가
+                          jwtService
+                              .extractRefreshToken(request)
+                              .ifPresent(jwtService::destroyRefreshToken);
+                          response.setStatus(HttpServletResponse.SC_OK);
+                        })
+                    .invalidateHttpSession(true) // 세션 무효화 (JWT 기반이므로 사실상 필요 없음)
+            )
+        .oauth2Login(
+            oauth2 ->
+                oauth2.successHandler(
+                    (request, response, authentication) -> {
+                      // ✅ OAuth2 로그인 후 JWT 응답에 추가
+                      OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                      String oauthId =
+                          oAuth2User.getAttribute(
+                              "sub"); // ✅ Google은 "sub", 네이버/카카오는 `OAuthAttributes`에서 자동 매핑됨
+
+                      String accessToken = jwtService.createAccessToken(oauthId);
+                      String refreshToken = jwtService.createRefreshToken();
+
+                      jwtService.updateRefreshToken(oauthId, refreshToken);
+
+                      response.setContentType("application/json"); // ✅ JSON 형식으로 설정
+                      response.setCharacterEncoding("UTF-8");
+
+                      jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+                    }));
+
     return http.build();
   }
 
