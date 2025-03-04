@@ -55,6 +55,15 @@ public class UserController {
     return CustomApiResponse.onSuccess(userFacade.getUser(user.getUsername()));
   }
 
+  @GetMapping("/user/admin")
+  @SecurityRequirement(name = "JWT Auth")
+  @Operation(summary = "유저가 admin인지 확인", description = "유저가 admin인지 조회합니다")
+  public CustomApiResponse<String> checkUserAdmin(
+      @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+    userService.checkAdmin(user.getUsername());
+    return CustomApiResponse.onSuccess("User is an admin");
+  }
+
   @PostMapping("/authorize/{githubId}")
   @SecurityRequirement(name = "JWT Auth")
   @ApiResponses({
