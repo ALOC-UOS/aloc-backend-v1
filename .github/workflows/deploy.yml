@@ -140,7 +140,7 @@ jobs:
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
           content: |
-            [aloc-spring]
+            [OPEN-ALOC-BACKEND]
             ✅ 배포 성공
             
             커밋한 사람 👨‍💻${{ github.actor }}
@@ -153,7 +153,7 @@ jobs:
         with:
           webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
           content: |
-            [aloc-spring]
+            [OPEN-ALOC-BACKEND]
             ❌ 배포 실패
             확인이 필요해요 👀
             
