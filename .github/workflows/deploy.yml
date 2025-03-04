@@ -36,6 +36,7 @@ jobs:
           cd ./src/main/resources
           echo "${{ secrets.APPLICATION }}" base64 -d > application.yml
           echo "${{ secrets.JWT_APPLICATION }}" base64 -d > application-jwt.yml
+          echo "${{ secrets.OAUTH_APPLICATION }}" | base64 -d > application-oauth.yml
           echo "${{ secrets.TEST_APPLICATION }}" base64 -d > application-test.yml
 
       - name: Install PostgreSQL client
