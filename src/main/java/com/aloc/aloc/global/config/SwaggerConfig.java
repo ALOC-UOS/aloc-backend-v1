@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(
-    info = @Info(title = "ALOC API", version = "v2"),
+    info = @Info(title = "OPEN-ALOC API", version = "v1"),
     security = {@SecurityRequirement(name = "JWT Auth")},
     servers = {
       @Server(url = "https://api.aloc.kr", description = "Production Server"),

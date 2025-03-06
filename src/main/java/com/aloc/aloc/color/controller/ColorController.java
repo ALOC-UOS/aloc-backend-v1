@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api2/color")
+@RequestMapping("/api/color")
 @Tag(name = "Color API", description = "Color API 입니다.")
 public class ColorController {
   private final ColorService colorService;

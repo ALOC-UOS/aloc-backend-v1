@@ -49,27 +49,25 @@ public class SecurityConfig {
             (authorize) ->
                 authorize
                     .requestMatchers(
-                        "/api2/login",
-                        "/api2/sign-up",
+                        "/api/login",
+                        "/api/sign-up",
                         "/swagger-ui/**",
                         "/api-docs/**",
-                        "/api2/swagger-ui.html",
-                        "/api2/chat/**",
-                        "/api2/ws/**",
-                        "/api2/chat/**")
+                        "/api/swagger-ui.html",
+                        "/api2/ws/**")
                     .permitAll()
                     .requestMatchers(
                         "/purchase",
-                        "/api2/authorize/*",
-                        "/api2/weekly-problems",
-                        "/api2/today-problem/solved",
-                        "/api2/problems/solved",
-                        "/api2/user",
-                        "/api2/authorize/**",
-                        "/api2/user/course",
-                        "/api2/withdraw",
-                        "/api2/color/change",
-                        "/api2/images/upload/profile")
+                        "/api/authorize/*",
+                        "/api/weekly-problems",
+                        "/api/today-problem/solved",
+                        "/api/problems/solved",
+                        "/api/user",
+                        "/api/authorize/**",
+                        "/api/user/course",
+                        "/api/withdraw",
+                        "/api/color/change",
+                        "/api/images/upload/profile")
                     .authenticated()
                     .anyRequest()
                     .permitAll())
@@ -87,7 +85,7 @@ public class SecurityConfig {
         .logout(
             logout ->
                 logout
-                    .logoutUrl("/api2/logout")
+                    .logoutUrl("/api/logout")
                     .logoutSuccessHandler(
                         (request, response, authentication) -> {
                           // ✅ Refresh Token 삭제 로직 추가
@@ -163,11 +161,6 @@ public class SecurityConfig {
     return provider;
   }
 
-  @Bean
-  public BCryptPasswordEncoder bcryptPasswordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
-
   // CORS 설정
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
@@ -176,13 +169,7 @@ public class SecurityConfig {
 
     corsConfiguration.setAllowedOriginPatterns(
         Arrays.asList(
-            "http://localhost:3000",
-            "https://*.iflab.run",
-            "https://iflab.run",
-            "https://aloc.kr",
-            "https://www.aloc.kr",
-            "https://aloc-client.vercel.app",
-            "https://api.aloc.kr"));
+            "http://localhost:3000", "https://aloc-client.vercel.app", "https://api.aloc.kr"));
     corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH"));
     corsConfiguration.setAllowedHeaders(List.of("*"));
     corsConfiguration.setAllowCredentials(true);

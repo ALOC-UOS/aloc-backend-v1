@@ -24,7 +24,7 @@ public class ColorService {
         .orElseThrow(() -> new IllegalArgumentException("해당 컬러가 없습니다. " + id));
   }
 
-  public String pickColor() {
+  private String pickColor() {
     Random random = new Random();
     int draw = random.nextInt(100) + 1;
 

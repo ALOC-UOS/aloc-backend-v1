@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api2")
+@RequestMapping("/api")
 @Tag(name = "Problem API", description = "Problem API 입니다.")
 public class ProblemController {
   private final ProblemService problemService;
