@@ -2,8 +2,6 @@ package com.aloc.aloc.problem.service;
 
 import com.aloc.aloc.algorithm.entity.Algorithm;
 import com.aloc.aloc.algorithm.service.AlgorithmService;
-import com.aloc.aloc.coinhistory.enums.CoinType;
-import com.aloc.aloc.coinhistory.service.CoinHistoryService;
 import com.aloc.aloc.problem.entity.Problem;
 import com.aloc.aloc.problem.enums.UserProblemStatus;
 import com.aloc.aloc.problem.repository.ProblemRepository;
@@ -24,7 +22,6 @@ public class CoinService {
   private final UserProblemRepository userProblemRepository;
   private final ProblemRepository problemRepository;
   private final UserService userService;
-  private final CoinHistoryService coinHistoryService;
 
   @Value("${app.season}")
   private Integer currentSeason;
@@ -95,20 +92,19 @@ public class CoinService {
     if (coinToAdd == 0) {
       return 0;
     }
-    addCoinsToUser(user, coinToAdd, CoinType.DAILY, "오늘의 문제 해결");
+    addCoinsToUser(user, coinToAdd);
     return coinToAdd;
   }
 
   private void addWeeklyCoinsIfNeeded(User user, int coinToAdd) {
     if (coinToAdd > 0) {
-      addCoinsToUser(user, coinToAdd, CoinType.WEEKLY, "이번주 위클리 문제 해결");
+      addCoinsToUser(user, coinToAdd);
     }
   }
 
-  private void addCoinsToUser(User user, int coin, CoinType coinType, String description) {
+  private void addCoinsToUser(User user, int coin) {
     user.addCoin(coin);
     userService.saveUser(user);
-    coinHistoryService.addCoinHistory(user, coin, coinType, description);
   }
 
   private boolean isEligibleForCoin(Problem problem) {

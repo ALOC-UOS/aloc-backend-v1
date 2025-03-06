@@ -1,7 +1,5 @@
 package com.aloc.aloc.color.service;
 
-import com.aloc.aloc.coinhistory.enums.CoinType;
-import com.aloc.aloc.coinhistory.service.CoinHistoryService;
 import com.aloc.aloc.color.Color;
 import com.aloc.aloc.color.dto.response.ColorResponseDto;
 import com.aloc.aloc.color.repository.ColorRepository;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Service;
 public class ColorService {
   private final ColorRepository colorRepository;
   private final UserRepository userRepository;
-  private final CoinHistoryService coinHistoryService;
 
   private static final int COLOR_CHANGE_MONEY = 100;
 
@@ -55,7 +52,6 @@ public class ColorService {
     Color color = colorRepository.findById(colorName).orElseThrow();
 
     userRepository.save(user);
-    coinHistoryService.addCoinHistory(user, -COLOR_CHANGE_MONEY, CoinType.BUY_COLOR, "컬러 변경권 구매");
     return new ColorResponseDto(user.getCoin(), color.getId(), color.getColor1());
   }
 }

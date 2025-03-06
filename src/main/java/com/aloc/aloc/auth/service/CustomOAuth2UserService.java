@@ -1,11 +1,9 @@
 package com.aloc.aloc.auth.service;
 
 import com.aloc.aloc.auth.enums.OAuthAttributes;
-import com.aloc.aloc.global.jwt.service.JwtService;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.entity.UserOAuthProfile;
 import com.aloc.aloc.user.repository.UserRepository;
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +21,6 @@ import org.springframework.stereotype.Service;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
   private final UserRepository userRepository;
-  private final JwtService jwtService;
-  private final HttpServletResponse response;
 
   @Override
   public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -42,7 +38,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     // 기존 사용자 조회 또는 신규 사용자 저장
     User user = saveOrUpdateUserProfile(userOAuthProfile);
 
-    return createDefaultOAuth2User(user, attributes, registrationId);
+    return createDefaultOAuth2User(user, attributes);
   }
 
   private User saveOrUpdateUserProfile(UserOAuthProfile userOAuthProfile) {
@@ -59,8 +55,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     return userRepository.save(user);
   }
 
-  private DefaultOAuth2User createDefaultOAuth2User(
-      User user, Map<String, Object> attributes, String registrationId) {
+  private DefaultOAuth2User createDefaultOAuth2User(User user, Map<String, Object> attributes) {
     return new DefaultOAuth2User(
         Collections.singletonList(new SimpleGrantedAuthority(user.getAuthority().name())),
         attributes,

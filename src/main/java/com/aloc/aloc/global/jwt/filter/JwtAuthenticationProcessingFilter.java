@@ -45,8 +45,8 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException, java.io.IOException {
-    String noCheckUrl = "/api2/login";
-    String refreshTokenUrl = "/api2/refresh";
+    String noCheckUrl = "/api/login";
+    String refreshTokenUrl = "/api/refresh";
     if (request.getRequestURI().equals(noCheckUrl)) {
       filterChain.doFilter(request, response);
       return;
