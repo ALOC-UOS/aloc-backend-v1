@@ -1,6 +1,5 @@
 package com.aloc.aloc.user.service;
 
-import com.aloc.aloc.history.service.HistoryService;
 import com.aloc.aloc.problemtype.enums.Course;
 import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
 import com.aloc.aloc.user.entity.User;
@@ -19,7 +18,6 @@ public class UserService {
   private static final Set<Authority> ACTIVE_AUTHORITIES =
       Set.of(Authority.ROLE_USER, Authority.ROLE_ADMIN);
   private final UserRepository userRepository;
-  private final HistoryService historyService;
   private final BaekjoonRankScrapingService baekjoonRankScrapingService;
 
   public void checkAdmin(String oauthId) {
@@ -45,7 +43,6 @@ public class UserService {
   public void updateUserRank(User user, Integer rank) {
     user.setRank(rank);
     userRepository.save(user);
-    historyService.addHistory(user, "changeRank", rank);
   }
 
   public List<User> getActiveUsers() {

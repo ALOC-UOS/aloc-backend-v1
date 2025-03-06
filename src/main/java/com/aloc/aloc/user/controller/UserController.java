@@ -1,11 +1,8 @@
 package com.aloc.aloc.user.controller;
 
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
-import com.aloc.aloc.problem.service.ProblemFacade;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.service.UserFacade;
-import com.aloc.aloc.user.service.UserRegistrationService;
-import com.aloc.aloc.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -23,10 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api2")
 @Tag(name = "User API", description = "User API 입니다.")
 public class UserController {
-  private final UserService userService;
   private final UserFacade userFacade;
-  private final ProblemFacade problemFacade;
-  private final UserRegistrationService userRegistrationService;
 
   @GetMapping("/users")
   @Operation(summary = "유저 목록 조회", description = "전체 유저 목록을 조회합니다.")
