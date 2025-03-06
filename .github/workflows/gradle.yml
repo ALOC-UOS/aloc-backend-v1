@@ -28,7 +28,7 @@ jobs:
       with:
         path: ~/.gradle/caches
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-        restore-keys: ${{ runner.os }}-gradle-
+        restore-keys: ${{ runner.os }}-gradle-v2-
 
     - name: Create application.yml
       run: |
@@ -43,32 +43,3 @@ jobs:
 
     - name: Build with Gradle Wrapper
       run: ./gradlew build --parallel --daemon
-
-    # ✅ 성공 시 Discord Webhook 알림
-    - name: Send CI Success Notification to Discord
-      if: success()
-      uses: tsickert/discord-webhook@v5.3.0
-      with:
-        webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        content: |
-          [OPEN-ALOC-BACKEND]
-          ✅ CI 빌드 성공 🎉
-          
-          **커밋한 사람:** 👨‍💻 ${{ github.actor }}
-          **커밋 메시지:** ${{ github.event.head_commit.message }}
-          🔗 [GitHub Actions 로그 확인하기](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-
-    # ❌ 실패 시 Discord Webhook 알림
-    - name: Send CI Failure Notification to Discord
-      if: failure()
-      uses: tsickert/discord-webhook@v5.3.0
-      with:
-        webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        content: |
-          [OPEN-ALOC-BACKEND]
-          ❌ CI 빌드 실패 ❗
-          확인이 필요합니다 👀
-          
-          **커밋한 사람:** 👨‍💻 ${{ github.actor }}
-          **커밋 메시지:** ${{ github.event.head_commit.message }}
-          🔗 [GitHub Actions 로그 확인하기](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
