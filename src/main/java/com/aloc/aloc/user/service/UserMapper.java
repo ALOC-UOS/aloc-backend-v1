@@ -16,7 +16,7 @@ public class UserMapper {
 
   UserDetailResponseDto mapToUserDetailResponseDto(User user) {
     Integer problemCounts = problemFacade.getTotalProblemCountByCourse(user.getCourse());
-    Color userColor = colorService.getColorById(user.getUserProfile().getProfileColor());
+    Color userColor = colorService.getColorById(user.getProfileColor());
 
     return UserDetailResponseDto.of(
         user,

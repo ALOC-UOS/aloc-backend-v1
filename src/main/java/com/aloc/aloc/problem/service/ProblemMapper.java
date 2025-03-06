@@ -54,14 +54,12 @@ public class ProblemMapper {
 
   SolvedUserResponseDto mapToSolvedUserResponseDto(User user, UserProblem userProblem) {
     return SolvedUserResponseDto.builder()
-        .username(user.getUsername())
-        .githubId(user.getGithubId())
+        .username(user.getName())
         .baekjoonId(user.getBaekjoonId())
-        .profileColor(user.getUserProfile().getProfileColor())
-        .studentId(user.getUserProfile().getStudentId())
-        .profileImageFileName(user.getUserProfile().getProfileImageFileName())
+        .profileColor(user.getProfileColor())
+        .profileImageUrl(user.getProfileImageUrl())
         .rank(user.getRank())
-        .coin(user.getUserProfile().getCoin())
+        .coin(user.getCoin())
         .solvedAt(userProblem.getSolvedAt().format(DateTimeFormatter.ofPattern("HH:mm:ss")))
         .build();
   }

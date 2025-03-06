@@ -132,12 +132,11 @@ public class ProblemSolvingService {
       Problem todayProblem,
       UserProblem userProblem,
       TodayProblemSolvedResponseDto response) {
-    System.out.println("오늘의 문제를 풀었어요: " + user.getGithubId());
     int place = userProblemService.getSolvedUserCount(todayProblem.getId()) + 1;
     int coin = coinService.addCoinEligibleForTodayProblem(user, todayProblem);
 
     userProblem.updateUserProblemStatus(UserProblemStatus.SOLVED);
-    updateResponse(response, place, coin, user.getUserProfile().getCoin());
+    updateResponse(response, place, coin, user.getCoin());
   }
 
   private void updateResponse(

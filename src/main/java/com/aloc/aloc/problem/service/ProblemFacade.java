@@ -101,7 +101,6 @@ public class ProblemFacade implements UserProblemRecordLoader {
       for (Problem problem : problems) {
         boolean isSolved = problemSolvingService.updateUserAndSaveSolvedProblem(user, problem);
         if (isSolved) {
-          System.out.println("문제를 풀었어요" + problem.getId() + " " + user.getGithubId());
           user.addSolvedCount();
           userService.checkUserRank(user);
           userService.saveUser(user);
@@ -118,7 +117,6 @@ public class ProblemFacade implements UserProblemRecordLoader {
     TodayProblemSolvedResponseDto response =
         problemSolvingService.updateTodaySolvedProblem(user, todayProblem);
     if (response.getSolvedStatus().equals(ProblemStatus.SOLVED)) {
-      System.out.println("오늘의 문제를 풀었어요" + user.getGithubId());
       user.addSolvedCount();
       userService.checkUserRank(user);
       userService.saveUser(user);

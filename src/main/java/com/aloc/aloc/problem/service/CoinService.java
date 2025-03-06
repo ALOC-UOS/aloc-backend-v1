@@ -106,7 +106,7 @@ public class CoinService {
   }
 
   private void addCoinsToUser(User user, int coin, CoinType coinType, String description) {
-    user.getUserProfile().addCoin(coin);
+    user.addCoin(coin);
     userService.saveUser(user);
     coinHistoryService.addCoinHistory(user, coin, coinType, description);
   }

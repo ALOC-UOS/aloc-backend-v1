@@ -18,13 +18,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   private final UserRepository userRepository;
 
   @Override
-  public UserDetails loadUserByUsername(String githubId) throws UsernameNotFoundException {
+  public UserDetails loadUserByUsername(String oauthId) throws UsernameNotFoundException {
     User user =
         userRepository
-            .findByGithubId(githubId)
+            .findByOauthId(oauthId)
             .orElseThrow(() -> new UsernameNotFoundException("사용자 정보가 없습니다."));
     GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(user.getAuthority().toString());
     return new org.springframework.security.core.userdetails.User(
-        user.getGithubId(), user.getPassword(), Collections.singleton(grantedAuthority));
+        user.getOauthId(), "", Collections.singleton(grantedAuthority));
   }
 }

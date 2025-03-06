@@ -12,19 +12,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
 
-  Optional<User> findByGithubId(String githubId);
-
   Optional<User> findByRefreshToken(String refreshToken);
 
   Optional<User> findByOauthId(String oauthId);
 
   List<User> findAllByAuthorityIn(Set<Authority> authorities);
 
-  boolean existsByGithubId(String username);
-
-  boolean existsByBaekjoonId(String username);
-
-  void deleteByGithubId(String githubId);
+  void deleteByOauthId(String oauthId);
 
   List<User> findAllByAuthorityInAndCourse(Set<Authority> activeAuthorities, Course course);
 }

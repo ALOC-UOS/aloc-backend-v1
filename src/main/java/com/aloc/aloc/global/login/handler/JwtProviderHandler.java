@@ -25,17 +25,17 @@ public class JwtProviderHandler extends SimpleUrlAuthenticationSuccessHandler {
   public void onAuthenticationSuccess(
       HttpServletRequest request, HttpServletResponse response, Authentication authentication)
       throws IOException {
-    String githubId = extractGithubId(authentication);
-    String accessToken = jwtService.createAccessToken(githubId);
+    String oauthId = extractOauthId(authentication);
+    String accessToken = jwtService.createAccessToken(oauthId);
     String refreshToken = jwtService.createRefreshToken();
-    jwtService.updateRefreshToken(githubId, refreshToken);
+    jwtService.updateRefreshToken(oauthId, refreshToken);
     jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
     userRepository
-        .findByGithubId(githubId)
+        .findByOauthId(oauthId)
         .ifPresentOrElse(
             user -> user.updateRefreshToken(refreshToken),
-            () -> log.error("로그인 성공. JWT 발급. DB에 사용자 정보 없음. githubId: {}", githubId));
-    log.info("로그인에 성공합니다. githubId: {}", githubId);
+            () -> log.error("로그인 성공. JWT 발급. DB에 사용자 정보 없음. githubId: {}", oauthId));
+    log.info("로그인에 성공합니다. githubId: {}", oauthId);
     log.info("AccessToken 을 발급합니다. AccessToken: {}", accessToken.substring(0, 10) + "...");
     log.info("RefreshToken 을 발급합니다. RefreshToken: {}", refreshToken.substring(0, 10) + "...");
 
@@ -54,7 +54,7 @@ public class JwtProviderHandler extends SimpleUrlAuthenticationSuccessHandler {
     //		response.getWriter().write("success");
   }
 
-  private String extractGithubId(Authentication authentication) {
+  private String extractOauthId(Authentication authentication) {
     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
     return userDetails.getUsername();
   }

@@ -32,7 +32,7 @@ public class CoinHistoryService {
     List<CoinHistory> coinHistories =
         coinHistoryRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId());
     return CoinHistoryResponseDto.builder()
-        .userCoin(user.getUserProfile().getCoin())
+        .userCoin(user.getCoin())
         .histories(CoinHistoryContentDto.listOf(coinHistories))
         .build();
   }

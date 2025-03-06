@@ -58,6 +58,6 @@ public class HistoryService {
 
   public void addHistory(User user, String icon, Integer rank) {
     historyRepository.save(
-        History.builder().user(user).username(user.getUsername()).icon(icon).rank(rank).build());
+        History.builder().user(user).username(user.getName()).icon(icon).rank(rank).build());
   }
 }

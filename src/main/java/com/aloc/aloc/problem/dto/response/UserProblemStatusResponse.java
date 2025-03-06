@@ -29,8 +29,7 @@ public class UserProblemStatusResponse {
   public static UserProblemStatusResponse of(
       User user, Integer unsolvedCount, Boolean todaySolved) {
     return UserProblemStatusResponse.builder()
-        .username(user.getUsername())
-        .githubId(user.getGithubId())
+        .username(user.getName())
         .solvedCount(user.getSolvedCount())
         .unsolvedCount(unsolvedCount)
         .todaySolved(todaySolved)

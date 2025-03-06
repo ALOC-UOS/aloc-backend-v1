@@ -17,17 +17,11 @@ public class UserResponseDto {
   @Schema(description = "유저 이름", example = "김철수")
   private String username;
 
-  @Schema(description = "깃허브 ID", example = "githubId")
-  private String githubId;
-
   @Schema(description = "백준 ID", example = "baekjoonId")
   private String baekjoonId;
 
   @Schema(description = "프로필 색상", example = "blue")
   private String profileColor;
-
-  @Schema(description = "학번", example = "20")
-  private String studentId;
 
   @Schema(description = "유저 권한", example = "ROLE_USER")
   private Authority authority;
@@ -41,21 +35,19 @@ public class UserResponseDto {
   @Schema(description = "코스", example = "FULL")
   private Course course;
 
-  @Schema(description = "프로필 이미지 파일 이름", example = "profile.jpg")
-  private String profileImageFileName;
+  @Schema(description = "프로필 이미지 주소", example = "https://...")
+  private String profileImageUrl;
 
   public static UserResponseDto of(User user) {
     return UserResponseDto.builder()
-        .username(user.getUsername())
+        .username(user.getName())
         .authority(user.getAuthority())
-        .githubId(user.getGithubId())
         .baekjoonId(user.getBaekjoonId())
-        .profileColor(user.getUserProfile().getProfileColor())
-        .studentId(user.getUserProfile().getStudentId().substring(2, 4))
+        .profileColor(user.getProfileColor())
         .rank(user.getRank())
-        .coin(user.getUserProfile().getCoin())
+        .coin(user.getCoin())
         .course(user.getCourse())
-        .profileImageFileName(user.getUserProfile().getProfileImageFileName())
+        .profileImageUrl(user.getProfileImageUrl())
         .build();
   }
 }

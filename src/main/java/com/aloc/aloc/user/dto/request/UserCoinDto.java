@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 public class UserCoinDto {
-  @Schema(description = "유저 githubId", example = "githubId")
-  private String githubId;
+  @Schema(description = "유저 oauthId", example = "oauthId")
+  private String oauthId;
 
   @Schema(description = "추가/제거하려는 코인 값", example = "100")
   private int coin;

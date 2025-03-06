@@ -43,19 +43,19 @@ public class ColorService {
     return colorList.get(random.nextInt(colorList.size())).getId();
   }
 
-  public ColorResponseDto changeColor(String githubId) {
-    User user = userRepository.findByGithubId(githubId).orElseThrow();
-    if (user.getUserProfile().getCoin() < COLOR_CHANGE_MONEY) {
+  public ColorResponseDto changeColor(String oauthId) {
+    User user = userRepository.findByOauthId(oauthId).orElseThrow();
+    if (user.getCoin() < COLOR_CHANGE_MONEY) {
       throw new IllegalArgumentException("코인이 부족합니다.");
     }
-    user.getUserProfile().setCoin(user.getUserProfile().getCoin() - COLOR_CHANGE_MONEY);
+    user.setCoin(user.getCoin() - COLOR_CHANGE_MONEY);
 
     String colorName = pickColor();
-    user.getUserProfile().setProfileColor(colorName);
+    user.setProfileColor(colorName);
     Color color = colorRepository.findById(colorName).orElseThrow();
 
     userRepository.save(user);
     coinHistoryService.addCoinHistory(user, -COLOR_CHANGE_MONEY, CoinType.BUY_COLOR, "컬러 변경권 구매");
-    return new ColorResponseDto(user.getUserProfile().getCoin(), color.getId(), color.getColor1());
+    return new ColorResponseDto(user.getCoin(), color.getId(), color.getColor1());
   }
 }

@@ -3,7 +3,7 @@ services:
   postgres:
     image: postgres:latest
     environment:
-      - POSTGRES_DB=aloc
+      - POSTGRES_DB=openaloc
       - POSTGRES_PASSWORD=password
       - POSTGRES_USER=postgres
     ports:
