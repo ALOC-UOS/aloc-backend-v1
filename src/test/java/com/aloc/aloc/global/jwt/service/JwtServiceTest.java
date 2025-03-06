@@ -44,9 +44,6 @@ public class JwtServiceTest {
 
   @BeforeEach
   public void init() {
-    userRepository.deleteAll(); // ✅ 테스트 실행 전 기존 데이터 삭제
-    em.flush();
-    em.clear();
     User user =
         User.builder()
             .username("홍길동")

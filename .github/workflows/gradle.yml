@@ -40,9 +40,6 @@ jobs:
         echo "${{ secrets.OAUTH_APPLICATION }}" base64 -d > application-oauth.yml
         echo "${{ secrets.TEST_APPLICATION }}" base64 -d > application-test.yml
 
-    - name: Use H2 for Testing (Disable prod)
-      run: echo "SPRING_PROFILES_ACTIVE=test" >> $GITHUB_ENV
-
     - name: Run Tests with Gradle
       run: ./gradlew test
 
