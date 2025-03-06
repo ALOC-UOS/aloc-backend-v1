@@ -59,7 +59,11 @@ class HistoryServiceTest {
             "userDiscord",
             1,
             "userNotion",
-            Course.FULL);
+            Course.FULL,
+            "oauthId",
+            "userId",
+            "nickname",
+            "profileImageUrl");
   }
 
   @Test

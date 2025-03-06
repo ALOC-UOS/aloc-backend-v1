@@ -16,6 +16,8 @@ public interface UserRepository extends JpaRepository<User, String> {
 
   Optional<User> findByRefreshToken(String refreshToken);
 
+  Optional<User> findByOauthId(String oauthId);
+
   List<User> findAllByAuthorityIn(Set<Authority> authorities);
 
   boolean existsByGithubId(String username);

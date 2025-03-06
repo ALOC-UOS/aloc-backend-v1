@@ -76,8 +76,7 @@ dependencies {
     //swagger
 //    implementation 'org.springdoc:springdoc-openapi-ui:1.8.0'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
-    implementation 'org.flywaydb:flyway-core' //    implementation "org.flywaydb:flyway-database-postgresql"
-    implementation 'org.flywaydb:flyway-database-postgresql'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 }
 
 tasks.named('test') {
@@ -91,14 +90,3 @@ tasks.named('build') {
 
 compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
-
-flyway {
-    driver = 'org.postgresql.Driver'
-    url = 'jdbc:postgresql://localhost:5432/aloc'
-    user = 'postgres'
-    password = 'password'
-    schemas = ['public']
-    table = 'schema_history'
-    baselineVersion = 1
-    locations = ['classpath:db/migration']
-}

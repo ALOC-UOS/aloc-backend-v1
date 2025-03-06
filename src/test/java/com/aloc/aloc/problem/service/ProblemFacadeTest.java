@@ -66,7 +66,11 @@ public class ProblemFacadeTest {
             "discord",
             15,
             "notion",
-            Course.FULL);
+            Course.FULL,
+            "oauthId",
+            "userId",
+            "nickname",
+            "profileImageUrl");
     user1.setId(1L);
     user1.setAuthority(Authority.ROLE_USER);
     User user2 =
@@ -79,7 +83,11 @@ public class ProblemFacadeTest {
             "discord",
             15,
             "notion",
-            Course.FULL);
+            Course.FULL,
+            "oauthId",
+            "userId",
+            "nickname",
+            "profileImageUrl");
     user2.setId(2L);
 
     // Set up Algorithms
