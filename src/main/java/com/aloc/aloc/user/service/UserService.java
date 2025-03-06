@@ -1,7 +1,5 @@
 package com.aloc.aloc.user.service;
 
-import com.aloc.aloc.alocrequest.repository.AlocRequestRepository;
-import com.aloc.aloc.coinhistory.service.CoinHistoryService;
 import com.aloc.aloc.history.service.HistoryService;
 import com.aloc.aloc.problemtype.enums.Course;
 import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
@@ -12,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,9 +21,6 @@ public class UserService {
   private final UserRepository userRepository;
   private final HistoryService historyService;
   private final BaekjoonRankScrapingService baekjoonRankScrapingService;
-  private final AlocRequestRepository alocRequestRepository;
-  private final BCryptPasswordEncoder passwordEncoder;
-  private final CoinHistoryService coinHistoryService;
 
   public void checkAdmin(String oauthId) {
     Optional<User> userOptional = userRepository.findByOauthId(oauthId);
