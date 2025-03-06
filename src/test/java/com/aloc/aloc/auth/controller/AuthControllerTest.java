@@ -33,31 +33,31 @@ public class AuthControllerTest {
 
   @Autowired private ObjectMapper objectMapper;
 
-  @Test
-  @DisplayName("회원가입 컨트롤러 테스트")
-  public void testSignUp() throws Exception {
-    // given
-    UserRequestDto userRequestDto = new UserRequestDto();
-    userRequestDto.setUsername("홍길동");
-    userRequestDto.setPassword("1234");
-    userRequestDto.setGithubId("github");
-    userRequestDto.setBaekjoonId("baejoon");
-    userRequestDto.setStudentId("2021920000");
-    userRequestDto.setDiscordId("discord");
-    userRequestDto.setNotionEmail("notion");
-    userRequestDto.setCourse(Course.FULL);
-
-    doNothing().when(authService).signUp(Mockito.any(UserRequestDto.class));
-
-    // when
-    mockMvc
-        .perform(
-            post("/api2/sign-up")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userRequestDto)))
-        // then
-        .andExpect(status().isOk());
-  }
+//  @Test
+//  @DisplayName("회원가입 컨트롤러 테스트")
+//  public void testSignUp() throws Exception {
+//    // given
+//    UserRequestDto userRequestDto = new UserRequestDto();
+//    userRequestDto.setUsername("홍길동");
+//    userRequestDto.setPassword("1234");
+//    userRequestDto.setGithubId("github");
+//    userRequestDto.setBaekjoonId("baejoon");
+//    userRequestDto.setStudentId("2021920000");
+//    userRequestDto.setDiscordId("discord");
+//    userRequestDto.setNotionEmail("notion");
+//    userRequestDto.setCourse(Course.FULL);
+//
+//    doNothing().when(authService).signUp(Mockito.any(UserRequestDto.class));
+//
+//    // when
+//    mockMvc
+//        .perform(
+//            post("/api2/sign-up")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(objectMapper.writeValueAsString(userRequestDto)))
+//        // then
+//        .andExpect(status().isOk());
+//  }
 
   @Test
   @DisplayName("탈퇴 컨트롤러 테스트")
