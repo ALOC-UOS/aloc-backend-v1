@@ -41,6 +41,7 @@ jobs:
         mkdir -p ./src/main/resources
         cd ./src/main/resources
         echo -n "${{ secrets.APPLICATION }}" base64 -d > application.yml
+        echo -n "${{ secrets.OAUTH_APPLICATION }}" base64 -d > application-oauth.yml
         echo -n "${{ secrets.JWT_APPLICATION }}" base64 -d > application-jwt.yml
         echo -n "${{ secrets.TEST_APPLICATION }}" base64 -d > application-test.yml
 
