@@ -1,17 +1,17 @@
-//package com.aloc.aloc.notion.service;
+// package com.aloc.aloc.notion.service;
 //
-//import static org.junit.jupiter.api.Assertions.*;
+// import static org.junit.jupiter.api.Assertions.*;
 //
-//import com.aloc.aloc.notion.NotionProperty;
-//import com.aloc.aloc.notion.dto.response.StudyScheduleResponseDto;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.test.context.ActiveProfiles;
+// import com.aloc.aloc.notion.NotionProperty;
+// import com.aloc.aloc.notion.dto.response.StudyScheduleResponseDto;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.test.context.ActiveProfiles;
 //
-//@SpringBootTest
-//@ActiveProfiles("test")
-//public class NotionServiceIntegrationTest {
+// @SpringBootTest
+// @ActiveProfiles("test")
+// public class NotionServiceIntegrationTest {
 //  @Autowired private NotionService notionService;
 //  @Autowired private NotionProperty notionProperty;
 //
@@ -23,4 +23,4 @@
 //    assertNotNull(response.getDate());
 //    assertNotNull(response.getLocation());
 //  }
-//}
+// }

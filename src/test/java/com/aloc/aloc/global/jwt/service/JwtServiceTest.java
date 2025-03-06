@@ -1,30 +1,30 @@
-//package com.aloc.aloc.global.jwt.service;
+// package com.aloc.aloc.global.jwt.service;
 //
-//import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
-//import static org.assertj.core.api.Assertions.assertThat;
-//import static org.junit.jupiter.api.Assertions.assertThrows;
+// import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
+// import static org.assertj.core.api.Assertions.assertThat;
+// import static org.junit.jupiter.api.Assertions.assertThrows;
 //
-//import com.aloc.aloc.user.entity.User;
-//import com.aloc.aloc.user.repository.UserRepository;
-//import com.auth0.jwt.JWT;
-//import com.auth0.jwt.interfaces.DecodedJWT;
-//import jakarta.persistence.EntityManager;
-//import jakarta.servlet.http.Cookie;
-//import jakarta.servlet.http.HttpServletRequest;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.beans.factory.annotation.Value;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.mock.web.MockHttpServletRequest;
-//import org.springframework.mock.web.MockHttpServletResponse;
-//import org.springframework.test.context.ActiveProfiles;
-//import org.springframework.transaction.annotation.Transactional;
+// import com.aloc.aloc.user.entity.User;
+// import com.aloc.aloc.user.repository.UserRepository;
+// import com.auth0.jwt.JWT;
+// import com.auth0.jwt.interfaces.DecodedJWT;
+// import jakarta.persistence.EntityManager;
+// import jakarta.servlet.http.Cookie;
+// import jakarta.servlet.http.HttpServletRequest;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.beans.factory.annotation.Value;
+// import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.mock.web.MockHttpServletRequest;
+// import org.springframework.mock.web.MockHttpServletResponse;
+// import org.springframework.test.context.ActiveProfiles;
+// import org.springframework.transaction.annotation.Transactional;
 //
-//@SpringBootTest
-//@Transactional
-//@ActiveProfiles("test")
-//public class JwtServiceTest {
+// @SpringBootTest
+// @Transactional
+// @ActiveProfiles("test")
+// public class JwtServiceTest {
 //  @Autowired JwtService jwtService;
 //  @Autowired UserRepository userRepository;
 //  @Autowired EntityManager em;
@@ -144,7 +144,8 @@
 //
 //    // when
 //    String extractOauthId =
-//        jwtService.extractOauthId(requestAccessToken).orElseThrow(() -> new Exception("토큰이 없습니다"));
+//        jwtService.extractOauthId(requestAccessToken).orElseThrow(() -> new Exception("토큰이
+// 없습니다"));
 //
 //    // then
 //    assertThat(extractOauthId).isEqualTo(oauthId);
@@ -171,7 +172,8 @@
 //
 //    // ✅ Refresh Token을 쿠키에서 가져오기
 //    Cookie refreshTokenCookie = mockHttpServletResponse.getCookie("refreshToken");
-//    String cookieRefreshToken = (refreshTokenCookie != null) ? refreshTokenCookie.getValue() : null;
+//    String cookieRefreshToken = (refreshTokenCookie != null) ? refreshTokenCookie.getValue() :
+// null;
 //
 //    MockHttpServletRequest httpServletRequest = new MockHttpServletRequest();
 //    httpServletRequest.addHeader(accessHeader, BEARER + headerAccessToken);
@@ -184,4 +186,4 @@
 //
 //    return httpServletRequest;
 //  }
-//}
+// }

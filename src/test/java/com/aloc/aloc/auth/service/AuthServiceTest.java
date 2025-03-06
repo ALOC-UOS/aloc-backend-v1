@@ -1,29 +1,29 @@
-//package com.aloc.aloc.auth.service;
+// package com.aloc.aloc.auth.service;
 //
-//import static org.junit.jupiter.api.Assertions.assertThrows;
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.Mockito.*;
+// import static org.junit.jupiter.api.Assertions.assertThrows;
+// import static org.mockito.ArgumentMatchers.any;
+// import static org.mockito.Mockito.*;
 //
-//import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
-//import com.aloc.aloc.user.dto.request.UserRequestDto;
-//import com.aloc.aloc.user.entity.User;
-//import com.aloc.aloc.user.repository.UserRepository;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.boot.test.mock.mockito.MockBean;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-//import org.springframework.test.context.ActiveProfiles;
-//import org.springframework.test.context.junit.jupiter.SpringExtension;
-//import org.springframework.transaction.annotation.Transactional;
+// import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
+// import com.aloc.aloc.user.dto.request.UserRequestDto;
+// import com.aloc.aloc.user.entity.User;
+// import com.aloc.aloc.user.repository.UserRepository;
+// import org.junit.jupiter.api.DisplayName;
+// import org.junit.jupiter.api.Test;
+// import org.junit.jupiter.api.extension.ExtendWith;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.boot.test.mock.mockito.MockBean;
+// import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+// import org.springframework.test.context.ActiveProfiles;
+// import org.springframework.test.context.junit.jupiter.SpringExtension;
+// import org.springframework.transaction.annotation.Transactional;
 //
-//@SpringBootTest
-//@Transactional
-//@ExtendWith(SpringExtension.class)
-//@ActiveProfiles("test")
-//public class AuthServiceTest {
+// @SpringBootTest
+// @Transactional
+// @ExtendWith(SpringExtension.class)
+// @ActiveProfiles("test")
+// public class AuthServiceTest {
 //
 //  @Autowired private AuthService authService;
 //
@@ -120,4 +120,4 @@
 //    // then
 //    verify(userRepository, times(1)).deleteByGithubId(githubId);
 //  }
-//}
+// }

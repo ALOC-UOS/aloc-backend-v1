@@ -1,31 +1,31 @@
-//package com.aloc.aloc.auth.controller;
+// package com.aloc.aloc.auth.controller;
 //
-//import static org.mockito.Mockito.doNothing;
-//import static org.mockito.Mockito.verify;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+// import static org.mockito.Mockito.doNothing;
+// import static org.mockito.Mockito.verify;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 //
-//import com.aloc.aloc.auth.service.AuthService;
-//import com.aloc.aloc.problemtype.enums.Course;
-//import com.aloc.aloc.user.dto.request.UserRequestDto;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.mockito.Mockito;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.boot.test.mock.mockito.MockBean;
-//import org.springframework.http.MediaType;
-//import org.springframework.security.test.context.support.WithMockUser;
-//import org.springframework.test.context.ActiveProfiles;
-//import org.springframework.test.web.servlet.MockMvc;
+// import com.aloc.aloc.auth.service.AuthService;
+// import com.aloc.aloc.problemtype.enums.Course;
+// import com.aloc.aloc.user.dto.request.UserRequestDto;
+// import com.fasterxml.jackson.databind.ObjectMapper;
+// import org.junit.jupiter.api.DisplayName;
+// import org.junit.jupiter.api.Test;
+// import org.mockito.Mockito;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+// import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.boot.test.mock.mockito.MockBean;
+// import org.springframework.http.MediaType;
+// import org.springframework.security.test.context.support.WithMockUser;
+// import org.springframework.test.context.ActiveProfiles;
+// import org.springframework.test.web.servlet.MockMvc;
 //
-//@SpringBootTest
-//@AutoConfigureMockMvc
-//@ActiveProfiles("test")
-//public class AuthControllerTest {
+// @SpringBootTest
+// @AutoConfigureMockMvc
+// @ActiveProfiles("test")
+// public class AuthControllerTest {
 //
 //  @Autowired private MockMvc mockMvc;
 //
@@ -67,4 +67,4 @@
 //
 //    verify(authService).withdraw("testuser");
 //  }
-//}
+// }
