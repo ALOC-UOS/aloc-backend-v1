@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api2/algorithm")
+@RequestMapping("/api/algorithm")
 @Tag(name = "Algorithm API", description = "Algorithm API 입니다.")
 public class AlgorithmController {
 

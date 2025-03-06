@@ -74,4 +74,9 @@ public class UserService {
     isActiveUser(user);
     return user;
   }
+
+  @Transactional
+  public void withdraw(String oauthId) {
+    userRepository.deleteByOauthId(oauthId);
+  }
 }
