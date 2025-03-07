@@ -1,20 +1,8 @@
 package com.aloc.aloc.problem.entity;
 
-import com.aloc.aloc.algorithm.entity.Algorithm;
+import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.global.domain.AuditingTimeEntity;
-import com.aloc.aloc.problemtag.ProblemTag;
-import com.aloc.aloc.problemtype.ProblemType;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinColumns;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -37,42 +25,22 @@ public class Problem extends AuditingTimeEntity {
   private String title;
 
   @Column(nullable = false)
-  private Integer difficulty;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumns({
-    @JoinColumn(name = "algorithm_id", referencedColumnName = "algorithmId"),
-    @JoinColumn(name = "algorithm_season", referencedColumnName = "season")
-  })
-  private Algorithm algorithm;
-
-  private Boolean hidden = true;
+  private Integer rank;
 
   private Integer problemId;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "problem_type_id")
-  private ProblemType problemType;
-
   @OneToMany(mappedBy = "problem", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<ProblemTag> problemTagList = new ArrayList<>();
+  private List<ProblemAlgorithm> problemAlgorithmList = new ArrayList<>();
 
   @Builder
-  public Problem(
-      String title,
-      Integer difficulty,
-      Algorithm algorithm,
-      Integer problemId,
-      ProblemType problemType) {
+  public Problem(String title, Integer rank, Integer problemId, Course course) {
     this.title = title;
-    this.difficulty = difficulty;
-    this.algorithm = algorithm;
+    this.rank = rank;
     this.problemId = problemId;
-    this.problemType = problemType;
-    this.problemTagList = new ArrayList<>();
+    this.problemAlgorithmList = new ArrayList<>();
   }
 
-  public void addProblemTag(ProblemTag problemTag) {
-    problemTagList.add(problemTag);
+  public void addAllProblemAlgorithms(List<ProblemAlgorithm> problemAlgorithms) {
+    this.problemAlgorithmList.addAll(problemAlgorithms);
   }
 }

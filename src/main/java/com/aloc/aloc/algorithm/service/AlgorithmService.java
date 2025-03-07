@@ -1,87 +1,48 @@
 package com.aloc.aloc.algorithm.service;
 
-import com.aloc.aloc.algorithm.dto.response.AlgorithmDto;
-import com.aloc.aloc.algorithm.dto.response.AlgorithmResponseDto;
 import com.aloc.aloc.algorithm.entity.Algorithm;
 import com.aloc.aloc.algorithm.repository.AlgorithmRepository;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.aloc.aloc.scraper.AlgorithmScrapingService;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class AlgorithmService {
 
   private final AlgorithmRepository algorithmRepository;
+  private final AlgorithmScrapingService algorithmScrapingService;
 
-  @Value("${app.season}")
-  private int currentSeason;
-
-  public List<AlgorithmResponseDto> getAlgorithms() {
-    List<Algorithm> algorithms = algorithmRepository.findAllByHiddenIsFalseOrderByWeekDesc();
-    // 시즌별로 그룹화
-    Map<Integer, List<AlgorithmDto>> groupedBySeason =
-        algorithms.stream()
-            .collect(
-                Collectors.groupingBy(
-                    Algorithm::getSeason,
-                    Collectors.mapping(
-                        algorithm ->
-                            AlgorithmDto.builder()
-                                .week(algorithm.getWeek())
-                                .algorithmId(algorithm.getAlgorithmId())
-                                .name(algorithm.getName())
-                                .build(),
-                        Collectors.toList())));
-
-    // 그룹화된 결과를 AlgorithmResponseDto 리스트로 변환
-    return groupedBySeason.entrySet().stream()
-        .map(
-            entry ->
-                AlgorithmResponseDto.builder()
-                    .season(entry.getKey())
-                    .algorithms(entry.getValue())
-                    .build())
-        .collect(Collectors.toList());
+  @Transactional
+  public String createAlgorithms() {
+    algorithmRepository.saveAll(algorithmScrapingService.scrapAlgorithms());
+    return "알고리즘 스크래핑 완료";
   }
 
-  public AlgorithmResponseDto getAlgorithmsBySeason(int season) {
-    List<Algorithm> algorithms =
-        algorithmRepository.findAllBySeasonAndHiddenFalseOrderByWeekDesc(season);
-    return AlgorithmResponseDto.builder()
-        .season(season)
-        .algorithms(AlgorithmDto.listOf(algorithms))
-        .build();
+  public List<Algorithm> getAlgorithmsByIds(List<Integer> algorithmIdList) {
+    List<Algorithm> algorithms = new ArrayList<>();
+    for (Integer algorithmId : algorithmIdList) {
+      algorithms.add(
+          algorithmRepository
+              .findByAlgorithmId(algorithmId)
+              .orElseThrow(() -> new NoSuchElementException("존재하지 않은 알고리즘 아이디가 포함되어 있습니다.")));
+    }
+    return algorithms;
   }
 
-  public Optional<Algorithm> getWeeklyAlgorithmBySeason(int season) {
-    return algorithmRepository.findFirstBySeasonAndHiddenTrueOrderByWeekAsc(season);
-  }
-
-  public void saveAlgorithm(Algorithm algorithm) {
-    algorithmRepository.save(algorithm);
-  }
-
-  public Algorithm findWeeklyAlgorithm() {
+  public Algorithm getOrCreateAlgorithm(
+      Integer algorithmId, String koreanName, String englishName) {
     return algorithmRepository
-        .findFirstBySeasonAndHiddenTrueOrderByWeekAsc(currentSeason)
-        .orElseThrow(() -> new NoSuchElementException("해당 시즌의 공개되지 않은 알고리즘이 존재하지 않습니다."));
-  }
-
-  public Algorithm findDailyAlgorithm() {
-    return algorithmRepository
-        .findFirstBySeasonAndHiddenFalseOrderByWeekDesc(currentSeason)
-        .orElseThrow(() -> new NoSuchElementException("공개된 알고리즘이 존재하지 않습니다."));
-  }
-
-  public Algorithm getAlgorithmByName(String algorithmName) {
-    return algorithmRepository
-        .findAlgorithmByNameAndSeason(algorithmName, currentSeason)
-        .orElseThrow(() -> new NoSuchElementException("해당 알고리즘이 존재하지 않습니다."));
+        .findByAlgorithmId(algorithmId)
+        .orElseGet(
+            () ->
+                algorithmRepository.save(
+                    Algorithm.builder()
+                        .algorithmId(algorithmId)
+                        .koreanName(koreanName)
+                        .englishName(englishName)
+                        .build()));
   }
 }

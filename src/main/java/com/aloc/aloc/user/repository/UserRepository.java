@@ -1,6 +1,5 @@
 package com.aloc.aloc.user.repository;
 
-import com.aloc.aloc.problemtype.enums.Course;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import java.util.List;
@@ -19,6 +18,4 @@ public interface UserRepository extends JpaRepository<User, String> {
   List<User> findAllByAuthorityIn(Set<Authority> authorities);
 
   void deleteByOauthId(String oauthId);
-
-  List<User> findAllByAuthorityInAndCourse(Set<Authority> activeAuthorities, Course course);
 }

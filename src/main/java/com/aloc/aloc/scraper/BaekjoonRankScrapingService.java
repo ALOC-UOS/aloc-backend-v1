@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class BaekjoonRankScrapingService {
-
-  private static final int DEFAULT_RANK = 15;
   private static final String BAEKJOON_API_URL = "https://solved.ac/api/v3/user/show?handle=";
 
   private static final String HEADER_FIELD_NAME = "User-Agent";

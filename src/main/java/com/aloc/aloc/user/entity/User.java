@@ -1,16 +1,9 @@
 package com.aloc.aloc.user.entity;
 
+import com.aloc.aloc.color.Color;
 import com.aloc.aloc.global.domain.AuditingTimeEntity;
-import com.aloc.aloc.problemtype.enums.Course;
 import com.aloc.aloc.user.enums.Authority;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,16 +29,14 @@ public class User extends AuditingTimeEntity {
   private String profileImageUrl; // image
   private Integer coin;
 
-  @Column(nullable = false)
-  private String profileColor;
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "color_id")
+  private Color color;
 
   @Column(nullable = false)
   private String baekjoonId;
 
   private Integer rank;
-
-  @Enumerated(EnumType.STRING)
-  private Course course;
 
   @Enumerated(EnumType.STRING)
   private Authority authority;
@@ -71,13 +62,11 @@ public class User extends AuditingTimeEntity {
   public User(
       String baekjoonId,
       Integer rank,
-      Course course,
       String oauthId,
       String name,
       String email,
       String profileImageUrl) {
     this.baekjoonId = baekjoonId;
-    this.course = course;
     this.authority = Authority.ROLE_GUEST;
     this.rank = rank;
     this.oauthId = oauthId;

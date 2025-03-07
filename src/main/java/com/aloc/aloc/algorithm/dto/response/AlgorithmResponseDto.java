@@ -1,17 +1,19 @@
 package com.aloc.aloc.algorithm.dto.response;
 
-import java.util.List;
+import com.aloc.aloc.algorithm.entity.Algorithm;
 import lombok.Builder;
-import lombok.Data;
 
-@Data
+@Builder
 public class AlgorithmResponseDto {
-  private Integer season;
-  private List<AlgorithmDto> algorithms;
+  private Long id;
+  private int algorithmId;
+  private String name;
 
-  @Builder
-  public AlgorithmResponseDto(Integer season, List<AlgorithmDto> algorithms) {
-    this.season = season;
-    this.algorithms = algorithms;
+  public static AlgorithmResponseDto of(Algorithm algorithm) {
+    return AlgorithmResponseDto.builder()
+        .id(algorithm.getId())
+        .algorithmId(algorithm.getAlgorithmId())
+        .name(algorithm.getKoreanName())
+        .build();
   }
 }

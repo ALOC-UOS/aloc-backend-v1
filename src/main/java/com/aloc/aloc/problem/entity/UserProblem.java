@@ -1,5 +1,6 @@
 package com.aloc.aloc.problem.entity;
 
+import com.aloc.aloc.course.entity.UserCourse;
 import com.aloc.aloc.problem.enums.UserProblemStatus;
 import com.aloc.aloc.user.entity.User;
 import jakarta.persistence.*;
@@ -27,7 +28,9 @@ public class UserProblem {
   @JoinColumn(name = "problem_id")
   private Problem problem;
 
-  private Integer season;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_course_id")
+  private UserCourse userCourse;
 
   @Enumerated(EnumType.STRING)
   private UserProblemStatus userProblemStatus;

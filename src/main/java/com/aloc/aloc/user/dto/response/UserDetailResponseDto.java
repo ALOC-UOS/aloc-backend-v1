@@ -12,12 +12,6 @@ public class UserDetailResponseDto extends UserResponseDto {
   @Schema(description = "해결한 문제 수", example = "3")
   private final Integer solvedCount;
 
-  @Schema(description = "해결하지 못한 문제 수", example = "2")
-  private final Integer unsolvedCount;
-
-  @Schema(description = "오늘의 daily 문제 해결 여부", example = "true")
-  private final Boolean todaySolved;
-
   @Schema(description = "색상 분류", example = "special")
   private final String colorCategory;
 
@@ -44,8 +38,6 @@ public class UserDetailResponseDto extends UserResponseDto {
 
   public static UserDetailResponseDto of(
       User user,
-      Integer unsolvedCount,
-      Boolean todaySolved,
       String colorCategory,
       String color1,
       String color2,
@@ -57,14 +49,10 @@ public class UserDetailResponseDto extends UserResponseDto {
         .username(user.getName())
         .authority(user.getAuthority())
         .baekjoonId(user.getBaekjoonId())
-        .profileColor(user.getProfileColor())
-        .course(user.getCourse())
         .rank(user.getRank())
         .coin(user.getCoin())
         .profileImageUrl(user.getProfileImageUrl())
         .solvedCount(user.getSolvedCount())
-        .unsolvedCount(unsolvedCount)
-        .todaySolved(todaySolved)
         .colorCategory(colorCategory)
         .color1(color1)
         .color2(color2)

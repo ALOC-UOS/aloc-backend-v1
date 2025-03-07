@@ -1,6 +1,5 @@
 package com.aloc.aloc.user.dto.response;
 
-import com.aloc.aloc.problemtype.enums.Course;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,9 +31,6 @@ public class UserResponseDto {
   @Schema(description = "코인", example = "100")
   private Integer coin;
 
-  @Schema(description = "코스", example = "FULL")
-  private Course course;
-
   @Schema(description = "프로필 이미지 주소", example = "https://...")
   private String profileImageUrl;
 
@@ -43,10 +39,9 @@ public class UserResponseDto {
         .username(user.getName())
         .authority(user.getAuthority())
         .baekjoonId(user.getBaekjoonId())
-        .profileColor(user.getProfileColor())
+        .profileColor(user.getColor().getCategory())
         .rank(user.getRank())
         .coin(user.getCoin())
-        .course(user.getCourse())
         .profileImageUrl(user.getProfileImageUrl())
         .build();
   }

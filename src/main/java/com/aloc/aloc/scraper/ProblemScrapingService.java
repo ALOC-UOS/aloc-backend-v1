@@ -1,16 +1,15 @@
 package com.aloc.aloc.scraper;
 
 import com.aloc.aloc.algorithm.entity.Algorithm;
-import com.aloc.aloc.algorithm.enums.CourseRoutineTier;
-import com.aloc.aloc.global.apipayload.exception.ScrapException;
+import com.aloc.aloc.algorithm.service.AlgorithmService;
+import com.aloc.aloc.course.dto.request.CourseRequestDto;
+import com.aloc.aloc.course.entity.Course;
+import com.aloc.aloc.course.entity.CourseProblem;
+import com.aloc.aloc.course.repository.CourseProblemRepository;
 import com.aloc.aloc.problem.entity.Problem;
+import com.aloc.aloc.problem.entity.ProblemAlgorithm;
+import com.aloc.aloc.problem.repository.ProblemAlgorithmRepository;
 import com.aloc.aloc.problem.service.ProblemService;
-import com.aloc.aloc.problemtag.ProblemTag;
-import com.aloc.aloc.problemtag.repository.ProblemTagRepository;
-import com.aloc.aloc.problemtype.ProblemType;
-import com.aloc.aloc.problemtype.repository.ProblemTypeRepository;
-import com.aloc.aloc.tag.Tag;
-import com.aloc.aloc.tag.repository.TagRepository;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -20,21 +19,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,158 +40,159 @@ public class ProblemScrapingService {
           + "(KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3";
   private static final int RUBY_1 = 30;
 
-  @Value("${app.season}")
-  private int currentSeason;
-
-  private final TagRepository tagRepository;
   private final ProblemService problemService;
-  private final ProblemTypeRepository problemTypeRepository;
-  private final ProblemTagRepository problemTagRepository;
+  private final AlgorithmService algorithmService;
+  private final ProblemAlgorithmRepository problemAlgorithmRepository;
+  private final CourseProblemRepository courseProblemRepository;
 
   @Transactional
-  public String addProblemsForStrategy(ProblemAdditionStrategy strategy) throws IOException {
-    Algorithm algorithm = strategy.getAlgorithm();
-    Map<CourseRoutineTier, List<Problem>> crawledProblems = new LinkedHashMap<>();
-    for (CourseRoutineTier tier : strategy.getRelevantTiers()) {
-      crawledProblems.put(tier, addProblemsByType(algorithm, tier));
-    }
-    strategy.updateAlgorithmHidden(algorithm);
-    return getCrawlingResultMessage(crawledProblems, algorithm);
-  }
-
-  private String getCrawlingResultMessage(
-      Map<CourseRoutineTier, List<Problem>> crawledProblems, Algorithm dailyAlgorithm) {
-    StringBuilder message = new StringBuilder();
-    message.append("daily 알고리즘 : ").append(dailyAlgorithm.getName()).append("\n\n");
-    for (Map.Entry<CourseRoutineTier, List<Problem>> entry : crawledProblems.entrySet()) {
-      CourseRoutineTier tier = entry.getKey();
-      List<Problem> problems = entry.getValue();
-      message
-          .append("[")
-          .append(tier)
-          .append("]")
-          .append("\n")
-          .append("✅  크롤링 성공 문제수: ")
-          .append(problems.size())
-          .append("개\n")
-          .append("🔢  문제 번호: ")
-          .append(
-              problems.stream()
-                  .map(problem -> String.valueOf(problem.getProblemId()))
-                  .collect(Collectors.joining(", ")))
-          .append("\n\n");
-
-      for (Problem problem : problems) {
-        message
-            .append("   - ")
-            .append(problem.getProblemId())
-            .append(": ")
-            .append(problem.getTitle())
-            .append("\n");
-      }
-    }
-    return message.toString();
-  }
-
-  @Transactional
-  public List<Problem> addProblemsByType(Algorithm algorithm, CourseRoutineTier courseRoutineTier)
+  public String createProblemsByCourse(Course course, CourseRequestDto courseRequestDto)
       throws IOException {
-    ProblemType problemType =
-        problemTypeRepository
-            .findByCourseAndRoutine(courseRoutineTier.getCourse(), courseRoutineTier.getRoutine())
-            .orElseThrow(() -> new NoSuchElementException("해당 문제 타입이 존재하지 않습니다."));
-
-    List<Integer> tierList = new ArrayList<>(courseRoutineTier.getTierList());
-    List<Problem> crawledProblems = new ArrayList<>();
-    int targetCount = courseRoutineTier.getTargetCount();
-    int maxTier = tierList.get(tierList.size() - 1);
-
-    while (true) {
-      String url = getProblemUrl(tierList, algorithm.getAlgorithmId());
-      crawledProblems.addAll(crawlProblems(url, problemType, algorithm));
-
-      crawledProblems = filterDuplicateProblems(crawledProblems);
-      if (crawledProblems.size() >= targetCount) {
-        return saveAndSortProblems(crawledProblems.subList(0, targetCount), problemType, algorithm);
-      }
-
-      crawledProblems = new ArrayList<>();
-      maxTier++;
-
-      if (maxTier > RUBY_1) { // 가장 높은 단계까지 포함하여 조회해도 문제 수가 targetCount 충족 못할 때
-        throw new ScrapException("스크롤 할 문제가 부족합니다. 수동으로 문제 추가해주세요.");
-      }
-      tierList.add(maxTier);
-    }
+    List<Algorithm> algorithms =
+        algorithmService.getAlgorithmsByIds(courseRequestDto.getAlgorithmIdList());
+    List<Integer> rankList = generateRankList(course.getMinRank(), course.getMaxRank());
+    List<Problem> scrapProblems = scrapProblems(course, algorithms, rankList);
+    List<CourseProblem> courseProblemList =
+        scrapProblems.stream()
+            .map(
+                problem ->
+                    CourseProblem.builder()
+                        .problem(problem) // 여기서 이미 Problem과 연결
+                        .course(course)
+                        .build())
+            .toList();
+    courseProblemRepository.saveAll(courseProblemList);
+    course.addAllCourseProblems(courseProblemList);
+    course.calculateAverageRank();
+    return getCrawlingResultMessage(course, scrapProblems);
   }
 
-  public String getProblemUrl(List<Integer> tierList, int algorithmId) {
-    String tiers = tierList.stream().map(Object::toString).collect(Collectors.joining(","));
-
-    return String.format(
-        "https://www.acmicpc.net/problemset?sort=ac_desc&tier=%s&algo=%d&algo_if=and",
-        tiers, algorithmId);
+  private List<Integer> generateRankList(int minRank, int maxRank) {
+    return IntStream.rangeClosed(minRank, maxRank).boxed().collect(Collectors.toList());
   }
 
   @Transactional
-  public List<Problem> crawlProblems(String url, ProblemType problemType, Algorithm algorithm)
-      throws IOException {
+  public List<Problem> scrapProblems(
+      Course course, List<Algorithm> algorithms, List<Integer> rankList) throws IOException {
+    String url = getProblemUrl(algorithms, rankList);
+    List<Problem> problems = crawlProblems(url);
+
+    return saveAndSortProblems(problems.subList(0, course.getProblemCnt()));
+  }
+
+  @Transactional
+  public List<Problem> crawlProblems(String url) throws IOException {
     Document document = Jsoup.connect(url).get();
     Elements rows = document.select("tbody tr");
 
     List<Integer> problemNumbers = extractProblemNumbers(rows);
-    // 문제 목록을 섞습니다.
     Collections.shuffle(problemNumbers);
 
     // 문제를 하나씩 확인하며 새로운 문제인지 확인합니다.
     return problemNumbers.stream()
-        .filter(
-            problemNumber -> problemService.isNewProblem(problemNumber, problemType, currentSeason))
         .map(
             problemNumber -> {
-              try {
-                String problemUrl = getProblemUrl(problemNumber);
-                String jsonString = fetchJsonFromUrl(problemUrl);
-                return parseProblem(jsonString, algorithm, problemType);
-              } catch (Exception e) {
-                System.err.println(
-                    "Error fetching problem " + problemNumber + ": " + e.getMessage());
-                return null;
-              }
+              // 먼저 problemId가 존재하는지 확인
+              Optional<Problem> existingProblem =
+                  problemService.findProblemByProblemId(problemNumber);
+
+              return existingProblem.orElseGet(
+                  () -> {
+                    try {
+                      String problemUrl = getProblemUrl(problemNumber);
+                      String jsonString = fetchJsonFromUrl(problemUrl);
+                      return parseProblem(jsonString);
+                    } catch (Exception e) {
+                      System.err.println(
+                          "Error fetching problem " + problemNumber + ": " + e.getMessage());
+                      return null;
+                    }
+                  });
             })
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
   }
 
-  private List<Problem> filterDuplicateProblems(List<Problem> crawledProblems) {
-    return crawledProblems.stream()
-        .filter(
-            problem ->
-                problemService.isNewProblem(
-                    problem.getProblemId(), problem.getProblemType(), currentSeason))
-        .distinct()
-        .collect(Collectors.toList());
+  private String getCrawlingResultMessage(Course course, List<Problem> problems) {
+    StringBuilder message = new StringBuilder();
+
+    message
+        .append("📌 크롤링 결과\n")
+        .append("📚 코스: ")
+        .append(course.getTitle())
+        .append("\n")
+        .append("📊 유형: ")
+        .append(course.getCourseType())
+        .append("\n")
+        .append("🎯 목표 문제 수: ")
+        .append(course.getProblemCnt())
+        .append("개\n")
+        .append("🆕 실제 크롤링된 문제 수: ")
+        .append(problems.size())
+        .append("개\n")
+        .append("🔢 난이도 범위: ")
+        .append(course.getMinRank())
+        .append(" ~ ")
+        .append(course.getMaxRank())
+        .append("\n")
+        .append("📈 평균 난이도: ")
+        .append(course.getAverageRank())
+        .append("\n\n");
+
+    if (problems.isEmpty()) {
+      message.append("❌ 크롤링된 문제가 없습니다.\n");
+    } else {
+      for (Problem problem : problems) {
+        message
+            .append("🔹 문제 ID: ")
+            .append(problem.getProblemId())
+            .append("\n   📖 제목: ")
+            .append(problem.getTitle())
+            .append("\n   ⭐️ 난이도: ")
+            .append(problem.getRank())
+            .append("\n   🏷 알고리즘: ")
+            .append(getKoreanAlgorithmNames(problem))
+            .append("\n\n");
+      }
+    }
+
+    return message.toString();
+  }
+
+  private String getKoreanAlgorithmNames(Problem problem) {
+    if (problem.getProblemAlgorithmList() == null || problem.getProblemAlgorithmList().isEmpty()) {
+      return "없음";
+    }
+    return problem.getProblemAlgorithmList().stream()
+        .map(pa -> pa.getAlgorithm().getKoreanName())
+        .collect(Collectors.joining(", "));
+  }
+
+  private String getProblemUrl(List<Algorithm> algorithms, List<Integer> rankList) {
+    List<Integer> algorithmIdList = algorithms.stream().map(Algorithm::getAlgorithmId).toList();
+    String algorithmIds =
+        algorithmIdList.stream().map(Object::toString).collect(Collectors.joining(","));
+    String tiers = rankList.stream().map(Object::toString).collect(Collectors.joining(","));
+
+    return String.format(
+        "https://www.acmicpc.net/problemset?sort=ac_desc&tier=%s&algo=%s&algo_if=and",
+        tiers, algorithmIds);
   }
 
   @Transactional
-  public List<Problem> saveAndSortProblems(
-      List<Problem> problems, ProblemType problemType, Algorithm algorithm) {
-    problems.sort(Comparator.comparingInt(Problem::getDifficulty));
+  public List<Problem> saveAndSortProblems(List<Problem> problems) {
+    problems.sort(Comparator.comparingInt(Problem::getRank));
 
     return problems.stream()
         .map(
-            problem ->
-                saveProblem(
-                    problem.getTitle(),
-                    problem.getDifficulty(),
-                    problem.getProblemId(),
-                    algorithm,
-                    problemType,
-                    problem.getProblemTagList()))
+            problem -> {
+              problemAlgorithmRepository.saveAll(problem.getProblemAlgorithmList());
+              return problemService.saveProblem(problem);
+            })
         .collect(Collectors.toList());
   }
 
-  private Problem parseProblem(String jsonString, Algorithm algorithm, ProblemType problemType) {
+  private Problem parseProblem(String jsonString) {
     JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
 
     String titleKo = extractTitleKo(jsonObject); // 한국어 제목 추출
@@ -207,27 +200,20 @@ public class ProblemScrapingService {
       throw new IllegalArgumentException("Korean title not found in JSON: " + jsonString);
     }
     int problemId = jsonObject.get("problemId").getAsInt();
-    int tier = jsonObject.get("level").getAsInt();
+    int rank = jsonObject.get("level").getAsInt();
 
-    Problem problem =
-        Problem.builder()
-            .title(titleKo)
-            .difficulty(tier)
-            .problemId(problemId)
-            .algorithm(algorithm)
-            .problemType(problemType)
-            .build();
+    Problem problem = Problem.builder().title(titleKo).rank(rank).problemId(problemId).build();
     // ProblemTag 리스트를 생성하며 Problem 객체와 연결
-    List<ProblemTag> problemTagList =
-        extractTags(jsonObject).stream()
+    List<ProblemAlgorithm> problemAlgorithmList =
+        extractAlgorithms(jsonObject).stream()
             .map(
-                tag ->
-                    ProblemTag.builder()
+                algorithm ->
+                    ProblemAlgorithm.builder()
                         .problem(problem) // 여기서 이미 Problem과 연결
-                        .tag(tag)
+                        .algorithm(algorithm)
                         .build())
             .toList();
-    problem.setProblemTagList(problemTagList);
+    problem.addAllProblemAlgorithms(problemAlgorithmList);
     return problem;
   }
 
@@ -235,7 +221,7 @@ public class ProblemScrapingService {
     List<Integer> problemNumbers = new ArrayList<>();
     int count = 0;
     for (Element row : rows) {
-      if (count >= 25) {
+      if (count >= 100) {
         break; // 100개에 도달하면 루프 종료
       }
       String problemIdText = row.select(".list_problem_id").text();
@@ -260,80 +246,25 @@ public class ProblemScrapingService {
     return null;
   }
 
-  private List<Tag> extractTags(JsonObject jsonObject) {
-    List<Tag> tagList = new ArrayList<>();
+  private List<Algorithm> extractAlgorithms(JsonObject jsonObject) {
+    List<Algorithm> algorithmList = new ArrayList<>();
     JsonArray tagsArray = jsonObject.getAsJsonArray("tags");
     for (int i = 0; i < tagsArray.size(); i++) {
       JsonObject tagObject = tagsArray.get(i).getAsJsonObject();
+      Integer algorithmId = tagObject.getAsJsonObject().get("bojTagId").getAsInt();
       JsonArray displayNames = tagObject.getAsJsonArray("displayNames");
       String koreanName = displayNames.get(0).getAsJsonObject().get("name").getAsString();
       String englishName = displayNames.get(1).getAsJsonObject().get("name").getAsString();
-      Tag tag = findOrCreateTag(koreanName, englishName);
-      tagList.add(tag);
+
+      Algorithm algorithm = getOrCreateAlgorithm(algorithmId, koreanName, englishName);
+      algorithmList.add(algorithm);
     }
-    return tagList;
+    return algorithmList;
   }
 
-  private Tag findOrCreateTag(String koreanName, String englishName) {
-    return tagRepository
-        .findByKoreanNameAndEnglishName(koreanName, englishName)
-        .orElseGet(
-            () -> {
-              Tag newTag = Tag.builder().koreanName(koreanName).englishName(englishName).build();
-              return tagRepository.save(newTag);
-            });
-  }
-
-  @Transactional
-  public Problem saveProblem(
-      String titleKo,
-      int tier,
-      int problemId,
-      Algorithm algorithm,
-      ProblemType problemType,
-      List<ProblemTag> problemTagList) {
-    Problem problem =
-        Problem.builder()
-            .title(titleKo)
-            .difficulty(tier)
-            .problemId(problemId)
-            .algorithm(algorithm)
-            .problemType(problemType)
-            .build();
-
-    problemService.saveProblem(problem);
-    for (ProblemTag problemTag : problemTagList) {
-      problemTag.setProblem(problem);
-      problemTagRepository.save(problemTag);
-      problem.addProblemTag(problemTag);
-    }
-    return problem;
-  }
-
-  @Transactional
-  public Problem getProblemByProblemId(
-      int problemId, Algorithm algorithm, ProblemType problemType) {
-    String url = getProblemUrl(problemId);
-    System.out.println("url: " + url);
-    try {
-      return crawlAndAddProblem(url, problemType, algorithm);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  @Transactional
-  public Problem crawlAndAddProblem(String problemUrl, ProblemType problemType, Algorithm algorithm)
-      throws IOException {
-    String jsonString = fetchJsonFromUrl(problemUrl);
-    Problem problem = parseProblem(jsonString, algorithm, problemType);
-    return saveProblem(
-        problem.getTitle(),
-        problem.getDifficulty(),
-        problem.getProblemId(),
-        algorithm,
-        problemType,
-        problem.getProblemTagList());
+  private Algorithm getOrCreateAlgorithm(
+      Integer algorithmId, String koreanName, String englishName) {
+    return algorithmService.getOrCreateAlgorithm(algorithmId, koreanName, englishName);
   }
 
   private String getProblemUrl(int problemNumber) {

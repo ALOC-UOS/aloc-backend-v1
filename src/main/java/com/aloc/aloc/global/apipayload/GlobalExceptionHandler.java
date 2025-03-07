@@ -1,5 +1,6 @@
 package com.aloc.aloc.global.apipayload;
 
+import com.aloc.aloc.global.apipayload.exception.AlreadyExistException;
 import com.aloc.aloc.global.apipayload.exception.AlreadyPurchasedException;
 import com.aloc.aloc.global.apipayload.exception.ScrapException;
 import com.aloc.aloc.global.apipayload.status.ErrorStatus;
@@ -61,6 +62,13 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(AlreadyPurchasedException.class)
   @ResponseStatus(HttpStatus.CONFLICT)
   public CustomApiResponse<String> handleAlreadyPurchasedException(AlreadyPurchasedException ex) {
+    return CustomApiResponse.onFailure(
+        ErrorStatus._CONFLICT.getCode(), ex.getMessage(), ErrorStatus._CONFLICT.getMessage());
+  }
+
+  @ExceptionHandler(AlreadyExistException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public CustomApiResponse<String> handleAlreadyExistException(AlreadyExistException ex) {
     return CustomApiResponse.onFailure(
         ErrorStatus._CONFLICT.getCode(), ex.getMessage(), ErrorStatus._CONFLICT.getMessage());
   }
