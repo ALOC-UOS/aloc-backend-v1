@@ -2,7 +2,7 @@ package com.aloc.aloc.problem.service;
 
 import com.aloc.aloc.problem.dto.response.ProblemSolvedResponseDto;
 import com.aloc.aloc.problem.entity.Problem;
-import com.aloc.aloc.problem.entity.UserProblem;
+import com.aloc.aloc.problem.entity.UserCourseProblem;
 import com.aloc.aloc.user.dto.response.SolvedUserResponseDto;
 import com.aloc.aloc.user.entity.User;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ProblemMapper {
 
-  SolvedUserResponseDto mapToSolvedUserResponseDto(User user, UserProblem userProblem) {
+  SolvedUserResponseDto mapToSolvedUserResponseDto(User user, UserCourseProblem userCourseProblem) {
     return SolvedUserResponseDto.builder()
         .username(user.getName())
         .baekjoonId(user.getBaekjoonId())
@@ -23,12 +23,13 @@ public class ProblemMapper {
         .profileImageUrl(user.getProfileImageUrl())
         .rank(user.getRank())
         .coin(user.getCoin())
-        .solvedAt(userProblem.getSolvedAt().format(DateTimeFormatter.ofPattern("HH:mm:ss")))
+        .solvedAt(userCourseProblem.getSolvedAt().format(DateTimeFormatter.ofPattern("HH:mm:ss")))
         .build();
   }
 
   // TODO: 수정
-  List<ProblemSolvedResponseDto> mapSolvedProblemToDtoList(List<UserProblem> solvedProblemList) {
+  List<ProblemSolvedResponseDto> mapSolvedProblemToDtoList(
+      List<UserCourseProblem> solvedProblemList) {
     return solvedProblemList.stream()
         .map(
             solvedProblem -> {

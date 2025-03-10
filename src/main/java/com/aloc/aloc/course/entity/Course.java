@@ -31,6 +31,7 @@ public class Course extends AuditingTimeEntity {
   private Integer maxRank;
   private Integer averageRank;
   private Long generateCnt;
+  private Integer duration;
 
   @Builder.Default
   @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -3,12 +3,15 @@ package com.aloc.aloc.user.entity;
 import com.aloc.aloc.global.domain.AuditingTimeEntity;
 import com.aloc.aloc.user.enums.Authority;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Getter
@@ -19,8 +22,9 @@ import lombok.Setter;
 public class User extends AuditingTimeEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @UuidGenerator
+  @Column(name = "id", updatable = false, nullable = false, columnDefinition = "BINARY(16)")
+  private UUID id;
 
   private String oauthId; // pk
   private String name; // name
@@ -41,6 +45,8 @@ public class User extends AuditingTimeEntity {
   private String refreshToken;
 
   @Column private Integer solvedCount = 0;
+  private LocalDateTime lastSolvedAt;
+  private LocalDateTime deletedAt;
 
   public void updateRefreshToken(String refreshToken) {
     this.refreshToken = refreshToken;

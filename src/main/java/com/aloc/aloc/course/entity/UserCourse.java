@@ -4,6 +4,7 @@ import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.global.domain.AuditingTimeEntity;
 import com.aloc.aloc.user.entity.User;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class UserCourse extends AuditingTimeEntity {
@@ -21,4 +22,6 @@ public class UserCourse extends AuditingTimeEntity {
 
   @Enumerated(EnumType.STRING)
   private UserCourseState userCourseState;
+
+  private LocalDateTime closedAt;
 }
