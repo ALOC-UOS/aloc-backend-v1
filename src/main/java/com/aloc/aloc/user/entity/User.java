@@ -29,7 +29,7 @@ public class User extends AuditingTimeEntity {
   private String oauthId; // pk
   private String name; // name
   private String email; // email
-  private String profileImageUrl; // image
+  private String profileImageFileName; // image
   private Integer coin;
 
   private String profileColor;
@@ -67,22 +67,20 @@ public class User extends AuditingTimeEntity {
       String oauthId,
       String name,
       String email,
-      String profileImageUrl) {
+      String profileImageFileName) {
     this.baekjoonId = baekjoonId;
     this.authority = Authority.ROLE_USER;
     this.rank = rank;
     this.oauthId = oauthId;
     this.name = name;
     this.email = email;
-    this.profileImageUrl = profileImageUrl;
+    this.profileImageFileName = profileImageFileName;
     this.coin = 0;
     this.profileColor = "Blue";
   }
 
-  public User update(String userId, String nickname, String profileImageUrl) {
-    this.name = userId;
-    this.email = nickname;
-    this.profileImageUrl = profileImageUrl;
+  public User update(String email) {
+    this.email = email;
     return this;
   }
 
@@ -91,7 +89,6 @@ public class User extends AuditingTimeEntity {
         .name(userOAuthProfile.userId())
         .oauthId(userOAuthProfile.oauthId())
         .email(userOAuthProfile.nickname())
-        .profileImageUrl(userOAuthProfile.profileImageUrl())
         .build();
   }
 

@@ -20,7 +20,7 @@ public class ProblemMapper {
         .username(user.getName())
         .baekjoonId(user.getBaekjoonId())
         .profileColor(user.getProfileColor())
-        .profileImageUrl(user.getProfileImageUrl())
+        .profileImageFileName(user.getProfileImageFileName())
         .rank(user.getRank())
         .coin(user.getCoin())
         .solvedAt(userCourseProblem.getSolvedAt().format(DateTimeFormatter.ofPattern("HH:mm:ss")))

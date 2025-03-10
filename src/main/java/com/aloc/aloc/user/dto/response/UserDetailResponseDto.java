@@ -51,7 +51,7 @@ public class UserDetailResponseDto extends UserResponseDto {
         .baekjoonId(user.getBaekjoonId())
         .rank(user.getRank())
         .coin(user.getCoin())
-        .profileImageUrl(user.getProfileImageUrl())
+        .profileImageFileName(user.getProfileImageFileName())
         .solvedCount(user.getSolvedCount())
         .type(type)
         .color1(color1)

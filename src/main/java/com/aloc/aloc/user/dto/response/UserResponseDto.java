@@ -19,7 +19,7 @@ public class UserResponseDto {
   @Schema(description = "백준 ID", example = "baekjoonId")
   private String baekjoonId;
 
-  @Schema(description = "프로필 색상", example = "blue")
+  @Schema(description = "프로필 색상이름", example = "blue")
   private String profileColor;
 
   @Schema(description = "유저 권한", example = "ROLE_USER")
@@ -31,8 +31,8 @@ public class UserResponseDto {
   @Schema(description = "코인", example = "100")
   private Integer coin;
 
-  @Schema(description = "프로필 이미지 주소", example = "https://...")
-  private String profileImageUrl;
+  @Schema(description = "프로필 이미지 이름", example = "이미지이름")
+  private String profileImageFileName;
 
   public static UserResponseDto of(User user) {
     return UserResponseDto.builder()
@@ -42,7 +42,7 @@ public class UserResponseDto {
         .profileColor(user.getProfileColor())
         .rank(user.getRank())
         .coin(user.getCoin())
-        .profileImageUrl(user.getProfileImageUrl())
+        .profileImageFileName(user.getProfileImageFileName())
         .build();
   }
 }

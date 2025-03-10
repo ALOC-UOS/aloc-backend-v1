@@ -44,11 +44,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
   private User saveOrUpdateUserProfile(UserOAuthProfile userOAuthProfile) {
     User user = userRepository.findByOauthId(userOAuthProfile.oauthId()).orElse(null);
     if (user != null) {
-      user =
-          user.update(
-              userOAuthProfile.userId(),
-              userOAuthProfile.nickname(),
-              userOAuthProfile.profileImageUrl());
+      user = user.update(userOAuthProfile.nickname());
     } else {
       user = User.create(userOAuthProfile);
     }

@@ -3,7 +3,6 @@ package com.aloc.aloc.user.controller;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
-import com.aloc.aloc.user.dto.response.UserResponseDto;
 import com.aloc.aloc.user.service.UserFacade;
 import com.aloc.aloc.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +12,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
@@ -48,12 +49,13 @@ public class UserController {
   }
 
   @SecurityRequirement(name = "JWT Auth")
-  @PutMapping("/user")
+  @PutMapping(value = "/user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ApiResponse(responseCode = "200", description = "success")
   @Operation(summary = "회원정보 업데이트", description = "회원 정보를 업데이트합니다.")
-  public CustomApiResponse<UserResponseDto> updateUser(
+  public CustomApiResponse<UserDetailResponseDto> updateUser(
       @Parameter(hidden = true) @AuthenticationPrincipal User user,
-      @RequestBody UserRequestDto userRequestDto) {
+      @RequestBody UserRequestDto userRequestDto)
+      throws FileUploadException {
     return CustomApiResponse.onSuccess(userService.updateUser(user.getUsername(), userRequestDto));
   }
 }
