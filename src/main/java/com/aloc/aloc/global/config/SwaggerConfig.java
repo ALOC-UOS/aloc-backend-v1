@@ -14,8 +14,8 @@ import org.springframework.context.annotation.Configuration;
     info = @Info(title = "OPEN-ALOC API", version = "v1"),
     security = {@SecurityRequirement(name = "Bearer Auth")},
     servers = {
-      @Server(url = "http://localhost:8080", description = "Local Server"),
-      @Server(url = "https://openaloc.store", description = "Production Server")
+      @Server(url = "https://openaloc.store", description = "Production Server"),
+      @Server(url = "http://localhost:8080", description = "Local Server")
     })
 @SecuritySchemes({
   @SecurityScheme(
