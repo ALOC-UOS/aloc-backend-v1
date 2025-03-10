@@ -4,8 +4,10 @@ import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.enums.CourseType;
 import java.time.LocalDateTime;
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
+@Getter
 public class CourseResponseDto {
   private Long courseId;
   private String title;

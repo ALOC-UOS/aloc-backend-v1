@@ -1,6 +1,5 @@
 package com.aloc.aloc.user.entity;
 
-import com.aloc.aloc.color.Color;
 import com.aloc.aloc.global.domain.AuditingTimeEntity;
 import com.aloc.aloc.user.enums.Authority;
 import jakarta.persistence.*;
@@ -29,11 +28,8 @@ public class User extends AuditingTimeEntity {
   private String profileImageUrl; // image
   private Integer coin;
 
-  @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "color_id")
-  private Color color;
+  private String profileColor;
 
-  @Column(nullable = false)
   private String baekjoonId;
 
   private Integer rank;
@@ -67,12 +63,14 @@ public class User extends AuditingTimeEntity {
       String email,
       String profileImageUrl) {
     this.baekjoonId = baekjoonId;
-    this.authority = Authority.ROLE_GUEST;
+    this.authority = Authority.ROLE_USER;
     this.rank = rank;
     this.oauthId = oauthId;
     this.name = name;
     this.email = email;
     this.profileImageUrl = profileImageUrl;
+    this.coin = 0;
+    this.profileColor = "Blue";
   }
 
   public User update(String userId, String nickname, String profileImageUrl) {

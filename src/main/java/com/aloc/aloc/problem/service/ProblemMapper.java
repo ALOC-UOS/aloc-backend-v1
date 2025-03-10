@@ -19,7 +19,7 @@ public class ProblemMapper {
     return SolvedUserResponseDto.builder()
         .username(user.getName())
         .baekjoonId(user.getBaekjoonId())
-        .profileColor(user.getColor().getCategory())
+        .profileColor(user.getProfileColor())
         .profileImageUrl(user.getProfileImageUrl())
         .rank(user.getRank())
         .coin(user.getCoin())

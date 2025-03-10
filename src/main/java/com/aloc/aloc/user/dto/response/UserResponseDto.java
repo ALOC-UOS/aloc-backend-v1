@@ -39,7 +39,7 @@ public class UserResponseDto {
         .username(user.getName())
         .authority(user.getAuthority())
         .baekjoonId(user.getBaekjoonId())
-        .profileColor(user.getColor().getCategory())
+        .profileColor(user.getProfileColor())
         .rank(user.getRank())
         .coin(user.getCoin())
         .profileImageUrl(user.getProfileImageUrl())

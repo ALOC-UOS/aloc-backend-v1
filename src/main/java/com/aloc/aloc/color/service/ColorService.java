@@ -49,7 +49,7 @@ public class ColorService {
 
     String colorName = pickColor();
     Color color = colorRepository.findById(colorName).orElseThrow();
-    user.setColor(color);
+    user.setProfileColor(colorName);
 
     userRepository.save(user);
     return new ColorResponseDto(user.getCoin(), color.getId(), color.getColor1());

@@ -1,7 +1,9 @@
 package com.aloc.aloc.user.controller;
 
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
+import com.aloc.aloc.user.dto.request.UserRequestDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
+import com.aloc.aloc.user.dto.response.UserResponseDto;
 import com.aloc.aloc.user.service.UserFacade;
 import com.aloc.aloc.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,10 +15,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,10 +40,20 @@ public class UserController {
   }
 
   @SecurityRequirement(name = "JWT Auth")
-  @DeleteMapping("/withdraw")
+  @DeleteMapping("/user/withdraw")
   @ApiResponse(responseCode = "200", description = "success")
   @Operation(summary = "회원 탈퇴", description = "회원 탈퇴를 진행합니다.")
   public void withdraw(@Parameter(hidden = true) @AuthenticationPrincipal User user) {
     userService.withdraw(user.getUsername());
+  }
+
+  @SecurityRequirement(name = "JWT Auth")
+  @PutMapping("/user")
+  @ApiResponse(responseCode = "200", description = "success")
+  @Operation(summary = "회원정보 업데이트", description = "회원 정보를 업데이트합니다.")
+  public CustomApiResponse<UserResponseDto> updateUser(
+      @Parameter(hidden = true) @AuthenticationPrincipal User user,
+      @RequestBody UserRequestDto userRequestDto) {
+    return CustomApiResponse.onSuccess(userService.updateUser(user.getUsername(), userRequestDto));
   }
 }

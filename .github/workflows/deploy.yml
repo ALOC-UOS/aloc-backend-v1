@@ -81,7 +81,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/aloc-spring:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/openaloc-backend:latest
 
       # 🔥 SSH 키 설정 (base64 디코딩 없이 원본 그대로 저장)
       - name: Setup SSH Key

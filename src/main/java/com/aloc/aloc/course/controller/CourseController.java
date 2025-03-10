@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 @Tag(name = "Course API", description = "course 관련 API입니다.")
 public class CourseController {
-  private CourseService courseService;
+  private final CourseService courseService;
 
   @GetMapping("/courses")
   @Operation(summary = "코스 목록 조회", description = "모든 코스 목록을 조회합니다.")
