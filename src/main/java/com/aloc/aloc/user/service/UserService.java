@@ -51,12 +51,24 @@ public class UserService {
   @Transactional
   public UserDetailResponseDto updateUser(String oauthId, UserRequestDto userRequestDto)
       throws FileUploadException {
+
     User user = findUser(oauthId);
-    user.setBaekjoonId(userRequestDto.getBaekjoonId());
-    user.setName(userRequestDto.getName());
-    user.setRank(baekjoonRankScrapingService.extractBaekjoonRank(user.getBaekjoonId()));
+
+    // 필드별 null 체크 후 업데이트
+    if (userRequestDto.getBaekjoonId() != null) {
+      user.setBaekjoonId(userRequestDto.getBaekjoonId());
+      user.setRank(baekjoonRankScrapingService.extractBaekjoonRank(user.getBaekjoonId()));
+    }
+
+    if (userRequestDto.getName() != null) {
+      user.setName(userRequestDto.getName());
+    }
+
+    if (userRequestDto.getProfileImageFile() != null) {
+      uploadProfileImage(oauthId, userRequestDto);
+    }
+
     userRepository.save(user);
-    uploadProfileImage(oauthId, userRequestDto);
 
     return userMapper.mapToUserDetailResponseDto(user);
   }

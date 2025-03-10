@@ -49,7 +49,7 @@ public class UserController {
   }
 
   @SecurityRequirement(name = "JWT Auth")
-  @PutMapping(value = "/user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PatchMapping(value = "/user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ApiResponse(responseCode = "200", description = "success")
   @Operation(summary = "회원정보 업데이트", description = "회원 정보를 업데이트합니다.")
   public CustomApiResponse<UserDetailResponseDto> updateUser(

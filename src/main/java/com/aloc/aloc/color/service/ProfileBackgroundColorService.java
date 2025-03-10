@@ -55,7 +55,6 @@ public class ProfileBackgroundColorService {
     user.setProfileColor(colorName);
 
     userRepository.save(user);
-    return new ProfileBackgroundColorResponseDto(
-        user.getCoin(), profileBackgroundColor.getName(), profileBackgroundColor.getColor1());
+    return ProfileBackgroundColorResponseDto.of(user.getCoin(), profileBackgroundColor);
   }
 }
