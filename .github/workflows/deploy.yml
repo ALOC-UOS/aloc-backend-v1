@@ -105,32 +105,32 @@ jobs:
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
             echo "🛑 Stopping and removing old container..."
-            if [ "$(docker ps -q -f name=aloc-spring)" ]; then
-              docker stop aloc-spring
-              docker rm aloc-spring
+            if [ "$(docker ps -q -f name=openaloc-backend)" ]; then
+              docker stop openaloc-backend
+              docker rm openaloc-backend
             fi
 
             echo "🔍 Waiting for Docker Hub to update..."
             NEW_DIGEST=""
             while [ -z "$NEW_DIGEST" ]; do
               sleep 10
-              NEW_DIGEST=$(docker manifest inspect ${{ secrets.DOCKER_USERNAME }}/aloc-spring:latest | jq -r '.config.digest')
+              NEW_DIGEST=$(docker manifest inspect ${{ secrets.DOCKER_USERNAME }}/openaloc-backend:latest | jq -r '.config.digest')
               echo "⏳ Waiting for new image digest..."
             done
 
             echo "🚮 Removing old image..."
             docker image prune -af
-            docker rmi ${{ secrets.DOCKER_USERNAME }}/aloc-spring:latest || true
+            docker rmi ${{ secrets.DOCKER_USERNAME }}/openaloc-backend:latest || true
 
             echo "📦 Pulling the latest image..."
-            docker pull ${{ secrets.DOCKER_USERNAME }}/aloc-spring:latest || exit 1
+            docker pull ${{ secrets.DOCKER_USERNAME }}/openaloc-backend:latest || exit 1
 
             echo "🚀 Running new container..."
-            docker run -d --name aloc-spring \
+            docker run -d --name openaloc-backend \
               -e TZ=Asia/Seoul \
               -p 8080:8080 \
               -v /home/ubuntu/upload/user:/app/upload \
-              ${{ secrets.DOCKER_USERNAME }}/aloc-spring:latest
+              ${{ secrets.DOCKER_USERNAME }}/openaloc-backend:latest
 
             echo "✅ Deployment completed!"
 
