@@ -12,13 +12,18 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @OpenAPIDefinition(
     info = @Info(title = "OPEN-ALOC API", version = "v1"),
-    security = {@SecurityRequirement(name = "JWT Auth")},
-    servers = {@Server(url = "http://localhost:8080", description = "Local Server")})
+    security = {@SecurityRequirement(name = "Bearer Auth")},
+    servers = {
+        @Server(url = "http://localhost:8080", description = "Local Server"),
+        @Server(url = "https://openaloc.store", description = "Production Server")
+    }
+)
 @SecuritySchemes({
-  @SecurityScheme(
-      name = "JWT Auth",
-      type = SecuritySchemeType.HTTP,
-      scheme = "bearer",
-      bearerFormat = "JWT")
+    @SecurityScheme(
+        name = "Bearer Auth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT"
+    )
 })
 public class SwaggerConfig {}
