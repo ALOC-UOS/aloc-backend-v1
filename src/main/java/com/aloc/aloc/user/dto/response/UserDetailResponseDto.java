@@ -13,7 +13,7 @@ public class UserDetailResponseDto extends UserResponseDto {
   private final Integer solvedCount;
 
   @Schema(description = "색상 분류", example = "special")
-  private final String colorCategory;
+  private final String type;
 
   @Schema(description = "색상 코드 1", example = "#FFB800")
   private final String color1;
@@ -38,7 +38,7 @@ public class UserDetailResponseDto extends UserResponseDto {
 
   public static UserDetailResponseDto of(
       User user,
-      String colorCategory,
+      String type,
       String color1,
       String color2,
       String color3,
@@ -53,7 +53,7 @@ public class UserDetailResponseDto extends UserResponseDto {
         .coin(user.getCoin())
         .profileImageUrl(user.getProfileImageUrl())
         .solvedCount(user.getSolvedCount())
-        .colorCategory(colorCategory)
+        .type(type)
         .color1(color1)
         .color2(color2)
         .color3(color3)

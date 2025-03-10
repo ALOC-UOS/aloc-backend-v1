@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Color {
+public class ProfileBackgroundColor {
 
-  @Id private String id;
+  @Id private String name;
 
   @Column(nullable = false)
   private String color1;
@@ -26,7 +26,7 @@ public class Color {
   private String color5;
 
   @Column(nullable = false)
-  private String category;
+  private String type;
 
   private Integer degree;
 }

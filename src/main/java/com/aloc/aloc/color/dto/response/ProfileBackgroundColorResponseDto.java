@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Builder
-public class ColorResponseDto {
+public class ProfileBackgroundColorResponseDto {
   private int coin;
   private String colorName;
   private String colorCode;
