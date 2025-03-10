@@ -58,8 +58,8 @@ public class SecurityConfig {
                         "/api/course",
                         "/v3/api-docs/**",
                         "/oauth2/authorization/**",
-						"/openaloc.store",  // ✅ Swagger가 실행될 도메인 추가
-            "/openaloc.store/swagger-ui/")
+                        "/openaloc.store", // ✅ Swagger가 실행될 도메인 추가
+                        "/openaloc.store/swagger-ui/")
                     .permitAll()
                     .requestMatchers(
                         "/purchase",
@@ -174,7 +174,9 @@ public class SecurityConfig {
 
     corsConfiguration.setAllowedOriginPatterns(
         Arrays.asList(
-            "http://localhost:3000", "https://aloc-client.vercel.app", "https://openaloc.store", // ✅ 추가
+            "http://localhost:3000",
+            "https://aloc-client.vercel.app",
+            "https://openaloc.store", // ✅ 추가
             "https://openaloc.store/swagger-ui/"));
     corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH"));
     corsConfiguration.setAllowedHeaders(List.of("*"));
