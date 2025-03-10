@@ -5,8 +5,10 @@ import com.aloc.aloc.global.domain.AuditingTimeEntity;
 import com.aloc.aloc.user.entity.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import lombok.Getter;
 
 @Entity
+@Getter
 public class UserCourse extends AuditingTimeEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

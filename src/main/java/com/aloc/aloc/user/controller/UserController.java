@@ -1,5 +1,7 @@
 package com.aloc.aloc.user.controller;
 
+import com.aloc.aloc.color.dto.response.ProfileBackgroundColorResponseDto;
+import com.aloc.aloc.color.service.ProfileBackgroundColorService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
   private final UserFacade userFacade;
   private final UserService userService;
+  private final ProfileBackgroundColorService profileBackgroundColorService;
 
   @GetMapping("/users")
   @Operation(summary = "유저 목록 조회", description = "전체 유저 목록을 조회합니다.")
@@ -57,5 +60,15 @@ public class UserController {
       @RequestBody UserRequestDto userRequestDto)
       throws FileUploadException {
     return CustomApiResponse.onSuccess(userService.updateUser(user.getUsername(), userRequestDto));
+  }
+
+  @PutMapping("/user/profile-background-color")
+  @SecurityRequirement(name = "JWT Auth")
+  @SecurityRequirement(name = "Refresh Token")
+  @Operation(summary = "프로필 색상 변경", description = "프로필 색상을 변경합니다.")
+  public CustomApiResponse<ProfileBackgroundColorResponseDto> changeColor(
+      @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+    return CustomApiResponse.onSuccess(
+        profileBackgroundColorService.changeColor(user.getUsername()));
   }
 }

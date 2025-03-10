@@ -4,6 +4,8 @@ import com.aloc.aloc.color.ProfileBackgroundColor;
 import com.aloc.aloc.color.service.ProfileBackgroundColorService;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,13 +19,17 @@ public class UserMapper {
         profileBackgroundColorService.getColorByName(user.getProfileColor());
 
     return UserDetailResponseDto.of(
-        user,
-        userProfileBackgroundColor.getType(),
-        userProfileBackgroundColor.getColor1(),
-        userProfileBackgroundColor.getColor2(),
-        userProfileBackgroundColor.getColor3(),
-        userProfileBackgroundColor.getColor4(),
-        userProfileBackgroundColor.getColor5(),
-        userProfileBackgroundColor.getDegree());
+        user, userProfileBackgroundColor, isTodaySolved(user.getLastSolvedAt()));
+  }
+
+  private boolean isTodaySolved(LocalDateTime lastSolvedAt) {
+    if (lastSolvedAt == null) {
+      return false;
+    }
+    // 현재 날짜 가져오기
+    LocalDate today = LocalDate.now();
+    LocalDate lastSolvedDate = lastSolvedAt.toLocalDate();
+
+    return lastSolvedDate.isEqual(today);
   }
 }

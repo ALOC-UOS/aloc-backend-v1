@@ -137,6 +137,8 @@ public class ProblemScrapingService {
         .append("\n")
         .append("📈 평균 난이도: ")
         .append(course.getAverageRank())
+        .append("🗓️ 기한: ")
+        .append(course.getDuration())
         .append("\n\n");
 
     if (problems.isEmpty()) {

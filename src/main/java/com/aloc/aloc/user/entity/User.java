@@ -45,6 +45,7 @@ public class User extends AuditingTimeEntity {
   private String refreshToken;
 
   @Column private Integer solvedCount = 0;
+  private Integer consecutiveSolvedDays = 0;
   private LocalDateTime lastSolvedAt;
   private LocalDateTime deletedAt;
 
