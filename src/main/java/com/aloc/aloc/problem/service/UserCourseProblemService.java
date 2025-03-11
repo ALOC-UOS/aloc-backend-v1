@@ -8,6 +8,7 @@ import com.aloc.aloc.problem.repository.UserCourseProblemRepository;
 import com.aloc.aloc.user.entity.User;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -61,5 +62,11 @@ public class UserCourseProblemService {
   private static boolean isUnsolvedUserCourseProblem(UserCourseProblem userCourseProblem) {
     return userCourseProblem.getUserCourseProblemStatus() == UserCourseProblemStatus.HIDDEN
         || userCourseProblem.getUserCourseProblemStatus() == UserCourseProblemStatus.UNSOLVED;
+  }
+
+  public UserCourseProblem getUserCourseProblemByProblem(Problem problem) {
+    return userCourseProblemRepository
+        .findByProblemAndUserCourseProblemStatus(problem, UserCourseProblemStatus.UNSOLVED)
+        .orElseThrow(() -> new NoSuchElementException("이미 해결했거나 도전 중인 문제가 아닙니다."));
   }
 }

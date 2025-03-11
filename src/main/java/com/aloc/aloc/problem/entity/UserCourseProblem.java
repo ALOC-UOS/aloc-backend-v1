@@ -44,4 +44,9 @@ public class UserCourseProblem extends AuditingTimeEntity {
   public void updateUserCourseProblemStatus(UserCourseProblemStatus userCourseProblemStatus) {
     this.userCourseProblemStatus = userCourseProblemStatus;
   }
+
+  public void updateUserCourseProblemSolved() {
+    this.userCourseProblemStatus = UserCourseProblemStatus.SOLVED;
+    this.solvedAt = LocalDateTime.now();
+  }
 }

@@ -72,6 +72,7 @@ public class CourseService {
       throw new IllegalStateException("코스는 최대 3개까지 신청할 수 있습니다.");
     }
     UserCourse userCourse = userCourseService.createUserCourse(user, course);
+    course.addGenerateCnt();
     return UserCourseResponseDto.of(userCourse);
   }
 

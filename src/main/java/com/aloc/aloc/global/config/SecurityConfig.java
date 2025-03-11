@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,6 +28,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
   private final UserDetailsServiceImpl userDetailsService;
   private final UserRepository userRepository;
@@ -84,22 +86,29 @@ public class SecurityConfig {
             )
         .oauth2Login(
             oauth2 ->
-                oauth2.successHandler(
-                    (request, response, authentication) -> {
-                      OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-                      String oauthId = oAuth2User.getAttribute("sub");
+                oauth2
+                    .successHandler(
+                        (request, response, authentication) -> {
+                          OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                          String oauthId = oAuth2User.getAttribute("sub");
 
-                      String accessToken = jwtService.createAccessToken(oauthId);
-                      String refreshToken = jwtService.createRefreshToken();
+                          String accessToken = jwtService.createAccessToken(oauthId);
+                          String refreshToken = jwtService.createRefreshToken();
 
-                      jwtService.updateRefreshToken(oauthId, refreshToken);
+                          jwtService.updateRefreshToken(oauthId, refreshToken);
 
-                      // ✅ Access & Refresh Token 설정
-                      jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+                          // ✅ Access & Refresh Token 설정
+                          jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
 
-                      // ✅ 프론트엔드로 리디렉트
-                      response.sendRedirect("https://openaloc.store/finish-google-sso");
-                    }));
+                          // ✅ 프론트엔드로 리디렉트
+                          response.sendRedirect("https://openaloc.store/finish-google-sso");
+                        })
+                    .failureHandler(
+                        (request, response, exception) -> {
+                          // 로그인 실패 시 로그 남기기
+                          log.error("OAuth2 로그인 실패: {}", exception.getMessage());
+                          response.sendRedirect("https://openaloc.store/login?error");
+                        }));
 
     return http.build();
   }

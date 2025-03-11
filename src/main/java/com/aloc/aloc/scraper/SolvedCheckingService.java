@@ -1,6 +1,7 @@
 package com.aloc.aloc.scraper;
 
 import com.aloc.aloc.problem.entity.Problem;
+import com.aloc.aloc.problem.entity.UserCourseProblem;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -18,20 +19,17 @@ public class SolvedCheckingService {
   private static final String BASE_URL =
       "https://www.acmicpc.net/status?problem_id=%d&user_id=%s&language_id=-1&result_id=4";
 
-  public boolean isProblemSolved(String baekjoonId, Problem problem) {
+  public boolean isProblemSolved(
+      String baekjoonId, Problem problem, UserCourseProblem userCourseProblem) {
     LocalDate recentlySolvedDate = getRecentlySolvedDate(baekjoonId, problem.getProblemId());
     if (recentlySolvedDate == null) {
       return false; // 최근에 푼 날짜가 없으면 문제를 풀지 않은 것으로 간주
     }
-    return isSolvedBefore(recentlySolvedDate, LocalDate.from(problem.getUpdatedAt()));
+    return isSolvedBefore(recentlySolvedDate, LocalDate.from(userCourseProblem.getUpdatedAt()));
   }
 
   private boolean isSolvedBefore(LocalDate solvedDate, LocalDate openedDate) {
-    return solvedDate != null && (solvedDate.isAfter(openedDate) || solvedDate.isEqual(openedDate));
-  }
-
-  private boolean isSolvedToday(LocalDate solvedDate) {
-    return solvedDate != null && solvedDate.isEqual(LocalDate.now());
+    return solvedDate.isAfter(openedDate) || solvedDate.isEqual(openedDate);
   }
 
   private LocalDate getRecentlySolvedDate(String baekjoonId, Integer problemId) {

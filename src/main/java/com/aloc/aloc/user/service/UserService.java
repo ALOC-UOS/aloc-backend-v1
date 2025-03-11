@@ -48,4 +48,10 @@ public class UserService {
   public void saveUser(User user) {
     userRepository.save(user);
   }
+
+  @Transactional
+  public void updateUserCoin(User user, int coin) {
+    user.addCoin(coin);
+    saveUser(user);
+  }
 }

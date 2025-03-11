@@ -59,4 +59,8 @@ public class Course extends AuditingTimeEntity {
     }
     this.averageRank = (int) totalRank / problemCnt;
   }
+
+  public void addGenerateCnt() {
+    this.generateCnt += 1L;
+  }
 }
