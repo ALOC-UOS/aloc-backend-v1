@@ -34,10 +34,10 @@ jobs:
         run: |
           mkdir -p ./src/main/resources
           cd ./src/main/resources
-          echo "${{ secrets.APPLICATION }}" base64 -d > application.yml
-          echo "${{ secrets.JWT_APPLICATION }}" base64 -d > application-jwt.yml
-          echo "${{ secrets.OAUTH_APPLICATION }}" base64 -d > application-oauth.yml
-          echo "${{ secrets.TEST_APPLICATION }}" base64 -d > application-test.yml
+          echo "${{ secrets.APPLICATION }}" > application.yml
+          echo "${{ secrets.JWT_APPLICATION }}" > application-jwt.yml
+          echo "${{ secrets.OAUTH_APPLICATION }}" > application-oauth.yml
+          echo "${{ secrets.TEST_APPLICATION }}" > application-test.yml
 
       - name: Install PostgreSQL client
         run: sudo apt-get install -y postgresql-client
