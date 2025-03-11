@@ -3,19 +3,16 @@ package com.aloc.aloc.global.jwt.filter;
 import com.aloc.aloc.global.jwt.service.JwtService;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.repository.UserRepository;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,67 +35,38 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
   private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
-  /**
-   * 1. /refresh를 요청하는 경우 -> accessToken 재발급 2. 리프레시 토큰은 없고 AccessToken만 있는 경우 -> 유저정보 저장후 필터 계속 진행
-   */
   @Override
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException, java.io.IOException {
-    String noCheckUrl = "/api/login";
-    String refreshTokenUrl = "/api/refresh";
-    if (request.getRequestURI().equals(noCheckUrl)) {
+
+    // ✅ 기존: ID/PW 로그인용 URL → OAuth2 로그인 관련 URL로 수정
+    String noCheckUrl = "/oauth2/authorization";
+    String refreshTokenUrl = "/auth/refresh";
+
+    // ✅ OAuth2 로그인 요청이면 필터 통과
+    if (request.getRequestURI().startsWith(noCheckUrl)) {
       filterChain.doFilter(request, response);
       return;
     }
-    String extractToken;
+
     if (request.getRequestURI().equals(refreshTokenUrl)) {
-      try {
-        extractToken = extractTokenFromJsonBody(request);
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-      if (jwtService.isTokenValid(extractToken)) {
-        checkRefreshTokenAndReIssueAccessToken(response, extractToken);
+      Optional<String> refreshToken = extractRefreshToken(request);
+
+      if (refreshToken.isPresent() && jwtService.isTokenValid(refreshToken.get())) {
+        checkRefreshTokenAndReIssueAccessToken(response, refreshToken.get());
       } else {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
       }
       return;
     }
 
-    // AccessToken 유효성 검사 후 필터 진행
+    // ✅ AccessToken 유효성 검사 후 필터 진행
     checkAccessTokenAndAuthentication(request, response, filterChain);
   }
 
-  private String extractTokenFromJsonBody(HttpServletRequest request) throws Exception {
-    StringBuilder stringBuilder = new StringBuilder();
-    BufferedReader bufferedReader = null;
-    try {
-      InputStream inputStream = request.getInputStream();
-      if (inputStream != null) {
-        bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        char[] charBuffer = new char[128];
-        int bytesRead;
-        while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
-          stringBuilder.append(charBuffer, 0, bytesRead);
-        }
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      if (bufferedReader != null) {
-        bufferedReader.close();
-      }
-    }
-
-    String body = stringBuilder.toString();
-
-    ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode jsonNode = objectMapper.readTree(body);
-
-    // JSON에서 "refreshToken" 필드를 찾아 반환합니다.
-    // 실제 JSON 구조에 따라 이 부분을 조정해야 할 수 있습니다.
-    return jsonNode.get("refreshToken").asText();
+  private Optional<String> extractRefreshToken(HttpServletRequest request) {
+    return jwtService.extractRefreshToken(request); // ✅ 쿠키에서 가져오도록 변경
   }
 
   private void checkAccessTokenAndAuthentication(

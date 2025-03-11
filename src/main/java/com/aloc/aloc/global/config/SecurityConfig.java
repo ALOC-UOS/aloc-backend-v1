@@ -1,13 +1,10 @@
 package com.aloc.aloc.global.config;
 
 import com.aloc.aloc.global.jwt.filter.JwtAuthenticationProcessingFilter;
-import com.aloc.aloc.global.jwt.service.JwtService;
-import com.aloc.aloc.global.login.filter.JsonUsernamePasswordAuthenticationFilter;
-import com.aloc.aloc.global.login.handler.JwtProviderHandler;
+import com.aloc.aloc.global.jwt.service.JwtServiceImpl;
 import com.aloc.aloc.global.login.handler.LoginFailureHandler;
 import com.aloc.aloc.global.login.service.UserDetailsServiceImpl;
 import com.aloc.aloc.user.repository.UserRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
@@ -32,19 +29,16 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
   private final UserDetailsServiceImpl userDetailsService;
-  private final ObjectMapper objectMapper;
   private final UserRepository userRepository;
-  private final JwtService jwtService;
+  private final JwtServiceImpl jwtService;
 
   // 특정 HTTP 요청에 대한 웹 기반 보안 구성
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
-        //			.formLogin(AbstractHttpConfigurer::disable)
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .addFilterBefore(jsonUsernamePasswordLoginFilter(), LogoutFilter.class)
         .addFilterBefore(
-            jwtAuthenticationProcessingFilter(), JsonUsernamePasswordAuthenticationFilter.class)
+            jwtAuthenticationProcessingFilter(), LogoutFilter.class) // ✅ UsernamePassword 관련 필터 제거
         .authorizeHttpRequests(
             (authorize) ->
                 authorize
@@ -56,7 +50,8 @@ public class SecurityConfig {
                         "/oauth2/authorization/**",
                         "/algorithm/**",
                         "/course",
-                        "/users")
+                        "/users",
+                        "/oauth/callback")
                     .permitAll()
                     .requestMatchers("/courses", "/user", "/user/**")
                     .authenticated()
@@ -76,7 +71,7 @@ public class SecurityConfig {
         .logout(
             logout ->
                 logout
-                    .logoutUrl("/api/logout")
+                    .logoutUrl("/auth/logout")
                     .logoutSuccessHandler(
                         (request, response, authentication) -> {
                           // ✅ Refresh Token 삭제 로직 추가
@@ -91,21 +86,21 @@ public class SecurityConfig {
             oauth2 ->
                 oauth2.successHandler(
                     (request, response, authentication) -> {
-                      // ✅ OAuth2 로그인 후 JWT 응답에 추가
                       OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-                      String oauthId =
-                          oAuth2User.getAttribute(
-                              "sub"); // ✅ Google은 "sub", 네이버/카카오는 `OAuthAttributes`에서 자동 매핑됨
+                      String oauthId = oAuth2User.getAttribute("sub");
 
                       String accessToken = jwtService.createAccessToken(oauthId);
                       String refreshToken = jwtService.createRefreshToken();
 
                       jwtService.updateRefreshToken(oauthId, refreshToken);
 
-                      response.setContentType("application/json"); // ✅ JSON 형식으로 설정
+                      response.setContentType("application/json");
                       response.setCharacterEncoding("UTF-8");
 
-                      jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+                      // ✅ 프론트로 리디렉트하도록 수정
+                      String targetUrl =
+                          "https://openaloc.store/oauth/callback?token=" + accessToken;
+                      response.sendRedirect(targetUrl);
                     }));
 
     return http.build();
@@ -117,24 +112,8 @@ public class SecurityConfig {
   }
 
   @Bean
-  public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordLoginFilter() {
-    JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordLoginFilter =
-        new JsonUsernamePasswordAuthenticationFilter(objectMapper);
-    jsonUsernamePasswordLoginFilter.setAuthenticationManager(authenticationManager());
-    jsonUsernamePasswordLoginFilter.setAuthenticationSuccessHandler(
-        new JwtProviderHandler(jwtService, userRepository));
-    jsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(new LoginFailureHandler());
-    return jsonUsernamePasswordLoginFilter;
-  }
-
-  @Bean
   public AuthenticationFailureHandler loginFailureHandler() {
     return new LoginFailureHandler();
-  }
-
-  @Bean
-  public JwtProviderHandler loginSuccessJwtProvideHandler() {
-    return new JwtProviderHandler(jwtService, userRepository);
   }
 
   @Bean
@@ -161,8 +140,8 @@ public class SecurityConfig {
     corsConfiguration.setAllowedOriginPatterns(
         Arrays.asList(
             "http://localhost:3000",
-            "https://openaloc.store", // ✅ 추가
-            "https://openaloc.store/swagger-ui/"));
+            "https://openaloc.store", // ✅ 프론트엔드 도메인 추가
+            "https://api.openaloc.store"));
     corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH"));
     corsConfiguration.setAllowedHeaders(List.of("*"));
     corsConfiguration.setAllowCredentials(true);
