@@ -1,7 +1,7 @@
 package com.aloc.aloc.user.service;
 
-import com.aloc.aloc.color.ProfileBackgroundColor;
-import com.aloc.aloc.color.service.ProfileBackgroundColorService;
+import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
+import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
 import java.time.LocalDate;

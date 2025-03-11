@@ -11,7 +11,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Getter
@@ -22,8 +21,8 @@ import org.hibernate.annotations.UuidGenerator;
 public class User extends AuditingTimeEntity {
 
   @Id
-  @UuidGenerator
-  @Column(name = "id", updatable = false, nullable = false, columnDefinition = "BINARY(16)")
+  @GeneratedValue(strategy = GenerationType.UUID)
+  @Column(columnDefinition = "UUID")
   private UUID id;
 
   private String oauthId; // pk

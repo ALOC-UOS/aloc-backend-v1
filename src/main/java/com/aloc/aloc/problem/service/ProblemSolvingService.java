@@ -7,5 +7,4 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ProblemSolvingService {
   private final ProblemService problemService;
-  private final UserProblemService userProblemService;
 }

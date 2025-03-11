@@ -1,7 +1,8 @@
 package com.aloc.aloc.problem.enums;
 
-public enum UserProblemStatus {
+public enum UserCourseProblemStatus {
   UNSOLVED,
   SOLVED,
-  CLOSED
+  CLOSED,
+  HIDDEN
 }

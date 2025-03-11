@@ -1,6 +1,6 @@
-package com.aloc.aloc.color.repository;
+package com.aloc.aloc.profilebackgroundcolor.repository;
 
-import com.aloc.aloc.color.ProfileBackgroundColor;
+import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

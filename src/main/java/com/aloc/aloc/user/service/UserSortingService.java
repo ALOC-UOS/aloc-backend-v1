@@ -1,7 +1,6 @@
 package com.aloc.aloc.user.service;
 
 import com.aloc.aloc.problem.service.ProblemService;
-import com.aloc.aloc.problem.service.UserProblemService;
 import com.aloc.aloc.user.entity.User;
 import java.util.Comparator;
 import java.util.List;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class UserSortingService {
-  private final UserProblemService userProblemService;
   private final ProblemService problemService;
 
   public List<User> sortUserList(List<User> userList) {

@@ -33,7 +33,7 @@ public class CourseService {
   }
 
   public Page<CourseResponseDto> getCoursesByUser(Pageable pageable, String oauthId) {
-    User user = userService.findUser(oauthId);
+    User user = userService.getUser(oauthId);
     List<UserCourse> userCourses = userCourseService.getUserCoursesByUser(user);
     Page<Course> courses = courseRepository.findAll(pageable);
 

@@ -1,6 +1,6 @@
 package com.aloc.aloc.user.dto.response;
 
-import com.aloc.aloc.color.ProfileBackgroundColor;
+import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
 import com.aloc.aloc.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.format.DateTimeFormatter;

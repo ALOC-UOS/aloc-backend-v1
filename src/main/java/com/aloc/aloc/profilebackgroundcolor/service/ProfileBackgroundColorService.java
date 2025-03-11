@@ -1,8 +1,8 @@
-package com.aloc.aloc.color.service;
+package com.aloc.aloc.profilebackgroundcolor.service;
 
-import com.aloc.aloc.color.ProfileBackgroundColor;
-import com.aloc.aloc.color.dto.response.ProfileBackgroundColorResponseDto;
-import com.aloc.aloc.color.repository.ProfileBackgroundColorRepository;
+import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
+import com.aloc.aloc.profilebackgroundcolor.dto.response.ProfileBackgroundColorResponseDto;
+import com.aloc.aloc.profilebackgroundcolor.repository.ProfileBackgroundColorRepository;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.repository.UserRepository;
 import java.util.List;

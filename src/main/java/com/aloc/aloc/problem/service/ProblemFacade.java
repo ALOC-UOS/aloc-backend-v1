@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProblemFacade {
   private final ProblemService problemService;
   private final UserService userService;
-  private final ProblemMapper problemMapper;
   private final ProblemSolvingService problemSolvingService;
   private final ProblemScrapingService problemScrapingService;
 }

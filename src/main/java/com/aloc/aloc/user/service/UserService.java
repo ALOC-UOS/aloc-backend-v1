@@ -1,19 +1,11 @@
 package com.aloc.aloc.user.service;
 
-import com.aloc.aloc.global.image.ImageUploadService;
-import com.aloc.aloc.global.image.enums.ImageType;
-import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
-import com.aloc.aloc.user.dto.request.UserRequestDto;
-import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.repository.UserRepository;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,9 +15,6 @@ public class UserService {
   private static final Set<Authority> ACTIVE_AUTHORITIES =
       Set.of(Authority.ROLE_USER, Authority.ROLE_ADMIN);
   private final UserRepository userRepository;
-  private final BaekjoonRankScrapingService baekjoonRankScrapingService;
-  private final ImageUploadService imageUploadService;
-  private final UserMapper userMapper;
 
   @Transactional
   public void updateUserRank(User user, Integer rank) {
@@ -37,7 +26,7 @@ public class UserService {
     return userRepository.findAllByAuthorityIn(ACTIVE_AUTHORITIES);
   }
 
-  public User findUser(String oauthId) {
+  public User getUser(String oauthId) {
     return userRepository
         .findByOauthId(oauthId)
         .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
@@ -49,41 +38,8 @@ public class UserService {
   }
 
   @Transactional
-  public UserDetailResponseDto updateUser(String oauthId, UserRequestDto userRequestDto)
-      throws FileUploadException {
-
-    User user = findUser(oauthId);
-
-    // 필드별 null 체크 후 업데이트
-    if (userRequestDto.getBaekjoonId() != null) {
-      user.setBaekjoonId(userRequestDto.getBaekjoonId());
-      user.setRank(baekjoonRankScrapingService.extractBaekjoonRank(user.getBaekjoonId()));
-    }
-
-    if (userRequestDto.getName() != null) {
-      user.setName(userRequestDto.getName());
-    }
-
-    if (userRequestDto.getProfileImageFile() != null) {
-      uploadProfileImage(oauthId, userRequestDto);
-    }
-
-    userRepository.save(user);
-
-    return userMapper.mapToUserDetailResponseDto(user);
-  }
-
-  private void uploadProfileImage(String oauthId, UserRequestDto userRequestDto)
-      throws FileUploadException {
-    Map<String, Object> metadata = new HashMap<>();
-    metadata.put("username", oauthId);
-    imageUploadService.uploadImage(
-        userRequestDto.getProfileImageFile(), ImageType.PROFILE, metadata);
-  }
-
-  @Transactional
   public void logout(String oauthId) {
-    User user = findUser(oauthId);
+    User user = getUser(oauthId);
     user.destroyRefreshToken();
     userRepository.save(user);
   }

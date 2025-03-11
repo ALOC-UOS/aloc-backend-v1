@@ -1,6 +1,5 @@
 package com.aloc.aloc.problem.service;
 
-import com.aloc.aloc.algorithm.service.AlgorithmService;
 import com.aloc.aloc.problem.entity.Problem;
 import com.aloc.aloc.problem.repository.ProblemRepository;
 import java.util.Optional;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ProblemService {
   private final ProblemRepository problemRepository;
-  private final AlgorithmService algorithmService;
 
   public Optional<Problem> findProblemByProblemId(Integer problemId) {
     return problemRepository.findByProblemId(problemId);

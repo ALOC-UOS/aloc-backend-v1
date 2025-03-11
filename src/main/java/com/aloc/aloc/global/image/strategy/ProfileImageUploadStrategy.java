@@ -31,7 +31,7 @@ public class ProfileImageUploadStrategy implements ImageUploadStrategy {
     Path uploadPath = pathResolver.resolvePath(ImageType.PROFILE);
     try {
       Path fullPath = fileStorageStrategy.storeFile(file, uploadPath, fileName);
-      User user = userService.findUser(userId);
+      User user = userService.getUser(userId);
       user.setProfileImageFileName(fileName);
       userService.saveUser(user);
 

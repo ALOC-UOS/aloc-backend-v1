@@ -1,9 +1,10 @@
 package com.aloc.aloc.user.controller;
 
-import com.aloc.aloc.color.dto.response.ProfileBackgroundColorResponseDto;
-import com.aloc.aloc.color.service.ProfileBackgroundColorService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
+import com.aloc.aloc.profilebackgroundcolor.dto.response.ProfileBackgroundColorResponseDto;
+import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
+import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.service.UserFacade;
 import com.aloc.aloc.user.service.UserService;
@@ -59,16 +60,23 @@ public class UserController {
       @Parameter(hidden = true) @AuthenticationPrincipal User user,
       @RequestBody UserRequestDto userRequestDto)
       throws FileUploadException {
-    return CustomApiResponse.onSuccess(userService.updateUser(user.getUsername(), userRequestDto));
+    return CustomApiResponse.onSuccess(userFacade.updateUser(user.getUsername(), userRequestDto));
   }
 
   @PutMapping("/user/profile-background-color")
   @SecurityRequirement(name = "JWT Auth")
-  @SecurityRequirement(name = "Refresh Token")
   @Operation(summary = "프로필 색상 변경", description = "프로필 색상을 변경합니다.")
   public CustomApiResponse<ProfileBackgroundColorResponseDto> changeColor(
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
     return CustomApiResponse.onSuccess(
         profileBackgroundColorService.changeColor(user.getUsername()));
+  }
+
+  @GetMapping("/user/courses")
+  @SecurityRequirement(name = "JWT Auth")
+  @Operation(summary = "유저의 코스 목록 불러오기", description = "유저의 코스목록을 불러옵니다.")
+  public CustomApiResponse<List<UserCourseResponseDto>> getUserCourses(
+      @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+    return CustomApiResponse.onSuccess(userFacade.getUserCourses(user.getUsername()));
   }
 }

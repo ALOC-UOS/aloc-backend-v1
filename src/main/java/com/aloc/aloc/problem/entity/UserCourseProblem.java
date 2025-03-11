@@ -1,7 +1,8 @@
 package com.aloc.aloc.problem.entity;
 
 import com.aloc.aloc.course.entity.UserCourse;
-import com.aloc.aloc.problem.enums.UserProblemStatus;
+import com.aloc.aloc.global.domain.AuditingTimeEntity;
+import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserCourseProblem {
+public class UserCourseProblem extends AuditingTimeEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -28,11 +29,11 @@ public class UserCourseProblem {
   private UserCourse userCourse;
 
   @Enumerated(EnumType.STRING)
-  private UserProblemStatus userProblemStatus;
+  private UserCourseProblemStatus userCourseProblemStatus;
 
   private LocalDateTime solvedAt;
 
-  public void updateUserProblemStatus(UserProblemStatus userProblemStatus) {
-    this.userProblemStatus = userProblemStatus;
+  public void updateUserProblemStatus(UserCourseProblemStatus userCourseProblemStatus) {
+    this.userCourseProblemStatus = userCourseProblemStatus;
   }
 }
