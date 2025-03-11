@@ -109,6 +109,7 @@ public class SecurityConfig {
 
                           // ✅ 동적 리다이렉트
                           String targetUrl = origin + "/finish-google-sso";
+						  log.info(targetUrl);
                           response.sendRedirect(targetUrl);
                         })
                     .failureHandler(
