@@ -101,7 +101,15 @@ public class SecurityConfig {
                           jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
 
                           // ✅ 프론트엔드로 리디렉트
-                          response.sendRedirect("https://openaloc.store/finish-google-sso");
+                          // ✅ 요청의 오리진 가져오기 (예: https://www.openaloc.store)
+                          String origin = request.getHeader("Origin");
+                          if (origin == null) {
+                            origin = "https://openaloc.store"; // 기본값 설정
+                          }
+
+                          // ✅ 동적 리다이렉트
+                          String targetUrl = origin + "/finish-google-sso";
+                          response.sendRedirect(targetUrl);
                         })
                     .failureHandler(
                         (request, response, exception) -> {
