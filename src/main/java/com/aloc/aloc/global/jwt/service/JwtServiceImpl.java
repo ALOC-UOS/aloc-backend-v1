@@ -3,7 +3,6 @@ package com.aloc.aloc.global.jwt.service;
 import com.aloc.aloc.user.repository.UserRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -95,18 +94,22 @@ public class JwtServiceImpl implements JwtService {
 
     log.info("✅ Setting Access Token Header: '{}'", accessToken.trim());
     log.info("✅ Setting Refresh Token Header: '{}'", refreshToken.trim());
+  }
 
-    try {
-      ObjectMapper objectMapper = new ObjectMapper();
-      Map<String, String> tokenMap = new HashMap<>();
-      tokenMap.put("accessToken", accessToken);
-      tokenMap.put("refreshToken", refreshToken);
+  @Override
+  public void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
+    response.setHeader(accessHeader, accessToken.trim());
+  }
 
-      response.getWriter().write(objectMapper.writeValueAsString(tokenMap)); // ✅ JSON 응답 보내기
-      response.getWriter().flush();
-    } catch (Exception e) {
-      log.error("❌ OAuth 로그인 후 토큰 응답 실패", e);
-    }
+  @Override
+  public void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+    Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+    refreshTokenCookie.setHttpOnly(true);
+    refreshTokenCookie.setSecure(true);
+    refreshTokenCookie.setPath("/");
+    refreshTokenCookie.setMaxAge((int) refreshTokenValidityInSeconds);
+    refreshTokenCookie.setAttribute("SameSite", "Strict");
+    response.addCookie(refreshTokenCookie);
   }
 
   @Override
@@ -114,9 +117,6 @@ public class JwtServiceImpl implements JwtService {
     response.setStatus(HttpServletResponse.SC_OK);
 
     setAccessTokenHeader(response, accessToken);
-
-    Map<String, String> tokenMap = new HashMap<>();
-    tokenMap.put(ACCESS_TOKEN_SUBJECT, accessToken);
   }
 
   @Override
@@ -152,21 +152,6 @@ public class JwtServiceImpl implements JwtService {
       log.error(e.getMessage());
       return Optional.empty();
     }
-  }
-
-  @Override
-  public void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
-    response.addHeader(accessHeader, accessToken.trim());
-  }
-
-  @Override
-  public void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-    Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-    refreshTokenCookie.setHttpOnly(true);
-    refreshTokenCookie.setSecure(true);
-    refreshTokenCookie.setPath("/");
-    refreshTokenCookie.setMaxAge((int) refreshTokenValidityInSeconds);
-    response.addCookie(refreshTokenCookie);
   }
 
   @Override

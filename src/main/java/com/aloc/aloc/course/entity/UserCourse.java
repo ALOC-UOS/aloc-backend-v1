@@ -8,10 +8,16 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "user_course")
 public class UserCourse extends AuditingTimeEntity {
   @Id
@@ -31,6 +37,26 @@ public class UserCourse extends AuditingTimeEntity {
 
   private LocalDateTime closedAt;
 
+  @Builder.Default
   @OneToMany(mappedBy = "userCourse", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<UserCourseProblem> userCourseProblemList = new ArrayList<>();
+
+  public static UserCourse of(User user, Course course) {
+    return UserCourse.builder()
+        .course(course)
+        .user(user)
+        .userCourseState(UserCourseState.IN_PROGRESS)
+        .closedAt(
+            LocalDateTime.now()
+                .plusDays(course.getDuration() - 1)
+                .withHour(23)
+                .withMinute(59)
+                .withSecond(59)
+                .withNano(999999999))
+        .build();
+  }
+
+  public void addUserCourseProblem(UserCourseProblem userCourseProblem) {
+    this.userCourseProblemList.add(userCourseProblem);
+  }
 }

@@ -33,7 +33,15 @@ public class UserCourseProblem extends AuditingTimeEntity {
 
   private LocalDateTime solvedAt;
 
-  public void updateUserProblemStatus(UserCourseProblemStatus userCourseProblemStatus) {
+  public static UserCourseProblem of(UserCourse userCourse, Problem problem) {
+    return UserCourseProblem.builder()
+        .problem(problem)
+        .userCourse(userCourse)
+        .userCourseProblemStatus(UserCourseProblemStatus.HIDDEN)
+        .build();
+  }
+
+  public void updateUserCourseProblemStatus(UserCourseProblemStatus userCourseProblemStatus) {
     this.userCourseProblemStatus = userCourseProblemStatus;
   }
 }

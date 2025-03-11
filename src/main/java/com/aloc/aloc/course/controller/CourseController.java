@@ -2,6 +2,7 @@ package com.aloc.aloc.course.controller;
 
 import com.aloc.aloc.course.dto.request.CourseRequestDto;
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
+import com.aloc.aloc.course.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,5 +43,14 @@ public class CourseController {
   public CustomApiResponse<CourseResponseDto> createCourse(
       @RequestBody CourseRequestDto courseRequestDto) throws IOException {
     return CustomApiResponse.onSuccess(courseService.createCourse(courseRequestDto));
+  }
+
+  @PostMapping("/course/{courseId}")
+  @SecurityRequirement(name = "JWT Auth")
+  @Operation(summary = "유저가 코스선택", description = "유저가 코스를 선택합니다.")
+  public CustomApiResponse<UserCourseResponseDto> createUserCourse(
+      @PathVariable Long courseId, @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+    return CustomApiResponse.onSuccess(
+        courseService.createUserCourse(courseId, user.getUsername()));
   }
 }

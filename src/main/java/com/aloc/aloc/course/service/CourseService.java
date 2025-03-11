@@ -2,6 +2,7 @@ package com.aloc.aloc.course.service;
 
 import com.aloc.aloc.course.dto.request.CourseRequestDto;
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
+import com.aloc.aloc.course.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.entity.UserCourse;
 import com.aloc.aloc.course.enums.UserCourseState;
@@ -12,6 +13,7 @@ import com.aloc.aloc.user.service.UserService;
 import com.aloc.aloc.webhook.DiscordWebhookService;
 import java.io.IOException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,5 +61,20 @@ public class CourseService {
     String message = problemScrapingService.createProblemsByCourse(course, courseRequestDto);
     discordWebhookService.sendNotification(message);
     return CourseResponseDto.of(course, false);
+  }
+
+  @Transactional
+  public UserCourseResponseDto createUserCourse(Long courseId, String oauthId) {
+    Course course =
+        courseRepository
+            .findById(courseId)
+            .orElseThrow(() -> new NoSuchElementException("해당 코스 아이디로 된 코스가 존재하지 않습니다."));
+    User user = userService.getUser(oauthId);
+
+    if (!userCourseService.isEligibleToCreateUserCourse(user)) {
+      throw new IllegalStateException("코스는 최대 3개까지 신청할 수 있습니다.");
+    }
+    UserCourse userCourse = userCourseService.createUserCourse(user, course);
+    return UserCourseResponseDto.of(userCourse);
   }
 }

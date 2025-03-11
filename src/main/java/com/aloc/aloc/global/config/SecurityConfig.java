@@ -94,13 +94,11 @@ public class SecurityConfig {
 
                       jwtService.updateRefreshToken(oauthId, refreshToken);
 
-                      response.setContentType("application/json");
-                      response.setCharacterEncoding("UTF-8");
+                      // ✅ Access & Refresh Token 설정
+                      jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
 
-                      // ✅ 프론트로 리디렉트하도록 수정
-                      String targetUrl =
-                          "https://openaloc.store/oauth/callback?token=" + accessToken;
-                      response.sendRedirect(targetUrl);
+                      // ✅ 프론트엔드로 리디렉트
+                      response.sendRedirect("https://openaloc.store/finish-google-sso");
                     }));
 
     return http.build();

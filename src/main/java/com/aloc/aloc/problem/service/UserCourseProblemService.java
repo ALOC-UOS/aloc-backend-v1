@@ -1,5 +1,6 @@
 package com.aloc.aloc.problem.service;
 
+import com.aloc.aloc.course.entity.UserCourse;
 import com.aloc.aloc.problem.entity.Problem;
 import com.aloc.aloc.problem.entity.UserCourseProblem;
 import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
@@ -37,5 +38,14 @@ public class UserCourseProblemService {
     return userCourseProblems.stream()
         .filter(ucp -> uniqueUsers.add(ucp.getUserCourse().getUser())) // 중복 User 필터링
         .toList();
+  }
+
+  public UserCourseProblem createUserCourseProblem(UserCourse userCourse, Problem problem) {
+    UserCourseProblem userCourseProblem = UserCourseProblem.of(userCourse, problem);
+    return userCourseProblemRepository.save(userCourseProblem);
+  }
+
+  public void saveUserCourserProblem(UserCourseProblem userCourseProblem) {
+    userCourseProblemRepository.save(userCourseProblem);
   }
 }
