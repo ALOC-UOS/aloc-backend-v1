@@ -17,7 +17,7 @@ public class CoinService {
   // 코스 해결시 코스 문제수 * 20개
   // 연속일 수 %7 == 0 일때 연속일 수 // 7 * 50개
 
-  //	public CoinResponseDto giveCoinBySolvingProblem(User user) {
-  //		userService.updateUserCoin(user, SOLVE_REWARD);
-  //	}
+  //  	public CoinResponseDto giveCoinBySolvingProblem(User user) {
+  //  		userService.updateUserCoin(user, SOLVE_REWARD);
+  //  	}
 }

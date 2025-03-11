@@ -148,6 +148,7 @@ public class SecurityConfig {
         Arrays.asList(
             "http://localhost:3000",
             "https://openaloc.store", // ✅ 프론트엔드 도메인 추가
+            "https://www.openaloc.store",
             "https://api.openaloc.store"));
     corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH"));
     corsConfiguration.setAllowedHeaders(List.of("*"));

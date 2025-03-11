@@ -28,11 +28,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
   public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
     OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
 
-	// ✅ user-info-uri 값 확인
-    String userInfoEndpointUri = userRequest.getClientRegistration()
-                                           .getProviderDetails()
-                                           .getUserInfoEndpoint()
-                                           .getUri();
+    // ✅ user-info-uri 값 확인
+    String userInfoEndpointUri =
+        userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri();
 
     log.info("🔍 UserInfo 요청 URI: {}", userInfoEndpointUri); // ✅ 올바른지 로그 확인
     OAuth2User oAuth2User = delegate.loadUser(userRequest);
