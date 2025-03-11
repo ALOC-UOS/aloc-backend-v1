@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/algorithm")
 public class AlgorithmController {
   private final AlgorithmService algorithmService;
 
-  @PostMapping("/algorithm/{name}")
+  @PostMapping("{name}")
   @Operation(summary = "알고리즘 생성", description = "알고리즘 이름으로 알고리즘 관련 정보를 스크랩핑하여 생성합니다.")
   public CustomApiResponse<String> createAlgorithm(
       @Parameter(description = "알고리즘 이름", required = true) @PathVariable String name) {

@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
 @Tag(name = "User API", description = "User API 입니다.")
 public class UserController {
   private final UserFacade userFacade;
@@ -45,14 +44,6 @@ public class UserController {
   }
 
   @SecurityRequirement(name = "JWT Auth")
-  @DeleteMapping("/user/withdraw")
-  @ApiResponse(responseCode = "200", description = "success")
-  @Operation(summary = "회원 탈퇴", description = "회원 탈퇴를 진행합니다.")
-  public void withdraw(@Parameter(hidden = true) @AuthenticationPrincipal User user) {
-    userService.withdraw(user.getUsername());
-  }
-
-  @SecurityRequirement(name = "JWT Auth")
   @PatchMapping(value = "/user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ApiResponse(responseCode = "200", description = "success")
   @Operation(summary = "회원정보 업데이트", description = "회원 정보를 업데이트합니다.")
@@ -61,6 +52,14 @@ public class UserController {
       @RequestBody UserRequestDto userRequestDto)
       throws FileUploadException {
     return CustomApiResponse.onSuccess(userFacade.updateUser(user.getUsername(), userRequestDto));
+  }
+
+  @DeleteMapping("/user/withdraw")
+  @SecurityRequirement(name = "JWT Auth")
+  @ApiResponse(responseCode = "200", description = "success")
+  @Operation(summary = "회원 탈퇴", description = "회원 탈퇴를 진행합니다.")
+  public void withdraw(@Parameter(hidden = true) @AuthenticationPrincipal User user) {
+    userService.withdraw(user.getUsername());
   }
 
   @PutMapping("/user/profile-background-color")

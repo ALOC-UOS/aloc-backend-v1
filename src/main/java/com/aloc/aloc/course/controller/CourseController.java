@@ -6,6 +6,7 @@ import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -19,22 +20,21 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
 @Tag(name = "Course API", description = "course 관련 API입니다.")
 public class CourseController {
   private final CourseService courseService;
 
   @GetMapping("/courses")
+  @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "코스 목록 조회", description = "모든 코스 목록을 조회합니다.")
   public CustomApiResponse<Page<CourseResponseDto>> getCourses(
       @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
           Pageable pageable,
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
-    if (user == null) {
-      return CustomApiResponse.onSuccess(courseService.getCourses(pageable));
-    }
     return CustomApiResponse.onSuccess(
-        courseService.getCoursesByUser(pageable, user.getUsername()));
+        (user != null)
+            ? courseService.getCoursesByUser(pageable, user.getUsername())
+            : courseService.getCourses(pageable));
   }
 
   @PostMapping("/course")

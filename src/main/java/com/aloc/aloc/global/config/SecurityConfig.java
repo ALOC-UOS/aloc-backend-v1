@@ -49,27 +49,16 @@ public class SecurityConfig {
             (authorize) ->
                 authorize
                     .requestMatchers(
-                        "/api/login",
                         "/swagger-ui/**",
                         "/api-docs/**",
                         "/api/swagger-ui.html",
-                        "/api/ws/**",
-                        "/api/course",
                         "/v3/api-docs/**",
-                        "/oauth2/authorization/**")
+                        "/oauth2/authorization/**",
+                        "/algorithm/**",
+                        "/course",
+                        "/users")
                     .permitAll()
-                    .requestMatchers(
-                        "/purchase",
-                        "/api/authorize/*",
-                        "/api/weekly-problems",
-                        "/api/today-problem/solved",
-                        "/api/problems/solved",
-                        "/api/user",
-                        "/api/authorize/**",
-                        "/api/user/course",
-                        "/api/withdraw",
-                        "/api/color/change",
-                        "/api/images/upload/profile")
+                    .requestMatchers("/courses", "/user", "/user/**")
                     .authenticated()
                     .anyRequest()
                     .permitAll())
