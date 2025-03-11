@@ -101,11 +101,7 @@ public class SecurityConfig {
                           jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
 
                           // ✅ 프론트에서 보낸 state 값(리다이렉트 주소) 가져오기
-                          String targetUrl = request.getParameter("state");
-
-                          if (targetUrl == null || targetUrl.isEmpty()) {
-                            targetUrl = "https://openaloc.store/finish-google-sso"; // 기본값 (배포된 프론트)
-                          }
+                          String targetUrl = "https://openaloc.store/finish-google-sso"; // 기본값 (배포된 프론트)
                           log.info(targetUrl);
                           response.sendRedirect(targetUrl);
                         })
