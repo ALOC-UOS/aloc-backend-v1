@@ -100,16 +100,13 @@ public class SecurityConfig {
                           // ✅ Access & Refresh Token 설정
                           jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
 
-                          // ✅ 프론트엔드로 리디렉트
-                          // ✅ 요청의 오리진 가져오기 (예: https://www.openaloc.store)
-                          String origin = request.getHeader("Origin");
-                          if (origin == null) {
-                            origin = "https://openaloc.store"; // 기본값 설정
-                          }
+                          // ✅ 프론트에서 보낸 state 값(리다이렉트 주소) 가져오기
+                          String targetUrl = request.getParameter("state");
 
-                          // ✅ 동적 리다이렉트
-                          String targetUrl = origin + "/finish-google-sso";
-						  log.info(targetUrl);
+                          if (targetUrl == null || targetUrl.isEmpty()) {
+                            targetUrl = "https://openaloc.store/finish-google-sso"; // 기본값 (배포된 프론트)
+                          }
+                          log.info(targetUrl);
                           response.sendRedirect(targetUrl);
                         })
                     .failureHandler(
