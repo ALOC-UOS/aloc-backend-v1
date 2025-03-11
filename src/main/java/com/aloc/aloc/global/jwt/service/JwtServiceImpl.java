@@ -108,7 +108,7 @@ public class JwtServiceImpl implements JwtService {
     refreshTokenCookie.setSecure(true);
     refreshTokenCookie.setPath("/");
     refreshTokenCookie.setMaxAge((int) refreshTokenValidityInSeconds);
-    refreshTokenCookie.setAttribute("SameSite", "Strict");
+    refreshTokenCookie.setAttribute("SameSite", "Lax");
     response.addCookie(refreshTokenCookie);
   }
 
