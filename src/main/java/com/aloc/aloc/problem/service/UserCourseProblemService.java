@@ -48,4 +48,18 @@ public class UserCourseProblemService {
   public void saveUserCourserProblem(UserCourseProblem userCourseProblem) {
     userCourseProblemRepository.save(userCourseProblem);
   }
+
+  public void closeUserCourseProblems(List<UserCourseProblem> userCourseProblems) {
+    for (UserCourseProblem userCourseProblem : userCourseProblems) {
+      if (isUnsolvedUserCourseProblem(userCourseProblem)) {
+        userCourseProblem.updateUserCourseProblemStatus(UserCourseProblemStatus.CLOSED);
+      }
+    }
+    userCourseProblemRepository.saveAll(userCourseProblems);
+  }
+
+  private static boolean isUnsolvedUserCourseProblem(UserCourseProblem userCourseProblem) {
+    return userCourseProblem.getUserCourseProblemStatus() == UserCourseProblemStatus.HIDDEN
+        || userCourseProblem.getUserCourseProblemStatus() == UserCourseProblemStatus.UNSOLVED;
+  }
 }

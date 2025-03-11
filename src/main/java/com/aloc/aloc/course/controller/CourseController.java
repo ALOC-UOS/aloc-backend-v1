@@ -53,4 +53,12 @@ public class CourseController {
     return CustomApiResponse.onSuccess(
         courseService.createUserCourse(courseId, user.getUsername()));
   }
+
+  @PutMapping("/course/{courseId}")
+  @SecurityRequirement(name = "JWT Auth")
+  @Operation(summary = "유저가 코스선택", description = "유저가 코스를 선택합니다.")
+  public CustomApiResponse<UserCourseResponseDto> closeUserCourse(
+      @PathVariable Long courseId, @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+    return CustomApiResponse.onSuccess(courseService.closeUserCourse(courseId, user.getUsername()));
+  }
 }

@@ -59,4 +59,8 @@ public class UserCourse extends AuditingTimeEntity {
   public void addUserCourseProblem(UserCourseProblem userCourseProblem) {
     this.userCourseProblemList.add(userCourseProblem);
   }
+
+  public void updateUserCourseState(UserCourseState userCourseState) {
+    this.userCourseState = userCourseState;
+  }
 }
