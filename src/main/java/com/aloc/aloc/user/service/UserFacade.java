@@ -82,11 +82,11 @@ public class UserFacade {
 
     User user = userService.getUser(oauthId);
 
-    // 필드별 null 체크 후 업데이트
-    if (userRequestDto.getBaekjoonId() != null) {
-      user.setBaekjoonId(userRequestDto.getBaekjoonId());
-      user.setRank(baekjoonRankScrapingService.extractBaekjoonRank(user.getBaekjoonId()));
-    }
+	if (userRequestDto.getBaekjoonId() != null && user.getBaekjoonId() == null) {
+		userService.checkBaekjoonId(userRequestDto.getBaekjoonId());
+		user.setBaekjoonId(userRequestDto.getBaekjoonId());
+      	user.setRank(baekjoonRankScrapingService.extractBaekjoonRank(user.getBaekjoonId()));
+	}
 
     if (userRequestDto.getName() != null) {
       user.setName(userRequestDto.getName());

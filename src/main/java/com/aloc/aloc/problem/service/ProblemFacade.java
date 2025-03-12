@@ -10,6 +10,7 @@ import com.aloc.aloc.problem.dto.response.ProblemSolvedResponseDto;
 import com.aloc.aloc.problem.entity.Problem;
 import com.aloc.aloc.problem.entity.UserCourseProblem;
 import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
+import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
 import com.aloc.aloc.scraper.SolvedCheckingService;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.service.UserService;
@@ -28,6 +29,7 @@ public class ProblemFacade {
   private final UserCourseProblemService userCourseProblemService;
   private final SolvedCheckingService solvedCheckingService;
   private final CoinService coinService;
+  private final BaekjoonRankScrapingService baekjoonRankScrapingService;
 
   @Transactional
   public ProblemSolvedResponseDto checkProblemSolved(Integer problemId, String oauthId) {
@@ -43,6 +45,8 @@ public class ProblemFacade {
     if (!solvedCheckingService.isProblemSolved(user.getBaekjoonId(), problem, userCourseProblem)) {
       return ProblemSolvedResponseDto.fail();
     }
+
+	user.setRank(baekjoonRankScrapingService.extractBaekjoonRank(user.getBaekjoonId()));
 
     // 문제 해결 성공 시 처리
     userCourseProblem.updateUserCourseProblemSolved();

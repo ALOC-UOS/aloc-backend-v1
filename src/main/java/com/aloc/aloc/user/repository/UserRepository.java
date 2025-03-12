@@ -19,4 +19,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
   List<User> findAllByAuthorityIn(Set<Authority> authorities);
 
   void deleteByOauthId(String oauthId);
+
+  boolean existsByBaekjoonId(String baekjoonId);
 }

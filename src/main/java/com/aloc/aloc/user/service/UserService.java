@@ -16,12 +16,6 @@ public class UserService {
       Set.of(Authority.ROLE_USER, Authority.ROLE_ADMIN);
   private final UserRepository userRepository;
 
-  @Transactional
-  public void updateUserRank(User user, Integer rank) {
-    user.setRank(rank);
-    userRepository.save(user);
-  }
-
   public List<User> getActiveUsers() {
     return userRepository.findAllByAuthorityIn(ACTIVE_AUTHORITIES);
   }
@@ -53,5 +47,12 @@ public class UserService {
   public void updateUserCoin(User user, int coin) {
     user.addCoin(coin);
     saveUser(user);
+  }
+
+  public void checkBaekjoonId(String baekjoondId) {
+	  if (userRepository.existsByBaekjoonId(baekjoondId)) {
+		  throw new IllegalArgumentException("이미 존재하는 백준 아이디 입니다.");
+	  }
+
   }
 }
