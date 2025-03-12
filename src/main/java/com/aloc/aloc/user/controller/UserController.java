@@ -3,6 +3,7 @@ package com.aloc.aloc.user.controller;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import com.aloc.aloc.profilebackgroundcolor.dto.response.ProfileBackgroundColorResponseDto;
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
+import com.aloc.aloc.user.dto.request.ProfileImageRequestDto;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
 import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
@@ -44,14 +45,25 @@ public class UserController {
   }
 
   @SecurityRequirement(name = "JWT Auth")
-  @PatchMapping(value = "/user", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PatchMapping("/user")
   @ApiResponse(responseCode = "200", description = "success")
   @Operation(summary = "회원정보 업데이트", description = "회원 정보를 업데이트합니다.")
   public CustomApiResponse<UserDetailResponseDto> updateUser(
       @Parameter(hidden = true) @AuthenticationPrincipal User user,
-      @RequestBody UserRequestDto userRequestDto)
-      throws FileUploadException {
+      @RequestBody UserRequestDto userRequestDto) {
     return CustomApiResponse.onSuccess(userFacade.updateUser(user.getUsername(), userRequestDto));
+  }
+
+  @SecurityRequirement(name = "JWT Auth")
+  @PatchMapping(value = "/user/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @ApiResponse(responseCode = "200", description = "success")
+  @Operation(summary = "유저의 프로필이미지 업데이트", description = "유저의 프로필 이미지를 업데이트 하거나 삭제합니다")
+  public CustomApiResponse<UserDetailResponseDto> updateUserProfileImage(
+      @Parameter(hidden = true) @AuthenticationPrincipal User user,
+      @RequestBody ProfileImageRequestDto profileImageRequestDto)
+      throws FileUploadException {
+    return CustomApiResponse.onSuccess(
+        userFacade.updateUserProfileImage(user.getUsername(), profileImageRequestDto));
   }
 
   @DeleteMapping("/user/withdraw")

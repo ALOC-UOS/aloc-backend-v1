@@ -2,12 +2,13 @@ package com.aloc.aloc.user.service;
 
 import com.aloc.aloc.course.entity.UserCourse;
 import com.aloc.aloc.course.service.UserCourseService;
-import com.aloc.aloc.global.image.ImageUploadService;
+import com.aloc.aloc.global.image.ImageService;
 import com.aloc.aloc.global.image.enums.ImageType;
 import com.aloc.aloc.problem.dto.response.ProblemResponseDto;
 import com.aloc.aloc.problem.entity.UserCourseProblem;
 import com.aloc.aloc.problem.service.UserCourseProblemService;
 import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
+import com.aloc.aloc.user.dto.request.ProfileImageRequestDto;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
 import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class UserFacade {
   private final UserMapper userMapper;
   private final UserService userService;
   private final BaekjoonRankScrapingService baekjoonRankScrapingService;
-  private final ImageUploadService imageUploadService;
+  private final ImageService imageService;
   private final UserCourseService userCourseService;
   private final UserCourseProblemService userCourseProblemService;
 
@@ -76,8 +78,7 @@ public class UserFacade {
   }
 
   @Transactional
-  public UserDetailResponseDto updateUser(String oauthId, UserRequestDto userRequestDto)
-      throws FileUploadException {
+  public UserDetailResponseDto updateUser(String oauthId, UserRequestDto userRequestDto) {
 
     User user = userService.getUser(oauthId);
 
@@ -91,20 +92,39 @@ public class UserFacade {
       user.setName(userRequestDto.getName());
     }
 
-    if (userRequestDto.getProfileImageFile() != null) {
-      uploadProfileImage(oauthId, userRequestDto);
-    }
-
     userService.saveUser(user);
 
     return userMapper.mapToUserDetailResponseDto(user);
   }
 
-  private void uploadProfileImage(String oauthId, UserRequestDto userRequestDto)
+  @Transactional
+  public UserDetailResponseDto updateUserProfileImage(
+      String oauthId, ProfileImageRequestDto profileImageRequestDto) throws FileUploadException {
+    User user = userService.getUser(oauthId);
+
+    if (user.getProfileImageFileName() != null) {
+      deleteProfileImage(oauthId, user.getProfileImageFileName());
+    }
+
+    if (profileImageRequestDto.getProfileImageFile() != null) {
+      uploadProfileImage(oauthId, profileImageRequestDto.getProfileImageFile());
+    }
+    return userMapper.mapToUserDetailResponseDto(user);
+  }
+
+  private void uploadProfileImage(String oauthId, MultipartFile profileImageFile)
       throws FileUploadException {
+    Map<String, Object> metadata = createMetaData(oauthId);
+    imageService.uploadImage(profileImageFile, ImageType.PROFILE, metadata);
+  }
+
+  private static Map<String, Object> createMetaData(String oauthId) {
     Map<String, Object> metadata = new HashMap<>();
     metadata.put("username", oauthId);
-    imageUploadService.uploadImage(
-        userRequestDto.getProfileImageFile(), ImageType.PROFILE, metadata);
+    return metadata;
+  }
+
+  private void deleteProfileImage(String oauthId, String fileName) {
+    imageService.deleteImage(fileName, ImageType.PROFILE, createMetaData(oauthId));
   }
 }

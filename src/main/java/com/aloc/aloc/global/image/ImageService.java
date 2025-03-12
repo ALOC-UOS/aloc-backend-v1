@@ -2,7 +2,7 @@ package com.aloc.aloc.global.image;
 
 import com.aloc.aloc.global.image.dto.ImageInfoDto;
 import com.aloc.aloc.global.image.enums.ImageType;
-import com.aloc.aloc.global.image.strategy.ImageUploadStrategy;
+import com.aloc.aloc.global.image.strategy.ImageStrategy;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -13,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-public class ImageUploadService {
-  private final Map<ImageType, ImageUploadStrategy> strategies;
+public class ImageService {
+  private final Map<ImageType, ImageStrategy> strategies;
 
-  public ImageUploadService(List<ImageUploadStrategy> strategyList) {
+  public ImageService(List<ImageStrategy> strategyList) {
     strategies =
         strategyList.stream()
             .collect(
@@ -26,7 +26,7 @@ public class ImageUploadService {
                             strategy
                                 .getClass()
                                 .getSimpleName()
-                                .replace("ImageUploadStrategy", "")
+                                .replace("ImageStrategy", "")
                                 .toUpperCase()),
                     Function.identity()));
   }
@@ -35,12 +35,19 @@ public class ImageUploadService {
   public ImageInfoDto uploadImage(
       MultipartFile file, ImageType imageType, Map<String, Object> metadata)
       throws FileUploadException {
-    ImageUploadStrategy strategy = strategies.get(imageType);
+    ImageStrategy strategy = strategies.get(imageType);
     validateStrategyExists(imageType, strategy);
     return strategy.upload(file, metadata);
   }
 
-  private static void validateStrategyExists(ImageType imageType, ImageUploadStrategy strategy) {
+  @Transactional
+  public void deleteImage(String fileName, ImageType imageType, Map<String, Object> metadata) {
+    ImageStrategy strategy = strategies.get(imageType);
+    validateStrategyExists(imageType, strategy);
+    strategy.delete(fileName, metadata);
+  }
+
+  private static void validateStrategyExists(ImageType imageType, ImageStrategy strategy) {
     if (strategy == null) {
       throw new IllegalArgumentException("Unsupported image type: " + imageType);
     }

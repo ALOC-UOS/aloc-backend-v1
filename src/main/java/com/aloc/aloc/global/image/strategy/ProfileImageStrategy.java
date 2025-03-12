@@ -14,23 +14,20 @@ import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
-public class ProfileImageUploadStrategy implements ImageUploadStrategy {
-  private final FileStorageStrategy fileStorageStrategy;
+public class ProfileImageStrategy implements ImageStrategy {
+  private final FileStrategy fileStrategy;
   private final ImageTypePathResolver pathResolver;
   private final UserService userService;
 
   @Override
   public ImageInfoDto upload(MultipartFile file, Map<String, Object> metadata)
       throws FileUploadException {
-    String userId = (String) metadata.get("username");
-    if (userId == null) {
-      throw new IllegalArgumentException("User ID is required for profile image upload");
-    }
+    String userId = getUserId(metadata);
 
     String fileName = FileNameGenerator.generateUniqueFileName(file.getOriginalFilename());
     Path uploadPath = pathResolver.resolvePath(ImageType.PROFILE);
     try {
-      Path fullPath = fileStorageStrategy.storeFile(file, uploadPath, fileName);
+      Path fullPath = fileStrategy.storeFile(file, uploadPath, fileName);
       User user = userService.getUser(userId);
       user.setProfileImageFileName(fileName);
       userService.saveUser(user);
@@ -38,6 +35,27 @@ public class ProfileImageUploadStrategy implements ImageUploadStrategy {
       return new ImageInfoDto(ImageType.PROFILE, fileName, fullPath);
     } catch (IOException e) {
       throw new FileUploadException("Failed to upload profile image", e);
+    }
+  }
+
+  private static String getUserId(Map<String, Object> metadata) {
+    String userId = (String) metadata.get("username");
+    if (userId == null) {
+      throw new IllegalArgumentException("User ID is required for profile image upload");
+    }
+    return userId;
+  }
+
+  @Override
+  public void delete(String fileName, Map<String, Object> metadata) {
+    String userId = getUserId(metadata);
+    Path uploadPath = pathResolver.resolvePath(ImageType.PROFILE);
+    if (fileStrategy.deleteFile(uploadPath, fileName)) {
+      User user = userService.getUser(userId);
+      user.setProfileImageFileName(null);
+      userService.saveUser(user);
+    } else {
+      throw new RuntimeException("파일 삭제에 실패하였습니다.");
     }
   }
 }

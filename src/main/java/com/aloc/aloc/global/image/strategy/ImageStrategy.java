@@ -5,6 +5,8 @@ import java.util.Map;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.web.multipart.MultipartFile;
 
-public interface ImageUploadStrategy {
+public interface ImageStrategy {
   ImageInfoDto upload(MultipartFile file, Map<String, Object> metadata) throws FileUploadException;
+
+  void delete(String fileName, Map<String, Object> metadata);
 }
