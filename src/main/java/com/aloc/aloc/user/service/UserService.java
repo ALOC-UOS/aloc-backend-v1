@@ -3,6 +3,7 @@ package com.aloc.aloc.user.service;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.repository.UserRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -50,9 +51,27 @@ public class UserService {
   }
 
   public void checkBaekjoonId(String baekjoondId) {
-	  if (userRepository.existsByBaekjoonId(baekjoondId)) {
-		  throw new IllegalArgumentException("이미 존재하는 백준 아이디 입니다.");
-	  }
+    if (userRepository.existsByBaekjoonId(baekjoondId)) {
+      throw new IllegalArgumentException("이미 존재하는 백준 아이디 입니다.");
+    }
+  }
 
+  @Transactional
+  public void initializeUserStreakDays() {
+    userRepository
+        .findAll()
+        .forEach(
+            user -> {
+              if (!isUserSolvedYesterday(user)) {
+                user.setLastSolvedAt(null);
+                user.setConsecutiveSolvedDays(0);
+              }
+            });
+  }
+
+  private boolean isUserSolvedYesterday(User user) {
+    return user.getLastSolvedAt()
+        .toLocalDate()
+        .equals(LocalDateTime.now().minusDays(1).toLocalDate());
   }
 }

@@ -46,7 +46,7 @@ public class ProblemFacade {
       return ProblemSolvedResponseDto.fail();
     }
 
-	user.setRank(baekjoonRankScrapingService.extractBaekjoonRank(user.getBaekjoonId()));
+    user.setRank(baekjoonRankScrapingService.extractBaekjoonRank(user.getBaekjoonId()));
 
     // 문제 해결 성공 시 처리
     userCourseProblem.updateUserCourseProblemSolved();

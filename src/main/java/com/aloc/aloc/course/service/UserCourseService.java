@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -61,5 +62,28 @@ public class UserCourseService {
   public void closeUserCourse(UserCourse userCourse) {
     userCourseProblemService.closeUserCourseProblems(userCourse.getUserCourseProblemList());
     userCourse.updateUserCourseState(UserCourseState.FAILED);
+  }
+
+  @Transactional
+  public void closeFailUserCourse() {
+    userCourseRepository
+        .findAllByUserCourseStateAndClosedAtBefore(UserCourseState.IN_PROGRESS, LocalDateTime.now())
+        .forEach(this::closeUserCourse);
+  }
+
+  @Transactional
+  public void openDailyUserCourseProblem() {
+    List<UserCourse> userCourses =
+        userCourseRepository.findAllByUserCourseState(UserCourseState.IN_PROGRESS);
+
+    userCourses.forEach(
+        userCourse -> {
+          for (UserCourseProblem ucp : userCourse.getUserCourseProblemList()) {
+            if (ucp.getUserCourseProblemStatus().equals(UserCourseProblemStatus.HIDDEN)) {
+              ucp.updateUserCourseProblemStatus(UserCourseProblemStatus.UNSOLVED);
+              break; // 하나만 변경 후 종료
+            }
+          }
+        });
   }
 }
