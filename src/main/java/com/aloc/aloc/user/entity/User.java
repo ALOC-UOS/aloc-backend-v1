@@ -56,8 +56,14 @@ public class User extends AuditingTimeEntity {
     this.refreshToken = null;
   }
 
-  public void addSolvedCount() {
+  public void updateUserBySolvingProblem() {
     this.solvedCount++;
+    if (lastSolvedAt == null || lastSolvedAt.equals(LocalDateTime.now().minusDays(1))) {
+      this.consecutiveSolvedDays++;
+    } else {
+      this.consecutiveSolvedDays = 1;
+    }
+    lastSolvedAt = LocalDateTime.now();
   }
 
   @Builder

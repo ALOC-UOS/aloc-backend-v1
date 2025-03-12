@@ -1,6 +1,7 @@
 package com.aloc.aloc.problem.controller;
 
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
+import com.aloc.aloc.problem.dto.response.ProblemSolvedResponseDto;
 import com.aloc.aloc.problem.service.ProblemFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,7 +23,7 @@ public class ProblemController {
   @PutMapping("/problem/{problemId}")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "문제 해결", description = "문제 해결 여부를 확인합니다.")
-  public CustomApiResponse<String> checkProblemSolved(
+  public CustomApiResponse<ProblemSolvedResponseDto> checkProblemSolved(
       @PathVariable Integer problemId,
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
     return CustomApiResponse.onSuccess(

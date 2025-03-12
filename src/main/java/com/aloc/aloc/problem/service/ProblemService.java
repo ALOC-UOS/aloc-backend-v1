@@ -2,7 +2,7 @@ package com.aloc.aloc.problem.service;
 
 import com.aloc.aloc.problem.entity.Problem;
 import com.aloc.aloc.problem.repository.ProblemRepository;
-import com.aloc.aloc.user.service.UserService;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ProblemService {
   private final ProblemRepository problemRepository;
-  private final UserService userService;
-  private final UserCourseProblemService userCourseProblemService;
 
   public Optional<Problem> findProblemByProblemId(Integer problemId) {
     return problemRepository.findByProblemId(problemId);
@@ -21,5 +19,10 @@ public class ProblemService {
   public Problem saveProblem(Problem problem) {
     problemRepository.save(problem);
     return problem;
+  }
+
+  public Problem getProblemByProblemId(Integer problemId) {
+    return findProblemByProblemId(problemId)
+        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 문제 입니다."));
   }
 }
