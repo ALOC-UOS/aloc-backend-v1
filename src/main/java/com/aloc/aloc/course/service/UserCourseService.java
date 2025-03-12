@@ -86,4 +86,9 @@ public class UserCourseService {
           }
         });
   }
+
+  @Transactional
+  public void deleteUserCourses(List<UserCourse> userCourses) {
+    userCourseRepository.deleteAll(userCourses);
+  }
 }

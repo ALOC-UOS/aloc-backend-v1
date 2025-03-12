@@ -28,11 +28,6 @@ public class UserService {
   }
 
   @Transactional
-  public void withdraw(String oauthId) {
-    userRepository.deleteByOauthId(oauthId);
-  }
-
-  @Transactional
   public void logout(String oauthId) {
     User user = getUser(oauthId);
     user.destroyRefreshToken();
@@ -58,8 +53,7 @@ public class UserService {
 
   @Transactional
   public void initializeUserStreakDays() {
-    userRepository
-        .findAll()
+    getActiveUsers()
         .forEach(
             user -> {
               if (!isUserSolvedYesterday(user)) {

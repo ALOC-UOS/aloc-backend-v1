@@ -71,7 +71,7 @@ public class UserController {
   @ApiResponse(responseCode = "200", description = "success")
   @Operation(summary = "회원 탈퇴", description = "회원 탈퇴를 진행합니다.")
   public void withdraw(@Parameter(hidden = true) @AuthenticationPrincipal User user) {
-    userService.withdraw(user.getUsername());
+    userFacade.withdraw(user.getUsername());
   }
 
   @PutMapping("/user/profile-background-color")

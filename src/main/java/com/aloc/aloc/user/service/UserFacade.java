@@ -13,6 +13,8 @@ import com.aloc.aloc.user.dto.request.UserRequestDto;
 import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
+import com.aloc.aloc.user.enums.Authority;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -126,5 +128,16 @@ public class UserFacade {
 
   private void deleteProfileImage(String oauthId, String fileName) {
     imageService.deleteImage(fileName, ImageType.PROFILE, createMetaData(oauthId));
+  }
+
+  @Transactional
+  public void withdraw(String oauthId) {
+    User user = userService.getUser(oauthId);
+
+    user.setAuthority(Authority.ROLE_DELETE);
+    user.setDeletedAt(LocalDateTime.now());
+
+    List<UserCourse> userCourses = userCourseService.getUserCoursesByUser(user);
+    userCourseService.deleteUserCourses(userCourses);
   }
 }
