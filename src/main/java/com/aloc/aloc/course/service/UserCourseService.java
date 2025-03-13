@@ -3,6 +3,7 @@ package com.aloc.aloc.course.service;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.entity.CourseProblem;
 import com.aloc.aloc.course.entity.UserCourse;
+import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.repository.UserCourseRepository;
 import com.aloc.aloc.problem.entity.Problem;
@@ -74,7 +75,8 @@ public class UserCourseService {
   @Transactional
   public void openDailyUserCourseProblem() {
     List<UserCourse> userCourses =
-        userCourseRepository.findAllByUserCourseState(UserCourseState.IN_PROGRESS);
+        userCourseRepository.findAllByUserCourseStateAndCourseType(
+            UserCourseState.IN_PROGRESS, CourseType.DAILY);
 
     userCourses.forEach(
         userCourse -> {

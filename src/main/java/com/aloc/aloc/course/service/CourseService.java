@@ -5,6 +5,7 @@ import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.entity.UserCourse;
+import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.repository.CourseRepository;
 import com.aloc.aloc.scraper.ProblemScrapingService;
@@ -29,15 +30,22 @@ public class CourseService {
   private final UserCourseService userCourseService;
   private final UserService userService;
 
-  public Page<CourseResponseDto> getCourses(Pageable pageable) {
-    Page<Course> courses = courseRepository.findAll(pageable);
+  public Page<CourseResponseDto> getCourses(Pageable pageable, CourseType courseTypeOrNull) {
+    Page<Course> courses = getCoursePageByCourseType(pageable, courseTypeOrNull);
     return courses.map(course -> CourseResponseDto.of(course, false));
   }
 
-  public Page<CourseResponseDto> getCoursesByUser(Pageable pageable, String oauthId) {
+  private Page<Course> getCoursePageByCourseType(Pageable pageable, CourseType courseTypeOrNull) {
+    return courseTypeOrNull == null
+        ? courseRepository.findAll(pageable)
+        : courseRepository.findAllByCourseType(courseTypeOrNull, pageable);
+  }
+
+  public Page<CourseResponseDto> getCoursesByUser(
+      Pageable pageable, String oauthId, CourseType courseTypeOrNull) {
     User user = userService.getUser(oauthId);
     List<UserCourse> userCourses = userCourseService.getUserCoursesByUser(user);
-    Page<Course> courses = courseRepository.findAll(pageable);
+    Page<Course> courses = getCoursePageByCourseType(pageable, courseTypeOrNull);
 
     return courses.map(
         course -> {

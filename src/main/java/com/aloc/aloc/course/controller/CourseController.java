@@ -3,6 +3,7 @@ package com.aloc.aloc.course.controller;
 import com.aloc.aloc.course.dto.request.CourseRequestDto;
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.dto.response.UserCourseResponseDto;
+import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,11 +32,12 @@ public class CourseController {
   public CustomApiResponse<Page<CourseResponseDto>> getCourses(
       @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
           Pageable pageable,
+      @RequestParam(required = false) CourseType courseType,
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
     return CustomApiResponse.onSuccess(
         (user != null)
-            ? courseService.getCoursesByUser(pageable, user.getUsername())
-            : courseService.getCourses(pageable));
+            ? courseService.getCoursesByUser(pageable, user.getUsername(), courseType)
+            : courseService.getCourses(pageable, courseType));
   }
 
   @PostMapping("/course")
