@@ -12,14 +12,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @OpenAPIDefinition(
     info = @Info(title = "OPEN-ALOC API", version = "v1"),
-    security = {@SecurityRequirement(name = "Bearer Auth")},
+    security = {@SecurityRequirement(name = "JWT Auth")},
     servers = {
       @Server(url = "https://api.openaloc.store", description = "Production Server"),
       @Server(url = "http://localhost:8080", description = "Local Server")
     })
 @SecuritySchemes({
   @SecurityScheme(
-      name = "Bearer Auth",
+      name = "JWT Auth",
       type = SecuritySchemeType.HTTP,
       scheme = "bearer",
       bearerFormat = "JWT")
