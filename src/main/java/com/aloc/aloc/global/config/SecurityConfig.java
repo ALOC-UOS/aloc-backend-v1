@@ -53,9 +53,10 @@ public class SecurityConfig {
                         "/algorithm/**",
                         "/course",
                         "/users",
-                        "/oauth/callback")
+                        "/oauth/callback",
+						"/courses")
                     .permitAll()
-                    .requestMatchers("/courses", "/user", "/user/**")
+                    .requestMatchers("/user", "/user/**")
                     .authenticated()
                     .anyRequest()
                     .permitAll())
