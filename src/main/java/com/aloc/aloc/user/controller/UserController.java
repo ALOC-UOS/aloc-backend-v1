@@ -3,7 +3,6 @@ package com.aloc.aloc.user.controller;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import com.aloc.aloc.profilebackgroundcolor.dto.response.ProfileBackgroundColorResponseDto;
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
-import com.aloc.aloc.user.dto.request.ProfileImageRequestDto;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
 import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
@@ -21,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -56,14 +56,12 @@ public class UserController {
 
   @SecurityRequirement(name = "JWT Auth")
   @PatchMapping(value = "/user/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  @ApiResponse(responseCode = "200", description = "success")
-  @Operation(summary = "유저의 프로필이미지 업데이트", description = "유저의 프로필 이미지를 업데이트 하거나 삭제합니다")
   public CustomApiResponse<UserDetailResponseDto> updateUserProfileImage(
       @Parameter(hidden = true) @AuthenticationPrincipal User user,
-      @RequestBody ProfileImageRequestDto profileImageRequestDto)
+      @RequestPart(value = "profileImageFile", required = false) MultipartFile profileImageFile)
       throws FileUploadException {
     return CustomApiResponse.onSuccess(
-        userFacade.updateUserProfileImage(user.getUsername(), profileImageRequestDto));
+        userFacade.updateUserProfileImage(user.getUsername(), profileImageFile));
   }
 
   @DeleteMapping("/user/withdraw")

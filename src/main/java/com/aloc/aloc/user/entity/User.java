@@ -47,6 +47,7 @@ public class User extends AuditingTimeEntity {
   private Integer consecutiveSolvedDays = 0;
   private LocalDateTime lastSolvedAt;
   private LocalDateTime deletedAt;
+  private Boolean isNewUser;
 
   public void updateRefreshToken(String refreshToken) {
     this.refreshToken = refreshToken;
@@ -84,6 +85,7 @@ public class User extends AuditingTimeEntity {
     this.profileImageFileName = profileImageFileName;
     this.coin = 0;
     this.profileColor = "Blue";
+    this.isNewUser = true;
   }
 
   public User update(String email) {

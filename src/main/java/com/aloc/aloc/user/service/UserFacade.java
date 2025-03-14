@@ -8,7 +8,6 @@ import com.aloc.aloc.problem.dto.response.ProblemResponseDto;
 import com.aloc.aloc.problem.entity.UserCourseProblem;
 import com.aloc.aloc.problem.service.UserCourseProblemService;
 import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
-import com.aloc.aloc.user.dto.request.ProfileImageRequestDto;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
 import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
@@ -23,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -84,13 +84,14 @@ public class UserFacade {
 
     User user = userService.getUser(oauthId);
 
-    if (userRequestDto.getBaekjoonId() != null && user.getBaekjoonId() == null) {
+    if (userRequestDto.getBaekjoonId() != null && user.getIsNewUser()) {
       userService.checkBaekjoonId(userRequestDto.getBaekjoonId());
       user.setBaekjoonId(userRequestDto.getBaekjoonId());
       user.setRank(baekjoonRankScrapingService.extractBaekjoonRank(user.getBaekjoonId()));
+      user.setIsNewUser(false);
     }
 
-    if (userRequestDto.getName() != null) {
+    if (StringUtils.hasText(userRequestDto.getName())) {
       user.setName(userRequestDto.getName());
     }
 
@@ -100,16 +101,16 @@ public class UserFacade {
   }
 
   @Transactional
-  public UserDetailResponseDto updateUserProfileImage(
-      String oauthId, ProfileImageRequestDto profileImageRequestDto) throws FileUploadException {
+  public UserDetailResponseDto updateUserProfileImage(String oauthId, MultipartFile profileImage)
+      throws FileUploadException {
     User user = userService.getUser(oauthId);
 
     if (user.getProfileImageFileName() != null) {
       deleteProfileImage(oauthId, user.getProfileImageFileName());
     }
 
-    if (profileImageRequestDto.getProfileImageFile() != null) {
-      uploadProfileImage(oauthId, profileImageRequestDto.getProfileImageFile());
+    if (profileImage != null) {
+      uploadProfileImage(oauthId, profileImage);
     }
     return userMapper.mapToUserDetailResponseDto(user);
   }

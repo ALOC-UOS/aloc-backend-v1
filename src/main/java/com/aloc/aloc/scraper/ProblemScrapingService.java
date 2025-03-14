@@ -76,6 +76,9 @@ public class ProblemScrapingService {
       Course course, List<Algorithm> algorithms, List<Integer> rankList) throws IOException {
     String url = getProblemUrl(algorithms, rankList);
     List<Problem> problems = crawlProblems(url);
+    if (problems.size() < course.getProblemCnt()) {
+      throw new IllegalArgumentException("해당 조건에 해당하는 문제 수가 부족합니다. 알고리즘을 더 추가하거나 랭크의 범위를 넓히세요");
+    }
 
     return saveAndSortProblems(problems.subList(0, course.getProblemCnt()));
   }
