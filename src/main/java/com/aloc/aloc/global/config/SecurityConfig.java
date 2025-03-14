@@ -51,12 +51,14 @@ public class SecurityConfig {
                         "/v3/api-docs/**",
                         "/oauth2/authorization/**",
                         "/algorithm/**",
-                        "/course",
                         "/users",
                         "/oauth/callback",
-                        "/courses")
+                        "/courses",
+                        "/auth/refresh",
+                        "/course")
                     .permitAll()
-                    .requestMatchers("/user", "/user/**")
+                    .requestMatchers(
+                        "/user", "/user/**", "/course/**", "/auth/logout", "/problem/**")
                     .authenticated()
                     .anyRequest()
                     .permitAll())
