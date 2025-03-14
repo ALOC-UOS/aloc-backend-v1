@@ -54,7 +54,7 @@ public class SecurityConfig {
                         "/course",
                         "/users",
                         "/oauth/callback",
-						"/courses")
+                        "/courses")
                     .permitAll()
                     .requestMatchers("/user", "/user/**")
                     .authenticated()
