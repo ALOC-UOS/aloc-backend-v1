@@ -120,7 +120,7 @@ public class ProblemScrapingService {
     StringBuilder message = new StringBuilder();
 
     message
-        .append("📌 크롤링 결과\n")
+        .append("## 📌 크롤링 결과\n\n")
         .append("📚 코스: ")
         .append(course.getTitle())
         .append("\n")
@@ -140,6 +140,7 @@ public class ProblemScrapingService {
         .append("\n")
         .append("📈 평균 난이도: ")
         .append(course.getAverageRank())
+		.append("\n")
         .append("🗓️ 기한: ")
         .append(course.getDuration())
         .append("\n\n");
