@@ -56,7 +56,7 @@ public class CourseController {
         courseService.createUserCourse(courseId, user.getUsername()));
   }
 
-  @PatchMapping("/course/{courseId}/stop")
+  @PatchMapping("/course/{courseId}")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "유저 코스 포기", description = "유저가 특정 코스를 포기합니다.")
   public CustomApiResponse<UserCourseResponseDto> closeUserCourse(
