@@ -11,9 +11,11 @@ import java.nio.file.Path;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
+@Component
 public class ProfileImageStrategy implements ImageStrategy {
   private final FileStrategy fileStrategy;
   private final ImageTypePathResolver pathResolver;

@@ -121,7 +121,7 @@ public class UserFacade {
     imageService.uploadImage(profileImageFile, ImageType.PROFILE, metadata);
   }
 
-  private static Map<String, Object> createMetaData(String oauthId) {
+  private Map<String, Object> createMetaData(String oauthId) {
     Map<String, Object> metadata = new HashMap<>();
     metadata.put("username", oauthId);
     return metadata;
