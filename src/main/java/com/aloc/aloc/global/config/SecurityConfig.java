@@ -105,7 +105,7 @@ public class SecurityConfig {
                               (boolean) oAuth2User.getAttributes().getOrDefault("isNewUser", false);
                           // ✅ 요청의 Origin을 확인하여 리다이렉트 주소 설정
                           String origin = request.getHeader("Origin");
-						  log.info("origin : " + origin);
+                          log.info("origin : " + origin);
                           String targetUrl;
 
                           if (origin != null && origin.contains("localhost")) {

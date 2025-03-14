@@ -3,7 +3,7 @@ package com.aloc.aloc.user.dto.response;
 import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
 import com.aloc.aloc.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -38,7 +38,7 @@ public class UserDetailResponseDto extends UserResponseDto {
   private final Integer degree;
 
   @Schema(description = "유저 생성 일자", example = "2024-03-04T19:37:55")
-  private final String createdAt;
+  private final LocalDateTime createdAt;
 
   @Schema(description = "오늘 문제 해결 여부", example = "true")
   private boolean isTodaySolved;
@@ -62,7 +62,7 @@ public class UserDetailResponseDto extends UserResponseDto {
         .color5(profileBackgroundColor.getColor5())
         .degree(profileBackgroundColor.getDegree())
         .isTodaySolved(isTodaySolved)
-        .createdAt(user.getCreatedAt().format(DateTimeFormatter.ofPattern("HH:mm:ss")))
+        .createdAt(user.getCreatedAt())
         .build();
   }
 }
