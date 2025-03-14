@@ -11,5 +11,6 @@ public class CourseRequestDto {
   private int problemCnt;
   private int minRank;
   private int maxRank;
+  private int duration;
   private List<Integer> algorithmIdList;
 }

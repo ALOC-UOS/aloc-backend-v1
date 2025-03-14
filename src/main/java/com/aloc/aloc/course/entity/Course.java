@@ -45,6 +45,10 @@ public class Course extends AuditingTimeEntity {
         .minRank(courseRequestDto.getMinRank())
         .maxRank(courseRequestDto.getMaxRank())
         .generateCnt(0L)
+        .duration(
+            courseRequestDto.getCourseType().equals(CourseType.DAILY)
+                ? courseRequestDto.getProblemCnt()
+                : courseRequestDto.getDuration())
         .build();
   }
 
