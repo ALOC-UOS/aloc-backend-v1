@@ -32,6 +32,7 @@ public class Course extends AuditingTimeEntity {
   private Integer averageRank;
   private Long generateCnt;
   private Integer duration;
+  private Long successCnt;
 
   @Builder.Default
   @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -45,6 +46,7 @@ public class Course extends AuditingTimeEntity {
         .minRank(courseRequestDto.getMinRank())
         .maxRank(courseRequestDto.getMaxRank())
         .generateCnt(0L)
+        .successCnt(0L)
         .duration(
             courseRequestDto.getCourseType().equals(CourseType.DAILY)
                 ? courseRequestDto.getProblemCnt()

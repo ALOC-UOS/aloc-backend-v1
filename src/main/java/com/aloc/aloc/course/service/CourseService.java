@@ -2,7 +2,7 @@ package com.aloc.aloc.course.service;
 
 import com.aloc.aloc.course.dto.request.CourseRequestDto;
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
-import com.aloc.aloc.course.dto.response.UserCourseResponseDto;
+import com.aloc.aloc.course.dto.response.CourseUserResponseDto;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.entity.UserCourse;
 import com.aloc.aloc.course.enums.CourseType;
@@ -13,8 +13,10 @@ import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.service.UserService;
 import com.aloc.aloc.webhook.DiscordWebhookService;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +34,7 @@ public class CourseService {
 
   public Page<CourseResponseDto> getCourses(Pageable pageable, CourseType courseTypeOrNull) {
     Page<Course> courses = getCoursePageByCourseType(pageable, courseTypeOrNull);
-    return courses.map(course -> CourseResponseDto.of(course, false));
+    return courses.map(course -> CourseResponseDto.of(course, UserCourseState.NOT_STARTED));
   }
 
   private Page<Course> getCoursePageByCourseType(Pageable pageable, CourseType courseTypeOrNull) {
@@ -49,14 +51,17 @@ public class CourseService {
 
     return courses.map(
         course -> {
-          boolean isSuccess =
+          Optional<UserCourse> latestUserCourse =
               userCourses.stream()
-                  .anyMatch(
-                      userCourse ->
-                          userCourse.getCourse().equals(course)
-                              && userCourse.getUserCourseState() == UserCourseState.SUCCESS);
+                  .filter(userCourse -> userCourse.getCourse().equals(course))
+                  .max(Comparator.comparing(UserCourse::getCreatedAt)); // 최신 createdAt 찾기
 
-          return CourseResponseDto.of(course, isSuccess);
+          UserCourseState latestState =
+              latestUserCourse
+                  .map(UserCourse::getUserCourseState)
+                  .orElse(UserCourseState.NOT_STARTED); // 만약 없다면 null 처리
+
+          return CourseResponseDto.of(course, latestState);
         });
   }
 
@@ -68,11 +73,11 @@ public class CourseService {
     // 스크랩핑 로직 추가
     String message = problemScrapingService.createProblemsByCourse(course, courseRequestDto);
     discordWebhookService.sendNotification(message);
-    return CourseResponseDto.of(course, false);
+    return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
   }
 
   @Transactional
-  public UserCourseResponseDto createUserCourse(Long courseId, String oauthId) {
+  public CourseUserResponseDto createUserCourse(Long courseId, String oauthId) {
     Course course = getCourseById(courseId);
     User user = userService.getUser(oauthId);
 
@@ -81,7 +86,7 @@ public class CourseService {
     }
     UserCourse userCourse = userCourseService.createUserCourse(user, course);
     course.addGenerateCnt();
-    return UserCourseResponseDto.of(userCourse);
+    return CourseUserResponseDto.of(userCourse);
   }
 
   private Course getCourseById(Long courseId) {
@@ -91,7 +96,7 @@ public class CourseService {
   }
 
   @Transactional
-  public UserCourseResponseDto closeUserCourse(Long courseId, String oauthId) {
+  public CourseUserResponseDto closeUserCourse(Long courseId, String oauthId) {
     Course course = getCourseById(courseId);
     User user = userService.getUser(oauthId);
     UserCourse userCourse = userCourseService.getUserCourseByUserAndCourse(user, course);
@@ -101,6 +106,6 @@ public class CourseService {
     }
 
     userCourseService.closeUserCourse(userCourse);
-    return UserCourseResponseDto.of(userCourse);
+    return CourseUserResponseDto.of(userCourse);
   }
 }
