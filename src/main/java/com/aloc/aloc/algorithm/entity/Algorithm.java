@@ -17,6 +17,7 @@ public class Algorithm extends AuditingTimeEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(unique = true, nullable = false)
   private Integer algorithmId;
 
   @Column(nullable = false)

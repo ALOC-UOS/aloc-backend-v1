@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AlgorithmRepository extends JpaRepository<Algorithm, Long> {
   Optional<Algorithm> findByAlgorithmId(Integer algorithmId);
+
+  boolean existsByAlgorithmId(Integer algorithmId);
 }

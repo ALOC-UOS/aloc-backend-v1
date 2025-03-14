@@ -16,8 +16,13 @@ public class AlgorithmService {
   private final AlgorithmScrapingService algorithmScrapingService;
 
   @Transactional
-  public String createAlgorithms() {
-    algorithmRepository.saveAll(algorithmScrapingService.scrapAlgorithms());
+  public String createAlgorithm(String name) {
+    Algorithm algorithm = algorithmScrapingService.scrapAlgorithmByName(name);
+    if (existsByAlgorithmId(algorithm.getAlgorithmId())) {
+      throw new IllegalArgumentException(
+          "이미 존재하는 알고리즘입니다. 알고리즘 아이디 : " + algorithm.getAlgorithmId());
+    }
+    algorithmRepository.save(algorithm);
     return "알고리즘 스크래핑 완료";
   }
 
@@ -44,5 +49,9 @@ public class AlgorithmService {
                         .koreanName(koreanName)
                         .englishName(englishName)
                         .build()));
+  }
+
+  public boolean existsByAlgorithmId(int algorithmId) {
+    return algorithmRepository.existsByAlgorithmId(algorithmId);
   }
 }
