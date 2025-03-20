@@ -37,6 +37,14 @@ public class CourseService {
     return courses.map(course -> CourseResponseDto.of(course, UserCourseState.NOT_STARTED));
   }
 
+  @Transactional
+  public CourseResponseDto updateCourse(Long courseId) {
+    Course course = getCourseById(courseId);
+    course.updateRankRange();
+    courseRepository.save(course);
+    return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
+  }
+
   private Page<Course> getCoursePageByCourseType(Pageable pageable, CourseType courseTypeOrNull) {
     return courseTypeOrNull == null
         ? courseRepository.findAll(pageable)

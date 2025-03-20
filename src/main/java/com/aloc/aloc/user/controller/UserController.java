@@ -1,5 +1,7 @@
 package com.aloc.aloc.user.controller;
 
+import com.aloc.aloc.course.dto.response.CourseUserResponseDto;
+import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import com.aloc.aloc.profilebackgroundcolor.dto.response.ProfileBackgroundColorResponseDto;
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
@@ -7,7 +9,6 @@ import com.aloc.aloc.user.dto.request.UserRequestDto;
 import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.service.UserFacade;
-import com.aloc.aloc.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "User API", description = "User API 입니다.")
 public class UserController {
   private final UserFacade userFacade;
-  private final UserService userService;
+  private final CourseService courseService;
   private final ProfileBackgroundColorService profileBackgroundColorService;
 
   @GetMapping("/users")
@@ -87,5 +88,22 @@ public class UserController {
   public CustomApiResponse<List<UserCourseResponseDto>> getUserCourses(
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
     return CustomApiResponse.onSuccess(userFacade.getUserCourses(user.getUsername()));
+  }
+
+  @PostMapping("/user/course/{courseId}")
+  @SecurityRequirement(name = "JWT Auth")
+  @Operation(summary = "유저가 코스선택", description = "유저가 코스를 선택합니다.")
+  public CustomApiResponse<CourseUserResponseDto> createUserCourse(
+      @PathVariable Long courseId, @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+    return CustomApiResponse.onSuccess(
+        courseService.createUserCourse(courseId, user.getUsername()));
+  }
+
+  @PatchMapping("/user/course/{courseId}")
+  @SecurityRequirement(name = "JWT Auth")
+  @Operation(summary = "유저 코스 포기", description = "유저가 특정 코스를 포기합니다.")
+  public CustomApiResponse<CourseUserResponseDto> closeUserCourse(
+      @PathVariable Long courseId, @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+    return CustomApiResponse.onSuccess(courseService.closeUserCourse(courseId, user.getUsername()));
   }
 }

@@ -66,6 +66,22 @@ public class Course extends AuditingTimeEntity {
     this.averageRank = (int) totalRank / problemCnt;
   }
 
+  public void updateRankRange() {
+    // 최소 랭크 (가장 작은 rank 값)
+    this.minRank =
+        courseProblemList.stream()
+            .mapToInt(courseProblem -> courseProblem.getProblem().getRank()) // problem의 rank를 추출
+            .min() // 최소값
+            .orElseThrow(() -> new IllegalStateException("No problems in the course")); // 없으면 예외 처리
+
+    // 최대 랭크 (가장 큰 rank 값)
+    this.maxRank =
+        courseProblemList.stream()
+            .mapToInt(courseProblem -> courseProblem.getProblem().getRank()) // problem의 rank를 추출
+            .max() // 최대값
+            .orElseThrow(() -> new IllegalStateException("No problems in the course")); // 없으면 예외 처리
+  }
+
   public void addGenerateCnt() {
     this.generateCnt += 1L;
   }

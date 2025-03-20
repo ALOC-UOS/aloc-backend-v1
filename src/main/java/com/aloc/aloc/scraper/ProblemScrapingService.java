@@ -64,6 +64,7 @@ public class ProblemScrapingService {
     courseProblemRepository.saveAll(courseProblemList);
     course.addAllCourseProblems(courseProblemList);
     course.calculateAverageRank();
+    course.updateRankRange();
     return getCrawlingResultMessage(course, scrapProblems);
   }
 
