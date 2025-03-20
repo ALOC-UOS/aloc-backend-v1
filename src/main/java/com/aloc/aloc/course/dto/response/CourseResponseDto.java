@@ -36,7 +36,7 @@ public class CourseResponseDto {
   private LocalDateTime createdAt;
 
   @Schema(description = "유저의 코스 성공 여부", example = "SUCCESS")
-  private UserCourseState state;
+  private UserCourseState status;
 
   @Schema(description = "다른 유저의 성공 횟수", example = "23")
   private Long successCnt;
@@ -50,7 +50,7 @@ public class CourseResponseDto {
         .rank(RankResponseDto.of(course.getMinRank(), course.getMaxRank(), course.getAverageRank()))
         .generateCnt(course.getGenerateCnt())
         .createdAt(course.getCreatedAt())
-        .state(userCourseState == null ? UserCourseState.NOT_STARTED : userCourseState)
+        .status(userCourseState == null ? UserCourseState.NOT_STARTED : userCourseState)
         .duration(course.getDuration())
         .successCnt(0L)
         .build();
