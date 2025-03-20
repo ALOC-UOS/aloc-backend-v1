@@ -47,7 +47,7 @@ public class ProblemResponseDto {
       Problem problem,
       List<UserCourseProblem> userCourseProblems) {
     List<String> solvingUserProfileImageFileNames =
-        userCourseProblems.subList(0, 3).stream()
+        userCourseProblems.subList(0, Math.min(userCourseProblems.size(), 3)).stream()
             .map(ucp -> ucp.getUserCourse().getUser().getProfileImageFileName())
             .toList();
 
