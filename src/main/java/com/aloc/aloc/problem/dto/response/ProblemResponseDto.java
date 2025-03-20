@@ -5,7 +5,9 @@ import com.aloc.aloc.problem.entity.UserCourseProblem;
 import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,10 +48,18 @@ public class ProblemResponseDto {
       UserCourseProblem userCourseProblem,
       Problem problem,
       List<UserCourseProblem> userCourseProblems) {
+
+    // 문제를 해결한 유저 수
+    int solvedUserNum = userCourseProblems.size();
+
+    // 프로필 이미지 파일 이름을 최대 3명까지 추출, 해결된 유저가 없으면 빈 리스트
     List<String> solvingUserProfileImageFileNames =
-        userCourseProblems.subList(0, Math.min(userCourseProblems.size(), 3)).stream()
-            .map(ucp -> ucp.getUserCourse().getUser().getProfileImageFileName())
-            .toList();
+        (solvedUserNum == 0)
+            ? Collections.emptyList() // 해결된 유저가 없으면 빈 리스트
+            : userCourseProblems.stream() // 해결된 유저가 있으면 프로필 이미지 파일 이름 추출
+                .limit(3) // 최대 3명까지만 추출
+                .map(ucp -> ucp.getUserCourse().getUser().getProfileImageFileName())
+                .collect(Collectors.toList());
 
     return ProblemResponseDto.builder()
         .problemId(problem.getProblemId())

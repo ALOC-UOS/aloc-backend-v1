@@ -37,6 +37,10 @@ public class UserCourseProblemService {
     List<UserCourseProblem> userCourseProblems =
         userCourseProblemRepository.findAllByProblemAndUserCourseProblemStatusOrderBySolvedAtDesc(
             problem, UserCourseProblemStatus.SOLVED);
+
+    if (userCourseProblems.isEmpty()) {
+      return userCourseProblems;
+    }
     Set<User> uniqueUsers = new HashSet<>();
 
     return userCourseProblems.stream()
