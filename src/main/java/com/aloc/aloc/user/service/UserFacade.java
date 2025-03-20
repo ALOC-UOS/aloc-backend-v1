@@ -80,7 +80,16 @@ public class UserFacade {
             ucp -> {
               List<UserCourseProblem> userCourseProblems =
                   userCourseProblemService.getSolvedUserCourseProblemByProblem(ucp.getProblem());
-              return ProblemResponseDto.of(ucp, ucp.getProblem(), userCourseProblems);
+              LocalDateTime lastSolvedAt =
+                  userCourseProblems.isEmpty() ? null : userCourseProblems.get(0).getSolvedAt();
+              List<UserDetailResponseDto> solvingUserList =
+                  userCourseProblems.stream()
+                      .map(
+                          userCourseProblem ->
+                              userMapper.mapToUserDetailResponseDto(
+                                  userCourseProblem.getUserCourse().getUser()))
+                      .toList();
+              return ProblemResponseDto.of(ucp, ucp.getProblem(), lastSolvedAt, solvingUserList);
             })
         .toList();
   }

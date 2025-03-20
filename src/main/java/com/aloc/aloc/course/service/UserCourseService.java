@@ -45,6 +45,7 @@ public class UserCourseService {
     for (Problem problem : problems) {
       UserCourseProblem userCourseProblem =
           userCourseProblemService.createUserCourseProblem(userCourse, problem);
+
       if (userCourse.getUserCourseProblemList().isEmpty()) {
         userCourseProblem.updateUserCourseProblemStatus(UserCourseProblemStatus.UNSOLVED);
         userCourseProblemService.saveUserCourserProblem(userCourseProblem);

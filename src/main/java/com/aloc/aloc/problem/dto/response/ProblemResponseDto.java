@@ -3,11 +3,10 @@ package com.aloc.aloc.problem.dto.response;
 import com.aloc.aloc.problem.entity.Problem;
 import com.aloc.aloc.problem.entity.UserCourseProblem;
 import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
+import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,41 +34,29 @@ public class ProblemResponseDto {
   @Schema(description = "가장 최근 해결한 시간", example = "시간")
   private LocalDateTime lastSolvedAt;
 
-  @Schema(description = "유저 문제 해결 여부", example = "true")
-  private Boolean isSolved;
-
-  @Schema(description = "유저 문제 공개 여부", example = "false")
-  private Boolean isHidden;
+  @Schema(description = "문제 상태", example = "IN_PROGRESS")
+  private UserCourseProblemStatus status;
 
   @Schema(description = "해결한 유저들의 프로필 이미지", example = "uuid1, uuid2")
-  private List<String> solvingUserProfileImageFileNames;
+  private List<UserDetailResponseDto> solvingUserList;
 
   public static ProblemResponseDto of(
       UserCourseProblem userCourseProblem,
       Problem problem,
-      List<UserCourseProblem> userCourseProblems) {
+      LocalDateTime lastSolvedAt,
+      List<UserDetailResponseDto> solvingUserList) {
 
     // 문제를 해결한 유저 수
-    int solvedUserNum = userCourseProblems.size();
-
-    // 프로필 이미지 파일 이름을 최대 3명까지 추출, 해결된 유저가 없으면 빈 리스트
-    List<String> solvingUserProfileImageFileNames =
-        (solvedUserNum == 0)
-            ? Collections.emptyList() // 해결된 유저가 없으면 빈 리스트
-            : userCourseProblems.stream() // 해결된 유저가 있으면 프로필 이미지 파일 이름 추출
-                .limit(3) // 최대 3명까지만 추출
-                .map(ucp -> ucp.getUserCourse().getUser().getProfileImageFileName())
-                .collect(Collectors.toList());
+    int solvedUserNum = solvingUserList.size();
 
     return ProblemResponseDto.builder()
         .problemId(problem.getProblemId())
         .title(problem.getTitle())
         .rank(problem.getRank())
-        .isSolved(userCourseProblem.getUserCourseProblemStatus() == UserCourseProblemStatus.SOLVED)
-        .isHidden(userCourseProblem.getUserCourseProblemStatus() == UserCourseProblemStatus.HIDDEN)
-        .solvingUserNum(userCourseProblems.size())
-        .lastSolvedAt(solvedUserNum == 0 ? null : userCourseProblems.get(0).getSolvedAt())
-        .solvingUserProfileImageFileNames(solvingUserProfileImageFileNames)
+        .status(userCourseProblem.getUserCourseProblemStatus())
+        .solvingUserNum(solvedUserNum)
+        .lastSolvedAt(lastSolvedAt)
+        .solvingUserList(solvingUserList)
         .build();
   }
 }

@@ -2,6 +2,7 @@ package com.aloc.aloc.user.dto.response;
 
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.entity.UserCourse;
+import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.problem.dto.response.ProblemResponseDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -18,6 +19,12 @@ public class UserCourseResponseDto {
   @Schema(description = "코스 이름", example = "작심삼일")
   private String title;
 
+  @Schema(description = "코스 유형", example = "DAILY")
+  private CourseType courseType;
+
+  @Schema(description = "문제 수", example = "3")
+  private Integer problemCnt;
+
   @Schema(description = "오늘의 문제 아이디", example = "1238")
   private int todayProblemId;
 
@@ -32,6 +39,8 @@ public class UserCourseResponseDto {
     return UserCourseResponseDto.builder()
         .id(course.getId())
         .title(course.getTitle())
+        .courseType(course.getCourseType())
+        .problemCnt(course.getProblemCnt())
         .todayProblemId(todayProblemId)
         .problems(problems)
         .closedAt(userCourse.getClosedAt())
