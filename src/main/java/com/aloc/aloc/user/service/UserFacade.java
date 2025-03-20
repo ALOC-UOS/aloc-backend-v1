@@ -90,11 +90,12 @@ public class UserFacade {
 
     User user = userService.getUser(oauthId);
 
-    if (userRequestDto.getBaekjoonId() != null && user.getIsNewUser()) {
+    if (userRequestDto.getBaekjoonId() != null
+        && user.getAuthority().equals(Authority.ROLE_NEW_USER)) {
       userService.checkBaekjoonId(userRequestDto.getBaekjoonId());
       user.setBaekjoonId(userRequestDto.getBaekjoonId());
       user.setRank(baekjoonRankScrapingService.extractBaekjoonRank(user.getBaekjoonId()));
-      user.setIsNewUser(false);
+      user.setAuthority(Authority.ROLE_USER);
     }
 
     if (StringUtils.hasText(userRequestDto.getName())) {
