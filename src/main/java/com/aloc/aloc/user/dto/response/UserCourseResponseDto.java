@@ -7,8 +7,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
+@Getter
 public class UserCourseResponseDto {
   @Schema(description = "코스 고유 아이디", example = "1L")
   private Long id;

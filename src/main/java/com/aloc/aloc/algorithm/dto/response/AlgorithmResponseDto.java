@@ -2,8 +2,10 @@ package com.aloc.aloc.algorithm.dto.response;
 
 import com.aloc.aloc.algorithm.entity.Algorithm;
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
+@Getter
 public class AlgorithmResponseDto {
   private Long id;
   private int algorithmId;

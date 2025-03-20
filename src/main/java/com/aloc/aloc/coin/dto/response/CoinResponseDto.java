@@ -3,8 +3,10 @@ package com.aloc.aloc.coin.dto.response;
 import com.aloc.aloc.coin.CoinType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
+@Getter
 public class CoinResponseDto {
   @Schema(description = "유저의 원래 코인", example = "100")
   private int previousCoin;
