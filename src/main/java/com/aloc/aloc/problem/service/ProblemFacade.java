@@ -65,7 +65,7 @@ public class ProblemFacade {
   }
 
   private boolean isCourseCompleted(int userCourseIdx, Course course) {
-    return userCourseIdx == course.getDuration() - 1;
+    return userCourseIdx == course.getProblemCnt() - 1;
   }
 
   private void activateNextProblem(UserCourse userCourse, int currentIndex) {
