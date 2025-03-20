@@ -8,6 +8,9 @@ import lombok.Getter;
 @Getter
 @Builder
 public class ColorResponseDto {
+  @Schema(description = "프로필 색상이름", example = "Blue")
+  private String name;
+
   @Schema(description = "색상 분류", example = "special")
   private final String type;
 
@@ -31,6 +34,7 @@ public class ColorResponseDto {
 
   public static ColorResponseDto of(ProfileBackgroundColor color) {
     return ColorResponseDto.builder()
+        .name(color.getName())
         .type(color.getType())
         .color1(color.getColor1())
         .color2(color.getColor2())

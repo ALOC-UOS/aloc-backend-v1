@@ -19,9 +19,6 @@ public class UserResponseDto {
   @Schema(description = "백준 ID", example = "baekjoonId")
   private String baekjoonId;
 
-  @Schema(description = "프로필 색상이름", example = "blue")
-  private String profileColor;
-
   @Schema(description = "유저 권한", example = "ROLE_USER")
   private Authority authority;
 
@@ -39,7 +36,6 @@ public class UserResponseDto {
         .name(user.getName())
         .authority(user.getAuthority())
         .baekjoonId(user.getBaekjoonId())
-        .profileColor(user.getProfileColor())
         .rank(user.getRank())
         .coin(user.getCoin())
         .profileImageFileName(user.getProfileImageFileName())
