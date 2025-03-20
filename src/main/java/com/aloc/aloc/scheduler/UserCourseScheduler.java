@@ -24,19 +24,10 @@ public class UserCourseScheduler {
       userCourseService.closeFailUserCourse();
       userCourseService.openDailyUserCourseProblem();
       discordWebhookService.sendNotification("✅ 실패한 코스 처리 및 daily 코스 문제 공개");
-    } catch (Exception e) {
-      log.error("❌ UserCourse관련 처리 중 오류 발생: {}", e.getMessage(), e);
-    }
-  }
-
-  @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
-  public void initializeUserStreakDays() {
-    log.info("🔄 유저 연속 문제 풀이 기록 초기화 시작...");
-    try {
       userService.initializeUserStreakDays();
       discordWebhookService.sendNotification("✅ 유저 연속 문제 풀이 기록 초기화 완료!");
     } catch (Exception e) {
-      log.error("❌ 유저 연속 문제 풀이 기록 초기화 중 오류 발생: {}", e.getMessage(), e);
+      log.error("❌ UserCourse관련 처리 중 오류 발생: {}", e.getMessage(), e);
     }
   }
 }

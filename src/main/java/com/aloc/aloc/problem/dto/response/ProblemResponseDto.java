@@ -68,7 +68,7 @@ public class ProblemResponseDto {
         .isSolved(userCourseProblem.getUserCourseProblemStatus() == UserCourseProblemStatus.SOLVED)
         .isHidden(userCourseProblem.getUserCourseProblemStatus() == UserCourseProblemStatus.HIDDEN)
         .solvingUserNum(userCourseProblems.size())
-        .lastSolvedAt(userCourseProblems.get(0).getSolvedAt())
+        .lastSolvedAt(solvedUserNum == 0 ? null : userCourseProblems.get(0).getSolvedAt())
         .solvingUserProfileImageFileNames(solvingUserProfileImageFileNames)
         .build();
   }
