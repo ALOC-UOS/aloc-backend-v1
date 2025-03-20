@@ -26,7 +26,7 @@ public class UserCourseProblemService {
           .get(i)
           .getUserCourseProblemStatus()
           .equals(UserCourseProblemStatus.HIDDEN)) {
-		  log.info(userCourseProblems.get(i).getId().toString());
+        log.info(userCourseProblems.get(i).getId().toString());
         return userCourseProblems.get(i - 1).getProblem().getProblemId();
       }
     }

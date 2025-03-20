@@ -26,7 +26,7 @@ public class ProfileImageStrategy implements ImageStrategy {
       throws FileUploadException {
     String userId = getUserId(metadata);
 
-    String fileName = FileNameGenerator.generateUniqueFileName(file.getOriginalFilename());
+    String fileName = FileNameGenerator.generateUniqueFileName();
     Path uploadPath = pathResolver.resolvePath(ImageType.PROFILE);
     try {
       Path fullPath = fileStrategy.storeFile(file, uploadPath, fileName);

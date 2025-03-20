@@ -16,26 +16,8 @@ public class UserDetailResponseDto extends UserResponseDto {
   @Schema(description = "연속문제 해결일 수", example = "2")
   private final Integer consecutiveSolvedDays;
 
-  @Schema(description = "색상 분류", example = "special")
-  private final String type;
-
-  @Schema(description = "색상 코드 1", example = "#FFB800")
-  private final String color1;
-
-  @Schema(description = "색상 코드 2", example = "#FF69F0")
-  private final String color2;
-
-  @Schema(description = "색상 코드 3", example = "#408CFF")
-  private final String color3;
-
-  @Schema(description = "색상 코드 4", example = "null")
-  private final String color4;
-
-  @Schema(description = "색상 코드 5", example = "null")
-  private final String color5;
-
-  @Schema(description = "그라데이션 기울기", example = "135")
-  private final Integer degree;
+  @Schema(description = "색상")
+  private final ColorResponseDto color;
 
   @Schema(description = "유저 생성 일자", example = "2024-03-04T19:37:55")
   private final LocalDateTime createdAt;
@@ -46,7 +28,7 @@ public class UserDetailResponseDto extends UserResponseDto {
   public static UserDetailResponseDto of(
       User user, ProfileBackgroundColor profileBackgroundColor, boolean isTodaySolved) {
     return UserDetailResponseDto.builder()
-        .username(user.getName())
+        .name(user.getName())
         .authority(user.getAuthority())
         .baekjoonId(user.getBaekjoonId())
         .rank(user.getRank())
@@ -54,13 +36,7 @@ public class UserDetailResponseDto extends UserResponseDto {
         .profileImageFileName(user.getProfileImageFileName())
         .solvedCount(user.getSolvedCount())
         .consecutiveSolvedDays(user.getConsecutiveSolvedDays())
-        .type(profileBackgroundColor.getType())
-        .color1(profileBackgroundColor.getColor1())
-        .color2(profileBackgroundColor.getColor2())
-        .color3(profileBackgroundColor.getColor3())
-        .color4(profileBackgroundColor.getColor4())
-        .color5(profileBackgroundColor.getColor5())
-        .degree(profileBackgroundColor.getDegree())
+        .color(ColorResponseDto.of(profileBackgroundColor))
         .isTodaySolved(isTodaySolved)
         .createdAt(user.getCreatedAt())
         .build();

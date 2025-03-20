@@ -14,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class UserResponseDto {
   @Schema(description = "유저 이름", example = "김철수")
-  private String username;
+  private String name;
 
   @Schema(description = "백준 ID", example = "baekjoonId")
   private String baekjoonId;
@@ -36,7 +36,7 @@ public class UserResponseDto {
 
   public static UserResponseDto of(User user) {
     return UserResponseDto.builder()
-        .username(user.getName())
+        .name(user.getName())
         .authority(user.getAuthority())
         .baekjoonId(user.getBaekjoonId())
         .profileColor(user.getProfileColor())
