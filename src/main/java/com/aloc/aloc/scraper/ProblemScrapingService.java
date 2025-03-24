@@ -228,7 +228,7 @@ public class ProblemScrapingService {
     List<Integer> problemNumbers = new ArrayList<>();
     int count = 0;
     for (Element row : rows) {
-      if (count >= 100) {
+      if (count >= 50) {
         break; // 100개에 도달하면 루프 종료
       }
       String problemIdText = row.select(".list_problem_id").text();
@@ -280,7 +280,7 @@ public class ProblemScrapingService {
 
   protected String fetchJsonFromUrl(String url) throws IOException {
     int maxRetries = 3; // 최대 3번까지 재시도
-    int retryDelayMs = 5000; // 5초
+    int retryDelayMs = 10000; // 5초
 
     for (int attempt = 0; attempt < maxRetries; attempt++) {
       try {
