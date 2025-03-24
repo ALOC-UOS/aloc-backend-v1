@@ -1,7 +1,9 @@
 package com.aloc.aloc.coin.service;
 
 import com.aloc.aloc.coin.dto.response.CoinResponseDto;
+import com.aloc.aloc.coin.entity.CoinHistory;
 import com.aloc.aloc.coin.enums.CoinType;
+import com.aloc.aloc.coin.repository.CoinHistoryRepository;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.service.UserService;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class CoinService {
   private final UserService userService;
+  private final CoinHistoryRepository coinHistoryRepository;
 
   private static final int SOLVE_REWARD = 10;
   private static final int COURSE_REWARD = 20;
@@ -23,10 +26,16 @@ public class CoinService {
   // 연속일 수 %7 == 0 일때 연속일 수 // 7 * 50개
 
   @Transactional
+  public void recordCoinHistory(User user, CoinResponseDto coinResponseDto) {
+    coinHistoryRepository.save(CoinHistory.of(user, coinResponseDto));
+  }
+
+  @Transactional
   public CoinResponseDto giveCoinBySolvingProblem(User user) {
     CoinResponseDto coinResponseDto =
         CoinResponseDto.of(user.getCoin(), SOLVE_REWARD, CoinType.SOLVE_REWARD, "문제 해결");
     userService.updateUserCoin(user, SOLVE_REWARD);
+    recordCoinHistory(user, coinResponseDto);
     return coinResponseDto;
   }
 
@@ -37,6 +46,7 @@ public class CoinService {
         CoinResponseDto.of(
             user.getCoin(), addedCoin, CoinType.COURSE_REWARD, course.getTitle() + "코스 해결 보상");
     userService.updateUserCoin(user, addedCoin);
+    recordCoinHistory(user, coinResponseDto);
     return coinResponseDto;
   }
 
@@ -49,6 +59,7 @@ public class CoinService {
         CoinResponseDto.of(
             user.getCoin(), addedCoin, CoinType.STREAK_REWARD, "연속 " + streakDays + "일 문제 해결 보상");
     userService.updateUserCoin(user, addedCoin);
+    recordCoinHistory(user, coinResponseDto);
     return coinResponseDto;
   }
 }
