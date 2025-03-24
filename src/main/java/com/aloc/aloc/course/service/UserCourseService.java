@@ -29,7 +29,7 @@ public class UserCourseService {
   }
 
   public List<UserCourse> getUserCoursesInProcessByUser(User user) {
-    return userCourseRepository.findAllByUserAndClosedAtAfter(user, LocalDateTime.now());
+    return userCourseRepository.findAllByUserAndUserCourseState(user, UserCourseState.IN_PROGRESS);
   }
 
   public List<UserCourse> getAllByUserAndUserCourseState(

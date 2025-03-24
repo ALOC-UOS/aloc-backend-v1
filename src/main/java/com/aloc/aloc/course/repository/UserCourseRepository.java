@@ -17,8 +17,6 @@ public interface UserCourseRepository extends JpaRepository<UserCourse, Long> {
 
   List<UserCourse> findAllByUserAndUserCourseState(User user, UserCourseState userCourseState);
 
-  List<UserCourse> findAllByUserAndClosedAtAfter(User user, LocalDateTime now);
-
   Optional<UserCourse> findByUserAndCourse(User user, Course course);
 
   @Query(
