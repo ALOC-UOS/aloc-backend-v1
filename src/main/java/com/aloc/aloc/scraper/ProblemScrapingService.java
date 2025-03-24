@@ -182,7 +182,7 @@ public class ProblemScrapingService {
     String tiers = rankList.stream().map(Object::toString).collect(Collectors.joining(","));
 
     return String.format(
-        "https://www.acmicpc.net/problemset?sort=ac_desc&tier=%s&algo=%s&algo_if=and",
+        "https://www.acmicpc.net/problemset?sort=ac_desc&tier=%s&algo=%s&algo_if=or",
         tiers, algorithmIds);
   }
 
