@@ -59,7 +59,10 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         checkRefreshTokenAndReIssueAccessToken(response, refreshToken.get());
       } else {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        log.error("리프레시 토큰이 없거나, 리프레시 토큰이 올바르지 않습니다.");
+        log.error(
+            "리프레시 토큰이 없거나, 리프레시 토큰이 올바르지 않습니다. refresh Token is present : {}, is Token valid : {}",
+            refreshToken.isPresent(),
+            jwtService.isTokenValid(refreshToken.get()));
       }
       log.info("토큰 발급 완료");
       return;
