@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,6 +29,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
@@ -57,6 +59,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         checkRefreshTokenAndReIssueAccessToken(response, refreshToken.get());
       } else {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        log.error("리프레시 토큰이 없거나, 리프레시 토큰이 올바르지 않습니다.");
       }
       return;
     }
@@ -118,10 +121,17 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
                 response.getWriter().write(objectMapper.writeValueAsString(tokenMap));
               } catch (Exception e) {
-                e.printStackTrace();
+                log.error(
+                    "❗️AccessToken 재발급 중 예외 발생 - user: {}, error: {}",
+                    user.getOauthId(),
+                    e.getMessage(),
+                    e);
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
               }
             },
-            () -> response.setStatus(HttpStatus.UNAUTHORIZED.value()));
+            () -> {
+              log.warn("⚠️ 유효하지 않은 Refresh Token으로 요청 시도: {}", refreshToken);
+              response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            });
   }
 }
