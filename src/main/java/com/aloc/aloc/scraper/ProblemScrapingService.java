@@ -10,6 +10,7 @@ import com.aloc.aloc.problem.entity.Problem;
 import com.aloc.aloc.problem.entity.ProblemAlgorithm;
 import com.aloc.aloc.problem.repository.ProblemAlgorithmRepository;
 import com.aloc.aloc.problem.service.ProblemService;
+import com.aloc.aloc.webhook.DiscordWebhookService;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -44,9 +45,10 @@ public class ProblemScrapingService {
   private final AlgorithmService algorithmService;
   private final ProblemAlgorithmRepository problemAlgorithmRepository;
   private final CourseProblemRepository courseProblemRepository;
+  private final DiscordWebhookService discordWebhookService;
 
   @Transactional
-  public String createProblemsByCourse(Course course, CourseRequestDto courseRequestDto)
+  public void createProblemsByCourse(Course course, CourseRequestDto courseRequestDto)
       throws IOException {
     List<Algorithm> algorithms =
         algorithmService.getAlgorithmsByIds(courseRequestDto.getAlgorithmIdList());
@@ -65,7 +67,7 @@ public class ProblemScrapingService {
     course.addAllCourseProblems(courseProblemList);
     course.calculateAverageRank();
     course.updateRankRange();
-    return getCrawlingResultMessage(course, scrapProblems);
+    discordWebhookService.sendScrapResultEmbed(course, scrapProblems);
   }
 
   private List<Integer> generateRankList(int minRank, int maxRank) {
@@ -115,67 +117,6 @@ public class ProblemScrapingService {
             })
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
-  }
-
-  private String getCrawlingResultMessage(Course course, List<Problem> problems) {
-    StringBuilder message = new StringBuilder();
-
-    message
-        .append("## 📌 크롤링 결과\n\n")
-        .append("📚 코스: ")
-        .append(course.getTitle())
-        .append("\n")
-        .append("📝 설명: ")
-        .append(course.getDescription())
-        .append("\n")
-        .append("📊 유형: ")
-        .append(course.getCourseType())
-        .append("\n")
-        .append("🎯 목표 문제 수: ")
-        .append(course.getProblemCnt())
-        .append("개\n")
-        .append("🆕 실제 크롤링된 문제 수: ")
-        .append(problems.size())
-        .append("개\n")
-        .append("🔢 난이도 범위: ")
-        .append(course.getMinRank())
-        .append(" ~ ")
-        .append(course.getMaxRank())
-        .append("\n")
-        .append("📈 평균 난이도: ")
-        .append(course.getAverageRank())
-        .append("\n")
-        .append("🗓️ 기한: ")
-        .append(course.getDuration())
-        .append("\n\n");
-
-    if (problems.isEmpty()) {
-      message.append("❌ 크롤링된 문제가 없습니다.\n");
-    } else {
-      for (Problem problem : problems) {
-        message
-            .append("🔹 문제 ID: ")
-            .append(problem.getProblemId())
-            .append("\n   📖 제목: ")
-            .append(problem.getTitle())
-            .append("\n   ⭐️ 난이도: ")
-            .append(problem.getRank())
-            .append("\n   🏷 알고리즘: ")
-            .append(getKoreanAlgorithmNames(problem))
-            .append("\n\n");
-      }
-    }
-
-    return message.toString();
-  }
-
-  private String getKoreanAlgorithmNames(Problem problem) {
-    if (problem.getProblemAlgorithmList() == null || problem.getProblemAlgorithmList().isEmpty()) {
-      return "없음";
-    }
-    return problem.getProblemAlgorithmList().stream()
-        .map(pa -> pa.getAlgorithm().getKoreanName())
-        .collect(Collectors.joining(", "));
   }
 
   private String getProblemUrl(List<Algorithm> algorithms, List<Integer> rankList) {

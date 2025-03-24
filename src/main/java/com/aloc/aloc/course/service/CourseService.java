@@ -11,7 +11,6 @@ import com.aloc.aloc.course.repository.CourseRepository;
 import com.aloc.aloc.scraper.ProblemScrapingService;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.service.UserService;
-import com.aloc.aloc.webhook.DiscordWebhookService;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
@@ -28,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CourseService {
   private final CourseRepository courseRepository;
   private final ProblemScrapingService problemScrapingService;
-  private final DiscordWebhookService discordWebhookService;
+
   private final UserCourseService userCourseService;
   private final UserService userService;
 
@@ -79,8 +78,7 @@ public class CourseService {
     Course course = Course.of(courseRequestDto);
     courseRepository.save(course);
     // 스크랩핑 로직 추가
-    String message = problemScrapingService.createProblemsByCourse(course, courseRequestDto);
-    discordWebhookService.sendNotification(message);
+    problemScrapingService.createProblemsByCourse(course, courseRequestDto);
     return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
   }
 
