@@ -61,6 +61,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         log.error("리프레시 토큰이 없거나, 리프레시 토큰이 올바르지 않습니다.");
       }
+      log.info("토큰 발급 완료");
       return;
     }
 
@@ -75,13 +76,24 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
   private void checkAccessTokenAndAuthentication(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException, java.io.IOException {
-    jwtService
-        .extractAccessToken(request)
-        .filter(jwtService::isTokenValid)
-        .flatMap(
-            accessToken ->
-                jwtService.extractOauthId(accessToken).flatMap(userRepository::findByOauthId))
-        .ifPresent(this::saveAuthentication);
+
+    boolean isAuthenticated =
+        jwtService
+            .extractAccessToken(request)
+            .filter(jwtService::isTokenValid)
+            .flatMap(
+                accessToken ->
+                    jwtService.extractOauthId(accessToken).flatMap(userRepository::findByOauthId))
+            .map(
+                user -> {
+                  saveAuthentication(user);
+                  return true;
+                })
+            .orElse(false);
+
+    if (!isAuthenticated) {
+      SecurityContextHolder.clearContext(); // ✅ 명시적으로 context 초기화
+    }
 
     filterChain.doFilter(request, response);
   }
