@@ -87,4 +87,8 @@ public class Course extends AuditingTimeEntity {
   public void addGenerateCnt() {
     this.generateCnt += 1L;
   }
+
+  public void addSuccessCnt() {
+    this.successCnt += 1L;
+  }
 }

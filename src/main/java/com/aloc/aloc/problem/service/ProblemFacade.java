@@ -56,6 +56,7 @@ public class ProblemFacade {
 
     if (isCourseCompleted(userCourseIdx, course)) {
       userCourse.updateUserCourseState(UserCourseState.SUCCESS);
+      userCourse.getCourse().addSuccessCnt();
       coinResponseDtos.add(coinService.giveCoinBySolvingCourse(user, course));
     } else if (course.getCourseType().equals(CourseType.DEADLINE)) {
       activateNextProblem(userCourse, userCourseIdx);
