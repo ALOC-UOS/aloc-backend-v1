@@ -1,5 +1,6 @@
 package com.aloc.aloc.algorithm.service;
 
+import com.aloc.aloc.algorithm.dto.response.AlgorithmResponseDto;
 import com.aloc.aloc.algorithm.entity.Algorithm;
 import com.aloc.aloc.algorithm.repository.AlgorithmRepository;
 import com.aloc.aloc.scraper.AlgorithmScrapingService;
@@ -53,5 +54,9 @@ public class AlgorithmService {
 
   public boolean existsByAlgorithmId(int algorithmId) {
     return algorithmRepository.existsByAlgorithmId(algorithmId);
+  }
+
+  public List<AlgorithmResponseDto> getAlgorithms() {
+    return algorithmRepository.findAll().stream().map(AlgorithmResponseDto::of).toList();
   }
 }

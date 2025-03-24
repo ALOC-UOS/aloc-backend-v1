@@ -28,6 +28,7 @@ public class UserCourseScheduler {
       discordWebhookService.sendNotification("✅ 유저 연속 문제 풀이 기록 초기화 완료!");
     } catch (Exception e) {
       log.error("❌ UserCourse관련 처리 중 오류 발생: {}", e.getMessage(), e);
+      discordWebhookService.sendNotification("❌ UserCourse관련 처리 중 오류 발생: " + e.getMessage());
     }
   }
 }
