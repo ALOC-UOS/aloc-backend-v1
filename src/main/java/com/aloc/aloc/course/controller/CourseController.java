@@ -29,7 +29,7 @@ public class CourseController {
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "코스 목록 조회", description = "모든 코스 목록을 조회합니다.")
   public CustomApiResponse<Page<CourseResponseDto>> getCourses(
-      @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+      @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC)
           Pageable pageable,
       @RequestParam(required = false) CourseType courseType,
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
