@@ -89,12 +89,21 @@ public class CourseService {
     Course course = getCourseById(courseId);
     User user = userService.getUser(oauthId);
 
-    if (!userCourseService.isEligibleToCreateUserCourse(user, course)) {
+    if (!isEligibleToCreateUserCourse(user, course)) {
       throw new IllegalStateException("코스는 최대 3개까지 신청할 수 있습니다.");
     }
     UserCourse userCourse = userCourseService.createUserCourse(user, course);
     course.addGenerateCnt();
     return CourseUserResponseDto.of(userCourse);
+  }
+
+  private boolean isEligibleToCreateUserCourse(User user, Course course) {
+    List<UserCourse> userCourses =
+        userCourseService.getAllByUserAndUserCourseState(user, UserCourseState.IN_PROGRESS);
+    boolean hasSameCourse =
+        userCourses.stream().anyMatch(uc -> uc.getCourse().getId().equals(course.getId()));
+
+    return userCourses.size() < 3 && !hasSameCourse;
   }
 
   private Course getCourseById(Long courseId) {

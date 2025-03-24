@@ -1,7 +1,7 @@
 package com.aloc.aloc.coin.service;
 
-import com.aloc.aloc.coin.CoinType;
 import com.aloc.aloc.coin.dto.response.CoinResponseDto;
+import com.aloc.aloc.coin.enums.CoinType;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.service.UserService;

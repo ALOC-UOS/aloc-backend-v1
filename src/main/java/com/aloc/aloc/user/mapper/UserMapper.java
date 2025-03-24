@@ -1,4 +1,4 @@
-package com.aloc.aloc.user.service;
+package com.aloc.aloc.user.mapper;
 
 import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class UserMapper {
   private final ProfileBackgroundColorService profileBackgroundColorService;
 
-  UserDetailResponseDto mapToUserDetailResponseDto(User user) {
+  public UserDetailResponseDto mapToUserDetailResponseDto(User user) {
     ProfileBackgroundColor userProfileBackgroundColor =
         profileBackgroundColorService.getColorByName(user.getProfileColor());
 

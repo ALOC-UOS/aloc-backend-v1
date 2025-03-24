@@ -8,7 +8,7 @@ import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorServic
 import com.aloc.aloc.user.dto.request.UserRequestDto;
 import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
-import com.aloc.aloc.user.service.UserFacade;
+import com.aloc.aloc.user.facade.UserFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

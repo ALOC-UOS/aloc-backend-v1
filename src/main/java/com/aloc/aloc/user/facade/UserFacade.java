@@ -1,4 +1,4 @@
-package com.aloc.aloc.user.service;
+package com.aloc.aloc.user.facade;
 
 import com.aloc.aloc.course.entity.UserCourse;
 import com.aloc.aloc.course.service.UserCourseService;
@@ -6,7 +6,6 @@ import com.aloc.aloc.global.image.ImageService;
 import com.aloc.aloc.global.image.enums.ImageType;
 import com.aloc.aloc.problem.dto.response.ProblemResponseDto;
 import com.aloc.aloc.problem.entity.UserCourseProblem;
-import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
 import com.aloc.aloc.problem.service.UserCourseProblemService;
 import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
@@ -14,6 +13,9 @@ import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
+import com.aloc.aloc.user.mapper.UserMapper;
+import com.aloc.aloc.user.service.UserService;
+import com.aloc.aloc.user.service.UserSortingService;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -41,9 +43,11 @@ public class UserFacade {
 
   public List<UserDetailResponseDto> getUsers() {
     List<User> users = userService.getActiveUsers();
+
     if (users.isEmpty()) {
       return List.of();
     }
+
     List<User> sortedUserList = userSortingService.sortUserList(users);
     return sortedUserList.stream()
         .map(userMapper::mapToUserDetailResponseDto)
@@ -68,32 +72,12 @@ public class UserFacade {
                               UserCourseProblem::getCreatedAt)) // createdAt 기준으로 오름차순 정렬
                       .toList();
               int todayProblemId = userCourseProblemService.getTodayProblemId(sortedProblems);
-              List<ProblemResponseDto> problemResponseDtos = mapToProblemResponseDto(userCourse);
+              List<ProblemResponseDto> problemResponseDtos =
+                  userCourseProblemService.mapToProblemResponseDto(userCourse);
               return UserCourseResponseDto.of(
                   userCourse, userCourse.getCourse(), problemResponseDtos, todayProblemId);
             })
         .collect(Collectors.toList());
-  }
-
-  private List<ProblemResponseDto> mapToProblemResponseDto(UserCourse userCourse) {
-    return userCourse.getUserCourseProblemList().stream()
-        .filter(ucp -> ucp.getUserCourseProblemStatus() != UserCourseProblemStatus.HIDDEN)
-        .map(
-            ucp -> {
-              List<UserCourseProblem> userCourseProblems =
-                  userCourseProblemService.getSolvedUserCourseProblemByProblem(ucp.getProblem());
-              LocalDateTime lastSolvedAt =
-                  userCourseProblems.isEmpty() ? null : userCourseProblems.get(0).getSolvedAt();
-              List<UserDetailResponseDto> solvingUserList =
-                  userCourseProblems.stream()
-                      .map(
-                          userCourseProblem ->
-                              userMapper.mapToUserDetailResponseDto(
-                                  userCourseProblem.getUserCourse().getUser()))
-                      .toList();
-              return ProblemResponseDto.of(ucp, ucp.getProblem(), lastSolvedAt, solvingUserList);
-            })
-        .toList();
   }
 
   @Transactional

@@ -2,7 +2,7 @@ package com.aloc.aloc.problem.controller;
 
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import com.aloc.aloc.problem.dto.response.ProblemSolvedResponseDto;
-import com.aloc.aloc.problem.service.ProblemFacade;
+import com.aloc.aloc.problem.facade.ProblemFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

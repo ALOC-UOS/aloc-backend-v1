@@ -1,4 +1,4 @@
-package com.aloc.aloc.problem.service;
+package com.aloc.aloc.problem.facade;
 
 import com.aloc.aloc.coin.dto.response.CoinResponseDto;
 import com.aloc.aloc.coin.service.CoinService;
@@ -10,7 +10,8 @@ import com.aloc.aloc.problem.dto.response.ProblemSolvedResponseDto;
 import com.aloc.aloc.problem.entity.Problem;
 import com.aloc.aloc.problem.entity.UserCourseProblem;
 import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
-import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
+import com.aloc.aloc.problem.service.ProblemService;
+import com.aloc.aloc.problem.service.UserCourseProblemService;
 import com.aloc.aloc.scraper.SolvedCheckingService;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.service.UserService;
@@ -29,7 +30,6 @@ public class ProblemFacade {
   private final UserCourseProblemService userCourseProblemService;
   private final SolvedCheckingService solvedCheckingService;
   private final CoinService coinService;
-  private final BaekjoonRankScrapingService baekjoonRankScrapingService;
 
   @Transactional
   public ProblemSolvedResponseDto checkProblemSolved(Integer problemId, String oauthId) {
@@ -37,32 +37,40 @@ public class ProblemFacade {
     Problem problem = problemService.getProblemByProblemId(problemId);
     UserCourseProblem userCourseProblem =
         userCourseProblemService.getUserCourseProblemByProblem(problem);
-    UserCourse userCourse = userCourseProblem.getUserCourse();
-    Course course = userCourse.getCourse();
-    int userCourseIdx = userCourse.getUserCourseProblemList().indexOf(userCourseProblem);
-    List<CoinResponseDto> coinResponseDtos = new ArrayList<>();
 
     if (!solvedCheckingService.isProblemSolved(user.getBaekjoonId(), problem, userCourseProblem)) {
       return ProblemSolvedResponseDto.fail();
     }
-
-    user.setRank(baekjoonRankScrapingService.extractBaekjoonRank(user.getBaekjoonId()));
-
-    // 문제 해결 성공 시 처리
+    userService.updateUserBaekjoonRank(user);
     userCourseProblem.updateUserCourseProblemSolved();
-    coinResponseDtos.add(coinService.giveCoinBySolvingProblem(user));
     user.updateUserBySolvingProblem();
-    checkAndGiveStreakCoin(user, coinResponseDtos);
 
-    if (isCourseCompleted(userCourseIdx, course)) {
-      userCourse.updateUserCourseState(UserCourseState.SUCCESS);
-      userCourse.getCourse().addSuccessCnt();
-      coinResponseDtos.add(coinService.giveCoinBySolvingCourse(user, course));
-    } else if (course.getCourseType().equals(CourseType.DEADLINE)) {
-      activateNextProblem(userCourse, userCourseIdx);
-    }
+    List<CoinResponseDto> coinResponseDtos = handleSolvedProblem(user, userCourseProblem);
 
     return ProblemSolvedResponseDto.success(coinResponseDtos);
+  }
+
+  private List<CoinResponseDto> handleSolvedProblem(
+      User user, UserCourseProblem userCourseProblem) {
+    List<CoinResponseDto> coinResponseDtos = new ArrayList<>();
+
+    // 기본 코인 지급
+    coinResponseDtos.add(coinService.giveCoinBySolvingProblem(user));
+    checkAndGiveStreakCoin(user, coinResponseDtos);
+
+    UserCourse userCourse = userCourseProblem.getUserCourse();
+    Course course = userCourse.getCourse();
+    int problemIndex = userCourse.getUserCourseProblemList().indexOf(userCourseProblem);
+
+    if (isCourseCompleted(problemIndex, course)) {
+      userCourse.updateUserCourseState(UserCourseState.SUCCESS);
+      course.addSuccessCnt();
+      coinResponseDtos.add(coinService.giveCoinBySolvingCourse(user, course));
+    } else if (course.getCourseType() == CourseType.DEADLINE) {
+      activateNextProblem(userCourse, problemIndex);
+    }
+
+    return coinResponseDtos;
   }
 
   private boolean isCourseCompleted(int userCourseIdx, Course course) {

@@ -1,5 +1,6 @@
 package com.aloc.aloc.user.service;
 
+import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.repository.UserRepository;
@@ -16,6 +17,7 @@ public class UserService {
   private static final Set<Authority> ACTIVE_AUTHORITIES =
       Set.of(Authority.ROLE_USER, Authority.ROLE_ADMIN);
   private final UserRepository userRepository;
+  private final BaekjoonRankScrapingService baekjoonRankScrapingService;
 
   public List<User> getActiveUsers() {
     return userRepository.findAllByAuthorityIn(ACTIVE_AUTHORITIES);
@@ -61,6 +63,11 @@ public class UserService {
                 user.setConsecutiveSolvedDays(0);
               }
             });
+  }
+
+  @Transactional
+  public void updateUserBaekjoonRank(User user) {
+    user.setRank(baekjoonRankScrapingService.extractBaekjoonRank(user.getBaekjoonId()));
   }
 
   private boolean isUserSolvedYesterday(User user) {

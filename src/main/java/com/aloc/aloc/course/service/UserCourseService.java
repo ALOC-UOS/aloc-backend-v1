@@ -32,13 +32,9 @@ public class UserCourseService {
     return userCourseRepository.findAllByUserAndClosedAtAfter(user, LocalDateTime.now());
   }
 
-  public boolean isEligibleToCreateUserCourse(User user, Course course) {
-
-    List<UserCourse> userCourses =
-        userCourseRepository.findAllByUserAndUserCourseState(user, UserCourseState.IN_PROGRESS);
-    boolean hasSameCourse =
-        userCourses.stream().anyMatch(uc -> uc.getCourse().getId().equals(course.getId()));
-    return userCourses.size() < 3 && !hasSameCourse;
+  public List<UserCourse> getAllByUserAndUserCourseState(
+      User user, UserCourseState userCourseState) {
+    return userCourseRepository.findAllByUserAndUserCourseState(user, userCourseState);
   }
 
   public UserCourse createUserCourse(User user, Course course) {

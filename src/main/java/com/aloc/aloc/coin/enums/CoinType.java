@@ -1,4 +1,4 @@
-package com.aloc.aloc.coin;
+package com.aloc.aloc.coin.enums;
 
 public enum CoinType {
   SOLVE_REWARD,
