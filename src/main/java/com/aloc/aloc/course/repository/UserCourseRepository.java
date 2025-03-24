@@ -15,6 +15,8 @@ import org.springframework.data.repository.query.Param;
 public interface UserCourseRepository extends JpaRepository<UserCourse, Long> {
   List<UserCourse> findAllByUser(User user);
 
+  List<UserCourse> findAllByUserAndUserCourseState(User user, UserCourseState userCourseState);
+
   List<UserCourse> findAllByUserAndClosedAtAfter(User user, LocalDateTime now);
 
   Optional<UserCourse> findByUserAndCourse(User user, Course course);

@@ -33,7 +33,10 @@ public class UserCourseService {
   }
 
   public boolean isEligibleToCreateUserCourse(User user) {
-    return userCourseRepository.findAllByUser(user).size() < 3;
+    return userCourseRepository
+            .findAllByUserAndUserCourseState(user, UserCourseState.IN_PROGRESS)
+            .size()
+        < 3;
   }
 
   public UserCourse createUserCourse(User user, Course course) {
