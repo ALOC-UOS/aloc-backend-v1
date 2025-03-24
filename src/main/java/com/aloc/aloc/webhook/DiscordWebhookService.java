@@ -111,7 +111,7 @@ public class DiscordWebhookService {
 
     // 3. 전송
     Map<String, Object> request = new HashMap<>();
-    request.put("content", "@everyone 크롤링이 완료되었습니다! 🎉");
+    request.put("content", "크롤링이 완료되었습니다! 🎉");
     request.put("embeds", embeds);
     request.put("allowed_mentions", Map.of("parse", List.of("everyone"))); // 멘션 허용
 
