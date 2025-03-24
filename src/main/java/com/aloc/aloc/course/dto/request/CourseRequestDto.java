@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 public class CourseRequestDto {
   private String title;
+  private String description;
   private CourseType courseType;
   private int problemCnt;
   private int minRank;

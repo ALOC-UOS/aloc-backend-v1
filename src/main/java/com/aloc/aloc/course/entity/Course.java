@@ -22,6 +22,7 @@ public class Course extends AuditingTimeEntity {
   private Long id;
 
   private String title;
+  private String description;
 
   @Enumerated(EnumType.STRING)
   private CourseType courseType;
@@ -41,6 +42,7 @@ public class Course extends AuditingTimeEntity {
   public static Course of(CourseRequestDto courseRequestDto) {
     return Course.builder()
         .title(courseRequestDto.getTitle())
+        .description((courseRequestDto.getDescription()))
         .courseType(courseRequestDto.getCourseType())
         .problemCnt(courseRequestDto.getProblemCnt())
         .minRank(courseRequestDto.getMinRank())

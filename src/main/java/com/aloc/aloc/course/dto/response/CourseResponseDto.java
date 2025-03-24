@@ -17,6 +17,9 @@ public class CourseResponseDto {
   @Schema(description = "코스 제목", example = "작심 삼일도 못한다고!?")
   private String title;
 
+  @Schema(description = "코스 설명", example = "기초 코스입니다.")
+  private String description;
+
   @Schema(description = "코스 유형", example = "DAILY")
   private CourseType type;
 
@@ -45,6 +48,7 @@ public class CourseResponseDto {
     return CourseResponseDto.builder()
         .id(course.getId())
         .title(course.getTitle())
+        .description(course.getDescription())
         .type(course.getCourseType())
         .problemCnt(course.getProblemCnt())
         .rank(RankResponseDto.of(course.getMinRank(), course.getMaxRank(), course.getAverageRank()))
