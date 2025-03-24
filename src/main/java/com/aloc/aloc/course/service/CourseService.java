@@ -89,7 +89,7 @@ public class CourseService {
     Course course = getCourseById(courseId);
     User user = userService.getUser(oauthId);
 
-    if (!userCourseService.isEligibleToCreateUserCourse(user)) {
+    if (!userCourseService.isEligibleToCreateUserCourse(user, course)) {
       throw new IllegalStateException("코스는 최대 3개까지 신청할 수 있습니다.");
     }
     UserCourse userCourse = userCourseService.createUserCourse(user, course);
