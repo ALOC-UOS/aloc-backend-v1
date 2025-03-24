@@ -64,8 +64,8 @@ public class UserService {
   }
 
   private boolean isUserSolvedYesterday(User user) {
-    return user.getLastSolvedAt()
-        .toLocalDate()
-        .equals(LocalDateTime.now().minusDays(1).toLocalDate());
+    LocalDateTime lastSolvedAt = user.getLastSolvedAt();
+    return lastSolvedAt != null
+        && lastSolvedAt.toLocalDate().equals(LocalDateTime.now().minusDays(1).toLocalDate());
   }
 }
