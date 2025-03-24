@@ -6,6 +6,7 @@ import com.aloc.aloc.global.image.ImageService;
 import com.aloc.aloc.global.image.enums.ImageType;
 import com.aloc.aloc.problem.dto.response.ProblemResponseDto;
 import com.aloc.aloc.problem.entity.UserCourseProblem;
+import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
 import com.aloc.aloc.problem.service.UserCourseProblemService;
 import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
@@ -76,6 +77,7 @@ public class UserFacade {
 
   private List<ProblemResponseDto> mapToProblemResponseDto(UserCourse userCourse) {
     return userCourse.getUserCourseProblemList().stream()
+        .filter(ucp -> ucp.getUserCourseProblemStatus() != UserCourseProblemStatus.HIDDEN)
         .map(
             ucp -> {
               List<UserCourseProblem> userCourseProblems =
