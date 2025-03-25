@@ -3,6 +3,7 @@ package com.aloc.aloc.global.jwt.service;
 import com.aloc.aloc.user.repository.UserRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,6 +44,7 @@ public class JwtServiceImpl implements JwtService {
   private static final String BEARER = "Bearer ";
 
   private final UserRepository userRepository;
+  private final EntityManager entityManager;
 
   @Override
   public String createAccessToken(String oauthId) {
@@ -70,6 +72,7 @@ public class JwtServiceImpl implements JwtService {
             users -> {
               users.updateRefreshToken(refreshToken);
               userRepository.save(users);
+              entityManager.flush();
               log.info("✅ [updateRefreshToken] refreshToken 저장 성공 - user: {}", users.getOauthId());
             },
             () -> {
