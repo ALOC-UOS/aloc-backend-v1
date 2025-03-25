@@ -62,6 +62,7 @@ public class JwtServiceImpl implements JwtService {
   }
 
   @Override
+  @Transactional
   public void updateRefreshToken(String oauthId, String refreshToken) {
     userRepository
         .findByOauthId(oauthId)
