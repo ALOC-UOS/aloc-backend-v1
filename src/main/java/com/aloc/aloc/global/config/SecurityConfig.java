@@ -5,6 +5,7 @@ import com.aloc.aloc.global.jwt.service.JwtServiceImpl;
 import com.aloc.aloc.global.login.handler.LoginFailureHandler;
 import com.aloc.aloc.global.login.service.UserDetailsServiceImpl;
 import com.aloc.aloc.user.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
@@ -79,10 +80,19 @@ public class SecurityConfig {
                     .logoutUrl("/auth/logout")
                     .logoutSuccessHandler(
                         (request, response, authentication) -> {
-                          // ✅ Refresh Token 삭제 로직 추가
+                          // ✅ Refresh Token 삭제 (DB에서)
                           jwtService
                               .extractRefreshToken(request)
                               .ifPresent(jwtService::destroyRefreshToken);
+
+                          // ✅ Refresh Token 쿠키도 브라우저에서 삭제
+                          Cookie cookie = new Cookie("refreshToken", null);
+                          cookie.setHttpOnly(true);
+                          cookie.setSecure(true); // HTTPS 환경이라면 true, 아니면 false
+                          cookie.setPath("/"); // 생성 시와 동일한 path 필요
+                          cookie.setMaxAge(0); // 즉시 만료되도록 설정
+                          response.addCookie(cookie);
+
                           response.setStatus(HttpServletResponse.SC_OK);
                         })
                     .invalidateHttpSession(true) // 세션 무효화 (JWT 기반이므로 사실상 필요 없음)
