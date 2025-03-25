@@ -66,7 +66,11 @@ public class JwtServiceImpl implements JwtService {
     userRepository
         .findByOauthId(oauthId)
         .ifPresentOrElse(
-            users -> users.updateRefreshToken(refreshToken), () -> new Exception("회원 조회 실패"));
+            users -> {
+              users.updateRefreshToken(refreshToken);
+              userRepository.save(users);
+            },
+            () -> new Exception("회원 조회 실패"));
   }
 
   @Override
