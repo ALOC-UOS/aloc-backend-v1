@@ -112,6 +112,7 @@ public class SecurityConfig {
                                   .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
                           String accessToken = jwtService.createAccessToken(oauthId);
                           String refreshToken = user.getRefreshToken();
+                          log.info("success handler refresh token : {}", refreshToken);
 
                           // ✅ [2] 쿠키와 헤더로 토큰 전송
                           jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
