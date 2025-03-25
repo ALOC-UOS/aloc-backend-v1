@@ -109,10 +109,7 @@ public class SecurityConfig {
                           String accessToken = jwtService.createAccessToken(oauthId);
                           String refreshToken = jwtService.createRefreshToken();
 
-                          jwtService.updateRefreshToken(oauthId, refreshToken);
-
                           // ✅ Access & Refresh Token 설정
-                          jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
 
                           // ✅ 요청의 Origin을 확인하여 리다이렉트 주소 설정
                           String origin = request.getHeader("Origin");
@@ -130,6 +127,8 @@ public class SecurityConfig {
                           User refreshedUser = userRepository.findByOauthId(oauthId).get();
                           log.info(
                               "🔍 저장 후 유저 상태: refreshToken = {}", refreshedUser.getRefreshToken());
+                          jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+                          jwtService.updateRefreshToken(oauthId, refreshToken);
 
                           response.sendRedirect(targetUrl);
                         })
