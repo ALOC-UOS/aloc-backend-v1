@@ -112,9 +112,7 @@ public class SecurityConfig {
 
                           // ✅ Access & Refresh Token 설정
                           jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
-                          // ✅ 신규 가입자인지 확인
-                          boolean isNewUser =
-                              (boolean) oAuth2User.getAttributes().getOrDefault("isNewUser", false);
+
                           // ✅ 요청의 Origin을 확인하여 리다이렉트 주소 설정
                           String origin = request.getHeader("Origin");
                           log.info("origin : " + origin);
@@ -126,9 +124,6 @@ public class SecurityConfig {
                             targetUrl = "https://openaloc.store/finish-google-sso"; // 배포된 프론트엔드
                           }
                           // ✅ 신규 유저라면 추가 정보 입력 페이지로 리다이렉트
-                          if (isNewUser) {
-                            targetUrl += "?new=true";
-                          }
 
                           log.info("🔄 OAuth2 로그인 후 리다이렉트: {}", targetUrl);
                           response.sendRedirect(targetUrl);
