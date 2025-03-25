@@ -63,8 +63,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     User savedUser = userRepository.save(user);
 
     // ✅ 여기서 바로 refreshToken 생성 및 저장
-    String refreshToken = jwtService.createRefreshToken();
-    jwtService.updateRefreshToken(savedUser.getOauthId(), refreshToken);
 
     return savedUser;
   }

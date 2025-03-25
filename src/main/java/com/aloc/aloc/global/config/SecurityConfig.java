@@ -4,13 +4,11 @@ import com.aloc.aloc.global.jwt.filter.JwtAuthenticationProcessingFilter;
 import com.aloc.aloc.global.jwt.service.JwtServiceImpl;
 import com.aloc.aloc.global.login.handler.LoginFailureHandler;
 import com.aloc.aloc.global.login.service.UserDetailsServiceImpl;
-import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -106,12 +104,10 @@ public class SecurityConfig {
                         (request, response, authentication) -> {
                           OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
                           String oauthId = oAuth2User.getAttribute("sub");
-                          User user =
-                              userRepository
-                                  .findByOauthId(oauthId)
-                                  .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
                           String accessToken = jwtService.createAccessToken(oauthId);
-                          String refreshToken = user.getRefreshToken();
+                          String refreshToken = jwtService.createRefreshToken();
+                          jwtService.updateRefreshToken(oauthId, refreshToken);
+
                           log.info("success handler refresh token : {}", refreshToken);
 
                           // ✅ [2] 쿠키와 헤더로 토큰 전송
