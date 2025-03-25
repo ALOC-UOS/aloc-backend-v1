@@ -4,6 +4,7 @@ import com.aloc.aloc.global.jwt.filter.JwtAuthenticationProcessingFilter;
 import com.aloc.aloc.global.jwt.service.JwtServiceImpl;
 import com.aloc.aloc.global.login.handler.LoginFailureHandler;
 import com.aloc.aloc.global.login.service.UserDetailsServiceImpl;
+import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -126,6 +127,10 @@ public class SecurityConfig {
                           // ✅ 신규 유저라면 추가 정보 입력 페이지로 리다이렉트
 
                           log.info("🔄 OAuth2 로그인 후 리다이렉트: {}", targetUrl);
+                          User refreshedUser = userRepository.findByOauthId(oauthId).get();
+                          log.info(
+                              "🔍 저장 후 유저 상태: refreshToken = {}", refreshedUser.getRefreshToken());
+
                           response.sendRedirect(targetUrl);
                         })
                     .failureHandler(
