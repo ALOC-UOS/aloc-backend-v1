@@ -10,6 +10,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -105,30 +106,22 @@ public class SecurityConfig {
                         (request, response, authentication) -> {
                           OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
                           String oauthId = oAuth2User.getAttribute("sub");
-
+                          User user =
+                              userRepository
+                                  .findByOauthId(oauthId)
+                                  .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
                           String accessToken = jwtService.createAccessToken(oauthId);
-                          String refreshToken = jwtService.createRefreshToken();
+                          String refreshToken = user.getRefreshToken();
 
-                          // ✅ Access & Refresh Token 설정
-
-                          // ✅ 요청의 Origin을 확인하여 리다이렉트 주소 설정
-                          String origin = request.getHeader("Origin");
-                          log.info("origin : " + origin);
-                          String targetUrl;
-
-                          if (origin != null && origin.contains("localhost")) {
-                            targetUrl = "http://localhost:3000/finish-google-sso"; // 로컬 프론트엔드
-                          } else {
-                            targetUrl = "https://openaloc.store/finish-google-sso"; // 배포된 프론트엔드
-                          }
-                          // ✅ 신규 유저라면 추가 정보 입력 페이지로 리다이렉트
-
-                          log.info("🔄 OAuth2 로그인 후 리다이렉트: {}", targetUrl);
-                          User refreshedUser = userRepository.findByOauthId(oauthId).get();
-                          log.info(
-                              "🔍 저장 후 유저 상태: refreshToken = {}", refreshedUser.getRefreshToken());
+                          // ✅ [2] 쿠키와 헤더로 토큰 전송
                           jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
-                          jwtService.updateRefreshToken(oauthId, refreshToken);
+
+                          // ✅ [4] Origin 확인하여 리다이렉트
+                          String origin = request.getHeader("Origin");
+                          String targetUrl =
+                              (origin != null && origin.contains("localhost"))
+                                  ? "http://localhost:3000/finish-google-sso"
+                                  : "https://openaloc.store/finish-google-sso";
 
                           response.sendRedirect(targetUrl);
                         })
