@@ -57,6 +57,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     if (user == null) {
       user = User.create(userOAuthProfile);
       userRepository.saveAndFlush(user);
+      log.info("새로운 유저 생성 : {}", user.getName());
     }
     return user;
   }

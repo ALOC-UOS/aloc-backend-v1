@@ -58,6 +58,7 @@ public class UserFacade {
 
   public UserDetailResponseDto getUser(String oauthId) {
     User user = userService.getUser(oauthId);
+    log.info("유저 정보 조회 시 리프레시 토큰 : {}", user.getRefreshToken());
     return userMapper.mapToUserDetailResponseDto(user);
   }
 
