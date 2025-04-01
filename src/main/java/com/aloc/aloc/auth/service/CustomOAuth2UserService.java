@@ -4,6 +4,7 @@ import com.aloc.aloc.auth.enums.OAuthAttributes;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.entity.UserOAuthProfile;
 import com.aloc.aloc.user.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import java.util.Collections;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
   private final UserRepository userRepository;
+  private final EntityManager entityManager;
 
   @Override
   public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -44,17 +46,19 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     UserOAuthProfile userOAuthProfile = OAuthAttributes.extract(registrationId, attributes);
 
     // 기존 사용자 조회 또는 신규 사용자 저장
-    User user = saveOrUpdateUserProfile(userOAuthProfile);
+    User user = getOrSaveUser(userOAuthProfile);
 
     return createDefaultOAuth2User(user, attributes);
   }
 
-  private User saveOrUpdateUserProfile(UserOAuthProfile userOAuthProfile) {
+  private User getOrSaveUser(UserOAuthProfile userOAuthProfile) {
     User user = userRepository.findByOauthId(userOAuthProfile.oauthId()).orElse(null);
     if (user == null) {
       user = User.create(userOAuthProfile);
+      userRepository.save(user);
+      entityManager.flush();
     }
-    return userRepository.save(user);
+    return user;
   }
 
   private DefaultOAuth2User createDefaultOAuth2User(User user, Map<String, Object> attributes) {
