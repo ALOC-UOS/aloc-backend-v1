@@ -10,6 +10,7 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -26,9 +27,9 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
       throws IOException, ServletException {
 
     // authentication.getPrincipal()에서 oauthId 추출 (UserDetails 형태로 캐스팅)
-    var oauthUser =
-        (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
-    String oauthId = oauthUser.getUsername();
+    DefaultOAuth2User oauthUser = (DefaultOAuth2User) authentication.getPrincipal();
+    String oauthId = oauthUser.getAttribute("sub");
+    log.info("oauthId : {}", oauthId);
 
     User user =
         userRepository
