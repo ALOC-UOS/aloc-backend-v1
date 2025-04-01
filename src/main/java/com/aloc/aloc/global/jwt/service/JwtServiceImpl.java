@@ -69,7 +69,10 @@ public class JwtServiceImpl implements JwtService {
             user -> {
               user.updateRefreshToken(refreshToken);
               userRepository.saveAndFlush(user);
-              log.info("✅ [updateRefreshToken] refreshToken 저장 성공 - user: {}", user.getOauthId());
+              log.info(
+                  "✅ [updateRefreshToken] refreshToken 저장 성공 - user: {}, refreshToke : {}",
+                  user.getOauthId(),
+                  user.getRefreshToken());
             },
             () -> {
               throw new RuntimeException("❌ 회원 조회 실패: oauthId = " + oauthId);

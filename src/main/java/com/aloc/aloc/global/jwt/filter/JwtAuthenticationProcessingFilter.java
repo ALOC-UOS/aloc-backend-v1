@@ -64,7 +64,6 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             refreshToken.isPresent(),
             jwtService.isTokenValid(refreshToken.get()));
       }
-      log.info("토큰 발급 완료");
       return;
     }
 
