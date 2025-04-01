@@ -87,6 +87,7 @@ public class SecurityConfig {
                           jwtService
                               .extractRefreshToken(request)
                               .ifPresent(jwtService::destroyRefreshToken);
+                          log.info("로그아웃 성공 리프레시 토큰 제거");
 
                           // ✅ Refresh Token 쿠키도 브라우저에서 삭제
                           Cookie cookie = new Cookie("refreshToken", null);
