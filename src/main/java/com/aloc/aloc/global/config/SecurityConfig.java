@@ -1,5 +1,7 @@
 package com.aloc.aloc.global.config;
 
+import com.aloc.aloc.auth.handler.OAuth2AuthenticationSuccessHandler;
+import com.aloc.aloc.auth.service.CustomOAuth2UserService;
 import com.aloc.aloc.global.jwt.filter.JwtAuthenticationProcessingFilter;
 import com.aloc.aloc.global.jwt.service.JwtServiceImpl;
 import com.aloc.aloc.global.login.handler.LoginFailureHandler;
@@ -19,7 +21,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -34,6 +35,8 @@ public class SecurityConfig {
   private final UserDetailsServiceImpl userDetailsService;
   private final UserRepository userRepository;
   private final JwtServiceImpl jwtService;
+  private final CustomOAuth2UserService customOAuth2UserService;
+  private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
   // 특정 HTTP 요청에 대한 웹 기반 보안 구성
   @Bean
@@ -100,34 +103,37 @@ public class SecurityConfig {
         .oauth2Login(
             oauth2 ->
                 oauth2
-                    .successHandler(
-                        (request, response, authentication) -> {
-                          OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-                          String oauthId = oAuth2User.getAttribute("sub");
-                          String accessToken = jwtService.createAccessToken(oauthId);
-                          String refreshToken = jwtService.createRefreshToken();
-                          jwtService.updateRefreshToken(oauthId, refreshToken);
-
-                          log.info("success handler refresh token : {}", refreshToken);
-
-                          // ✅ [2] 쿠키와 헤더로 토큰 전송
-                          jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
-
-                          // ✅ [4] Origin 확인하여 리다이렉트
-                          String origin = request.getHeader("Origin");
-                          String targetUrl =
-                              (origin != null && origin.contains("localhost"))
-                                  ? "http://localhost:3000/finish-google-sso"
-                                  : "https://openaloc.store/finish-google-sso";
-
-                          response.sendRedirect(targetUrl);
-                        })
-                    .failureHandler(
-                        (request, response, exception) -> {
-                          // 로그인 실패 시 로그 남기기
-                          log.error("OAuth2 로그인 실패: {}", exception.getMessage());
-                          response.sendRedirect("https://openaloc.store/login?error");
-                        }));
+                    .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+                    .successHandler(oAuth2AuthenticationSuccessHandler));
+    //                    .successHandler(
+    //                        (request, response, authentication) -> {
+    //                          OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+    //                          String oauthId = oAuth2User.getAttribute("sub");
+    //                          String accessToken = jwtService.createAccessToken(oauthId);
+    //                          String refreshToken = jwtService.createRefreshToken();
+    //                          jwtService.updateRefreshToken(oauthId, refreshToken);
+    //
+    //                          log.info("success handler refresh token : {}", refreshToken);
+    //
+    //                          // ✅ [2] 쿠키와 헤더로 토큰 전송
+    //                          jwtService.sendAccessAndRefreshToken(response, accessToken,
+    // refreshToken);
+    //
+    //                          // ✅ [4] Origin 확인하여 리다이렉트
+    //                          String origin = request.getHeader("Origin");
+    //                          String targetUrl =
+    //                              (origin != null && origin.contains("localhost"))
+    //                                  ? "http://localhost:3000/finish-google-sso"
+    //                                  : "https://openaloc.store/finish-google-sso";
+    //
+    //                          response.sendRedirect(targetUrl);
+    //                        })
+    //                    .failureHandler(
+    //                        (request, response, exception) -> {
+    //                          // 로그인 실패 시 로그 남기기
+    //                          log.error("OAuth2 로그인 실패: {}", exception.getMessage());
+    //                          response.sendRedirect("https://openaloc.store/login?error");
+    //                        }));
 
     return http.build();
   }

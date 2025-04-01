@@ -1,7 +1,6 @@
 package com.aloc.aloc.auth.service;
 
 import com.aloc.aloc.auth.enums.OAuthAttributes;
-import com.aloc.aloc.global.jwt.service.JwtServiceImpl;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.entity.UserOAuthProfile;
 import com.aloc.aloc.user.repository.UserRepository;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Service;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
   private final UserRepository userRepository;
-  private final JwtServiceImpl jwtService;
 
   @Override
   public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -53,18 +51,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
   private User saveOrUpdateUserProfile(UserOAuthProfile userOAuthProfile) {
     User user = userRepository.findByOauthId(userOAuthProfile.oauthId()).orElse(null);
-    if (user != null) {
-      user = user.update(userOAuthProfile.nickname());
-    } else {
+    if (user == null) {
       user = User.create(userOAuthProfile);
     }
-
-    // ✅ 저장된 user
-    User savedUser = userRepository.save(user);
-
-    // ✅ 여기서 바로 refreshToken 생성 및 저장
-
-    return savedUser;
+    return userRepository.save(user);
   }
 
   private DefaultOAuth2User createDefaultOAuth2User(User user, Map<String, Object> attributes) {
