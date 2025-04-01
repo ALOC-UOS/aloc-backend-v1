@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
   private final EntityManager entityManager;
 
   @Override
+  @Transactional
   public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
     OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
 
@@ -51,7 +53,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     return createDefaultOAuth2User(user, attributes);
   }
 
-  private User getOrSaveUser(UserOAuthProfile userOAuthProfile) {
+  @Transactional
+  protected User getOrSaveUser(UserOAuthProfile userOAuthProfile) {
     User user = userRepository.findByOauthId(userOAuthProfile.oauthId()).orElse(null);
     if (user == null) {
       user = User.create(userOAuthProfile);
