@@ -53,6 +53,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     }
 
     if (request.getRequestURI().equals(refreshTokenUrl)) {
+      log.info("리프레시 토큰으로 엑세스 토큰 요청 들어옴");
       Optional<String> refreshToken = extractRefreshToken(request);
 
       if (refreshToken.isPresent() && jwtService.isTokenValid(refreshToken.get())) {

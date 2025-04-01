@@ -84,6 +84,10 @@ public class SecurityConfig {
                     .logoutSuccessHandler(
                         (request, response, authentication) -> {
                           // ✅ Refresh Token 삭제 (DB에서)
+                          log.warn(
+                              "👋 로그아웃 요청 발생 - IP: {}, User-Agent: {}",
+                              request.getRemoteAddr(),
+                              request.getHeader("User-Agent"));
                           jwtService
                               .extractRefreshToken(request)
                               .ifPresent(jwtService::destroyRefreshToken);
