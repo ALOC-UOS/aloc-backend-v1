@@ -37,7 +37,8 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     jwtService.updateRefreshToken(oauthId, refreshToken);
     jwtService.setRefreshTokenCookie(response, refreshToken);
 
-    String redirectUri = "https://openaloc.store/finish-google-sso";
+    //    String redirectUri = "https://openaloc.store/finish-google-sso";
+    String redirectUri = "https://localhost:3000/finish-google-sso";
 
     // ✅ 쿼리파라미터로 토큰 전달 (주의: refreshToken은 보안상 권장 안됨!)
     String redirectWithToken = String.format("%s?accessToken=%s", redirectUri, accessToken);
