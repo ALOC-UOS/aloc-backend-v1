@@ -4,7 +4,6 @@ import com.aloc.aloc.auth.enums.OAuthAttributes;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.entity.UserOAuthProfile;
 import com.aloc.aloc.user.repository.UserRepository;
-import jakarta.persistence.EntityManager;
 import java.util.Collections;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
   private final UserRepository userRepository;
-  private final EntityManager entityManager;
 
   @Override
   @Transactional
@@ -58,8 +56,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     User user = userRepository.findByOauthId(userOAuthProfile.oauthId()).orElse(null);
     if (user == null) {
       user = User.create(userOAuthProfile);
-      userRepository.save(user);
-      entityManager.flush();
+      userRepository.saveAndFlush(user);
     }
     return user;
   }

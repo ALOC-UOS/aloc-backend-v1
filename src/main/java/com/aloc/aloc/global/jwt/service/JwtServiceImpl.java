@@ -68,8 +68,7 @@ public class JwtServiceImpl implements JwtService {
         .ifPresentOrElse(
             user -> {
               user.updateRefreshToken(refreshToken);
-              userRepository.save(user);
-              entityManager.flush();
+              userRepository.saveAndFlush(user);
               log.info("✅ [updateRefreshToken] refreshToken 저장 성공 - user: {}", user.getOauthId());
             },
             () -> {
