@@ -46,7 +46,8 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
     // ✅ 쿼리파라미터로 토큰 전달 (주의: refreshToken은 보안상 권장 안됨!)
     String redirectWithToken = String.format("%s?accessToken=%s", redirectUri, accessToken);
-    log.info("redirect 전!! user token 상태 : {}", user.getRefreshToken());
+    user = userRepository.findByOauthId(oauthId).orElseThrow();
+    log.info("✅ 저장 후 user의 refreshToken: {}", user.getRefreshToken());
     // ✅ 리다이렉트
     response.sendRedirect(redirectWithToken);
   }
