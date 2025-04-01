@@ -35,9 +35,6 @@ public class JwtServiceImpl implements JwtService {
   @Value("${jwt.access.header}")
   private String accessHeader;
 
-  @Value("${jwt.refresh.header}")
-  private String refreshHeader;
-
   private static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
   private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
   private static final String USERNAME_CLAIM = "oauthId";
@@ -119,7 +116,7 @@ public class JwtServiceImpl implements JwtService {
     refreshTokenCookie.setSecure(true);
     refreshTokenCookie.setPath("/");
     refreshTokenCookie.setMaxAge((int) refreshTokenValidityInSeconds);
-    refreshTokenCookie.setAttribute("SameSite", "Lax");
+    refreshTokenCookie.setAttribute("SameSite", "None");
     response.addCookie(refreshTokenCookie);
   }
 
