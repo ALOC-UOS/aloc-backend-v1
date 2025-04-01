@@ -41,10 +41,14 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
     // 리프레시 토큰 저장
     jwtService.updateRefreshToken(oauthId, refreshToken);
+    jwtService.setRefreshTokenCookie(response, refreshToken);
 
-    // 토큰을 응답에 담아서 전달
-    jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+    String redirectUri = "https://openaloc.store/finish-google-sso";
 
-    log.info("✅ OAuth2 로그인 성공 - accessToken, refreshToken 응답 완료");
+    // ✅ 쿼리파라미터로 토큰 전달 (주의: refreshToken은 보안상 권장 안됨!)
+    String redirectWithToken = String.format("%s?accessToken=%s", redirectUri, accessToken);
+
+    // ✅ 리다이렉트
+    response.sendRedirect(redirectWithToken);
   }
 }

@@ -97,43 +97,12 @@ public class SecurityConfig {
                           response.addCookie(cookie);
 
                           response.setStatus(HttpServletResponse.SC_OK);
-                        })
-                    .invalidateHttpSession(true) // 세션 무효화 (JWT 기반이므로 사실상 필요 없음)
-            )
+                        }))
         .oauth2Login(
             oauth2 ->
                 oauth2
                     .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                     .successHandler(oAuth2AuthenticationSuccessHandler));
-    //                    .successHandler(
-    //                        (request, response, authentication) -> {
-    //                          OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-    //                          String oauthId = oAuth2User.getAttribute("sub");
-    //                          String accessToken = jwtService.createAccessToken(oauthId);
-    //                          String refreshToken = jwtService.createRefreshToken();
-    //                          jwtService.updateRefreshToken(oauthId, refreshToken);
-    //
-    //                          log.info("success handler refresh token : {}", refreshToken);
-    //
-    //                          // ✅ [2] 쿠키와 헤더로 토큰 전송
-    //                          jwtService.sendAccessAndRefreshToken(response, accessToken,
-    // refreshToken);
-    //
-    //                          // ✅ [4] Origin 확인하여 리다이렉트
-    //                          String origin = request.getHeader("Origin");
-    //                          String targetUrl =
-    //                              (origin != null && origin.contains("localhost"))
-    //                                  ? "http://localhost:3000/finish-google-sso"
-    //                                  : "https://openaloc.store/finish-google-sso";
-    //
-    //                          response.sendRedirect(targetUrl);
-    //                        })
-    //                    .failureHandler(
-    //                        (request, response, exception) -> {
-    //                          // 로그인 실패 시 로그 남기기
-    //                          log.error("OAuth2 로그인 실패: {}", exception.getMessage());
-    //                          response.sendRedirect("https://openaloc.store/login?error");
-    //                        }));
 
     return http.build();
   }
