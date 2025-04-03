@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Getter
@@ -18,6 +19,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "study_user")
+@DynamicUpdate
 public class User extends AuditingTimeEntity {
 
   @Id
@@ -68,27 +70,14 @@ public class User extends AuditingTimeEntity {
   }
 
   @Builder
-  public User(
-      String baekjoonId,
-      Integer rank,
-      String oauthId,
-      String name,
-      String email,
-      String profileImageFileName) {
-    this.baekjoonId = baekjoonId;
+  public User(String oauthId, String name, String email, String profileImageFileName) {
     this.authority = Authority.ROLE_NEW_USER;
-    this.rank = rank;
     this.oauthId = oauthId;
     this.name = name;
     this.email = email;
     this.profileImageFileName = profileImageFileName;
     this.coin = 0;
     this.profileColor = "Blue";
-  }
-
-  public User update(String email) {
-    this.email = email;
-    return this;
   }
 
   public static User create(UserOAuthProfile userOAuthProfile) {

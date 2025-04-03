@@ -1,10 +1,13 @@
 package com.aloc.aloc.global.config;
 
+import com.aloc.aloc.auth.handler.OAuth2AuthenticationSuccessHandler;
+import com.aloc.aloc.auth.service.CustomOAuth2UserService;
 import com.aloc.aloc.global.jwt.filter.JwtAuthenticationProcessingFilter;
 import com.aloc.aloc.global.jwt.service.JwtServiceImpl;
 import com.aloc.aloc.global.login.handler.LoginFailureHandler;
 import com.aloc.aloc.global.login.service.UserDetailsServiceImpl;
 import com.aloc.aloc.user.repository.UserRepository;
+import com.aloc.aloc.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
@@ -18,8 +21,8 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -33,13 +36,18 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
   private final UserDetailsServiceImpl userDetailsService;
   private final UserRepository userRepository;
+  private final UserService userService;
   private final JwtServiceImpl jwtService;
+  private final CustomOAuth2UserService customOAuth2UserService;
+  private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
   // 특정 HTTP 요청에 대한 웹 기반 보안 구성
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(
             jwtAuthenticationProcessingFilter(), LogoutFilter.class) // ✅ UsernamePassword 관련 필터 제거
         .authorizeHttpRequests(
@@ -81,9 +89,14 @@ public class SecurityConfig {
                     .logoutSuccessHandler(
                         (request, response, authentication) -> {
                           // ✅ Refresh Token 삭제 (DB에서)
+                          log.warn(
+                              "👋 로그아웃 요청 발생 - IP: {}, User-Agent: {}",
+                              request.getRemoteAddr(),
+                              request.getHeader("User-Agent"));
                           jwtService
                               .extractRefreshToken(request)
                               .ifPresent(jwtService::destroyRefreshToken);
+                          log.info("로그아웃 성공 리프레시 토큰 제거");
 
                           // ✅ Refresh Token 쿠키도 브라우저에서 삭제
                           Cookie cookie = new Cookie("refreshToken", null);
@@ -94,58 +107,19 @@ public class SecurityConfig {
                           response.addCookie(cookie);
 
                           response.setStatus(HttpServletResponse.SC_OK);
-                        })
-                    .invalidateHttpSession(true) // 세션 무효화 (JWT 기반이므로 사실상 필요 없음)
-            )
+                        }))
         .oauth2Login(
             oauth2 ->
                 oauth2
-                    .successHandler(
-                        (request, response, authentication) -> {
-                          OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-                          String oauthId = oAuth2User.getAttribute("sub");
-
-                          String accessToken = jwtService.createAccessToken(oauthId);
-                          String refreshToken = jwtService.createRefreshToken();
-
-                          jwtService.updateRefreshToken(oauthId, refreshToken);
-
-                          // ✅ Access & Refresh Token 설정
-                          jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
-                          // ✅ 신규 가입자인지 확인
-                          boolean isNewUser =
-                              (boolean) oAuth2User.getAttributes().getOrDefault("isNewUser", false);
-                          // ✅ 요청의 Origin을 확인하여 리다이렉트 주소 설정
-                          String origin = request.getHeader("Origin");
-                          log.info("origin : " + origin);
-                          String targetUrl;
-
-                          if (origin != null && origin.contains("localhost")) {
-                            targetUrl = "http://localhost:3000/finish-google-sso"; // 로컬 프론트엔드
-                          } else {
-                            targetUrl = "https://openaloc.store/finish-google-sso"; // 배포된 프론트엔드
-                          }
-                          // ✅ 신규 유저라면 추가 정보 입력 페이지로 리다이렉트
-                          if (isNewUser) {
-                            targetUrl += "?new=true";
-                          }
-
-                          log.info("🔄 OAuth2 로그인 후 리다이렉트: {}", targetUrl);
-                          response.sendRedirect(targetUrl);
-                        })
-                    .failureHandler(
-                        (request, response, exception) -> {
-                          // 로그인 실패 시 로그 남기기
-                          log.error("OAuth2 로그인 실패: {}", exception.getMessage());
-                          response.sendRedirect("https://openaloc.store/login?error");
-                        }));
+                    .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+                    .successHandler(oAuth2AuthenticationSuccessHandler));
 
     return http.build();
   }
 
   @Bean
   public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
-    return new JwtAuthenticationProcessingFilter(jwtService, userRepository);
+    return new JwtAuthenticationProcessingFilter(jwtService, userService, userRepository);
   }
 
   @Bean

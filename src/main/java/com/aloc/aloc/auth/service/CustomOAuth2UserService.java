@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
   private final UserRepository userRepository;
 
   @Override
+  @Transactional
   public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
     OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
 
@@ -44,19 +46,20 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     UserOAuthProfile userOAuthProfile = OAuthAttributes.extract(registrationId, attributes);
 
     // 기존 사용자 조회 또는 신규 사용자 저장
-    User user = saveOrUpdateUserProfile(userOAuthProfile);
+    User user = getOrSaveUser(userOAuthProfile);
 
     return createDefaultOAuth2User(user, attributes);
   }
 
-  private User saveOrUpdateUserProfile(UserOAuthProfile userOAuthProfile) {
+  @Transactional
+  protected User getOrSaveUser(UserOAuthProfile userOAuthProfile) {
     User user = userRepository.findByOauthId(userOAuthProfile.oauthId()).orElse(null);
-    if (user != null) {
-      user = user.update(userOAuthProfile.nickname());
-    } else {
+    if (user == null) {
       user = User.create(userOAuthProfile);
+      userRepository.saveAndFlush(user);
+      log.info("새로운 유저 생성 : {}", user.getName());
     }
-    return userRepository.save(user);
+    return user;
   }
 
   private DefaultOAuth2User createDefaultOAuth2User(User user, Map<String, Object> attributes) {

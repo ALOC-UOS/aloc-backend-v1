@@ -3,6 +3,7 @@ package com.aloc.aloc.global.jwt.service;
 import com.aloc.aloc.user.repository.UserRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,6 +14,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -34,15 +36,13 @@ public class JwtServiceImpl implements JwtService {
   @Value("${jwt.access.header}")
   private String accessHeader;
 
-  @Value("${jwt.refresh.header}")
-  private String refreshHeader;
-
   private static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
   private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
   private static final String USERNAME_CLAIM = "oauthId";
   private static final String BEARER = "Bearer ";
 
   private final UserRepository userRepository;
+  private final EntityManager entityManager;
 
   @Override
   public String createAccessToken(String oauthId) {
@@ -62,11 +62,22 @@ public class JwtServiceImpl implements JwtService {
   }
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void updateRefreshToken(String oauthId, String refreshToken) {
     userRepository
         .findByOauthId(oauthId)
         .ifPresentOrElse(
-            users -> users.updateRefreshToken(refreshToken), () -> new Exception("회원 조회 실패"));
+            user -> {
+              user.updateRefreshToken(refreshToken);
+              userRepository.saveAndFlush(user);
+              log.info(
+                  "✅ [updateRefreshToken] refreshToken 저장 성공 - user: {}, refreshToke : {}",
+                  user.getOauthId(),
+                  user.getRefreshToken());
+            },
+            () -> {
+              throw new RuntimeException("❌ 회원 조회 실패: oauthId = " + oauthId);
+            });
   }
 
   @Override
@@ -108,7 +119,7 @@ public class JwtServiceImpl implements JwtService {
     refreshTokenCookie.setSecure(true);
     refreshTokenCookie.setPath("/");
     refreshTokenCookie.setMaxAge((int) refreshTokenValidityInSeconds);
-    refreshTokenCookie.setAttribute("SameSite", "Lax");
+    refreshTokenCookie.setAttribute("SameSite", "None");
     response.addCookie(refreshTokenCookie);
   }
 

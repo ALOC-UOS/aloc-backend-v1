@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserFacade {
 
@@ -57,6 +59,7 @@ public class UserFacade {
 
   public UserDetailResponseDto getUser(String oauthId) {
     User user = userService.getUser(oauthId);
+    log.info("유저 정보 조회 시 리프레시 토큰 : {}", user.getRefreshToken());
     return userMapper.mapToUserDetailResponseDto(user);
   }
 
@@ -90,24 +93,46 @@ public class UserFacade {
 
   @Transactional
   public UserDetailResponseDto updateUser(String oauthId, UserRequestDto userRequestDto) {
+    log.info("✅ [updateUser] 호출됨 - oauthId: {}", oauthId);
+    log.info("📥 [요청 값] userRequestDto: {}", userRequestDto);
 
     User user = userService.getUser(oauthId);
+    log.info("🔍 유저 조회 완료 - email: {}, authority: {}", user.getEmail(), user.getAuthority());
 
+    // 백준 ID 등록 + 권한 변경
     if (userRequestDto.getBaekjoonId() != null
         && user.getAuthority().equals(Authority.ROLE_NEW_USER)) {
+      log.info("🟡 백준 ID 존재 + ROLE_NEW_USER → 백준 ID 등록 및 권한 변경 처리");
+
       userService.checkBaekjoonId(userRequestDto.getBaekjoonId());
+      log.info("✅ 백준 ID 중복 검사 통과: {}", userRequestDto.getBaekjoonId());
+
       user.setBaekjoonId(userRequestDto.getBaekjoonId());
-      user.setRank(baekjoonRankScrapingService.extractBaekjoonRank(user.getBaekjoonId()));
+      log.info("📌 백준 ID 설정됨: {}", user.getBaekjoonId());
+
+      int extractedRank = baekjoonRankScrapingService.extractBaekjoonRank(user.getBaekjoonId());
+      user.setRank(extractedRank);
+      log.info("📊 백준 랭크 추출 완료: {}", extractedRank);
+
       user.setAuthority(Authority.ROLE_USER);
+      log.info("🔄 권한 변경됨 → ROLE_USER");
     }
 
+    // 이름 설정
     if (StringUtils.hasText(userRequestDto.getName())) {
+      log.info("📝 이름 업데이트: {}", userRequestDto.getName());
       user.setName(userRequestDto.getName());
     }
 
+    // 저장
     userService.saveUser(user);
+    log.info("💾 유저 정보 저장 완료 - userId: {}, refreshToken: {}", user.getId(), user.getRefreshToken());
 
-    return userMapper.mapToUserDetailResponseDto(user);
+    // 응답 생성
+    UserDetailResponseDto response = userMapper.mapToUserDetailResponseDto(user);
+    log.info("✅ [응답 반환] userDetailResponseDto: {}", response);
+
+    return response;
   }
 
   @Transactional
