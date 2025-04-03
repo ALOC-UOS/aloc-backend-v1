@@ -83,6 +83,14 @@ public class UserController {
         profileBackgroundColorService.changeColor(user.getUsername()));
   }
 
+  /**
+   * Retrieves the list of courses associated with the authenticated user.
+   *
+   * <p>This endpoint uses the user facade to obtain the course details for the user identified
+   * by the provided authentication token. The course data is returned within a CustomApiResponse.
+   *
+   * @return a CustomApiResponse containing a list of UserCourseResponseDto objects
+   */
   @GetMapping("/user/courses")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "유저의 코스 목록 불러오기", description = "유저의 코스목록을 불러옵니다.")
@@ -91,6 +99,14 @@ public class UserController {
     return CustomApiResponse.onSuccess(userFacade.getUserCourses(user.getUsername()));
   }
 
+  /**
+   * Retrieves a simplified list of courses for the authenticated user.
+   *
+   * <p>This endpoint returns a custom API response containing a list of simplified course details,
+   * allowing clients to quickly access essential information about the user's courses.</p>
+   *
+   * @return a custom API response with a list of simple course response DTOs
+   */
   @GetMapping("/user/simple-courses")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "유저의 코스 목록 불러오기", description = "간단한 버전의 유저의 코스목록을 불러옵니다.")
@@ -99,6 +115,16 @@ public class UserController {
     return CustomApiResponse.onSuccess(userFacade.getSimpleUserCourses(user.getUsername()));
   }
 
+  /**
+   * Allows the authenticated user to select a course.
+   *
+   * Processes the course selection by associating the course identified by the given courseId
+   * with the current user and returns a custom API response containing the details of the created association.
+   *
+   * @param courseId the unique identifier of the course to be selected
+   * @param user the currently authenticated user
+   * @return a custom API response containing the details of the course-user association
+   */
   @PostMapping("/user/course/{courseId}")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "유저가 코스선택", description = "유저가 코스를 선택합니다.")

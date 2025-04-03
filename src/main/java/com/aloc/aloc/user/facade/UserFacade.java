@@ -60,6 +60,16 @@ public class UserFacade {
     return userMapper.mapToUserDetailResponseDto(user);
   }
 
+  /**
+   * Retrieves the user's active courses in process and maps each course to a response DTO.
+   *
+   * <p>This method first obtains the user by the OAuth ID, then fetches all courses that are currently in process.
+   * For each course, it sorts the associated problems by creation date, determines the problem ID assigned for today,
+   * and maps the course along with its problems to a {@code UserCourseResponseDto}.
+   *
+   * @param oauthId the OAuth identifier for the user
+   * @return a list of {@code UserCourseResponseDto} objects representing the user's active courses with current problem details
+   */
   public List<UserCourseResponseDto> getUserCourses(String oauthId) {
     User user = userService.getUser(oauthId);
     List<UserCourse> userCourses = userCourseService.getUserCoursesInProcessByUser(user);
@@ -81,6 +91,15 @@ public class UserFacade {
         .collect(Collectors.toList());
   }
 
+  /**
+   * Retrieves a simplified list of active courses for the specified user.
+   *
+   * <p>This method finds the user by the provided OAuth ID, retrieves the user's courses that are currently in process,
+   * and converts each course into a simplified response data transfer object.
+   *
+   * @param oauthId the OAuth identifier of the user
+   * @return a list of simplified course response DTOs; an empty list if no active courses are found
+   */
   public List<UserCourseSimpleResponseDto> getSimpleUserCourses(String oauthId) {
     User user = userService.getUser(oauthId);
     List<UserCourse> userCourses = userCourseService.getUserCoursesInProcessByUser(user);
@@ -88,6 +107,17 @@ public class UserFacade {
     return userCourses.stream().map(UserCourseSimpleResponseDto::of).toList();
   }
 
+  /**
+   * Updates a user's details based on the provided user request data.
+   *
+   * <p>If the request contains a new Baekjoon ID and the user currently has a new user role,
+   * the method validates the Baekjoon ID, updates the user's rank based on the extracted Baekjoon rank,
+   * and changes their authority to a regular user. Additionally, it updates the user's name if provided.
+   *
+   * @param oauthId the OAuth identifier of the user
+   * @param userRequestDto the DTO containing updated user details
+   * @return a response DTO representing the updated user information
+   */
   @Transactional
   public UserDetailResponseDto updateUser(String oauthId, UserRequestDto userRequestDto) {
 

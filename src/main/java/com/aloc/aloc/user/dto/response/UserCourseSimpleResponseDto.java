@@ -30,6 +30,16 @@ public class UserCourseSimpleResponseDto {
   @Schema(description = "랭크")
   private RankResponseDto rank;
 
+  /**
+   * Constructs a simplified DTO for a user's course from the given UserCourse entity.
+   *
+   * <p>This method extracts the associated course details from the provided UserCourse and creates a new
+   * UserCourseSimpleResponseDto containing the course ID, title, type, created and closed dates, as well as
+   * ranking information derived from the course’s minimum, maximum, and average rank values.
+   *
+   * @param userCourse the UserCourse entity from which to extract course data
+   * @return a UserCourseSimpleResponseDto populated with course and ranking details
+   */
   public static UserCourseSimpleResponseDto of(UserCourse userCourse) {
     Course course = userCourse.getCourse();
 
