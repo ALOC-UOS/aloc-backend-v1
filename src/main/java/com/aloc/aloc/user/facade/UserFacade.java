@@ -10,6 +10,7 @@ import com.aloc.aloc.problem.service.UserCourseProblemService;
 import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
 import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
+import com.aloc.aloc.user.dto.response.UserCourseSimpleResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
@@ -78,6 +79,13 @@ public class UserFacade {
                   userCourse, userCourse.getCourse(), problemResponseDtos, todayProblemId);
             })
         .collect(Collectors.toList());
+  }
+
+  public List<UserCourseSimpleResponseDto> getSimpleUserCourses(String oauthId) {
+    User user = userService.getUser(oauthId);
+    List<UserCourse> userCourses = userCourseService.getUserCoursesInProcessByUser(user);
+
+    return userCourses.stream().map(UserCourseSimpleResponseDto::of).toList();
   }
 
   @Transactional
