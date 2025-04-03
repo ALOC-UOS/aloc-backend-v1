@@ -114,11 +114,9 @@ public class CourseService {
   public CourseUserResponseDto closeUserCourse(Long courseId, String oauthId) {
     Course course = getCourseById(courseId);
     User user = userService.getUser(oauthId);
-    UserCourse userCourse = userCourseService.getUserCourseByUserAndCourse(user, course);
-
-    if (userCourse.getUserCourseState() != UserCourseState.IN_PROGRESS) {
-      throw new IllegalArgumentException("진행 중인 코스가 아니라 포기할 수 없습니다.");
-    }
+    UserCourse userCourse =
+        userCourseService.getUserCourseByUserAndCourseAndUserCourseState(
+            user, course, UserCourseState.IN_PROGRESS);
 
     userCourseService.closeUserCourse(userCourse);
     return CourseUserResponseDto.of(userCourse);

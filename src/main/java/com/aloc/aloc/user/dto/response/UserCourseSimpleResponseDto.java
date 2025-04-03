@@ -34,7 +34,7 @@ public class UserCourseSimpleResponseDto {
     Course course = userCourse.getCourse();
 
     return UserCourseSimpleResponseDto.builder()
-        .id(userCourse.getId())
+        .id(course.getId())
         .title(course.getTitle())
         .courseType(course.getCourseType())
         .createdAt(userCourse.getCreatedAt())
