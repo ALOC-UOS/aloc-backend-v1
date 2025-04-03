@@ -17,7 +17,8 @@ public interface UserCourseRepository extends JpaRepository<UserCourse, Long> {
 
   List<UserCourse> findAllByUserAndUserCourseState(User user, UserCourseState userCourseState);
 
-  Optional<UserCourse> findByUserAndCourse(User user, Course course);
+  Optional<UserCourse> findByUserAndCourseAndUserCourseState(
+      User user, Course course, UserCourseState userCourseState);
 
   @Query(
       "SELECT uc FROM UserCourse uc WHERE "
