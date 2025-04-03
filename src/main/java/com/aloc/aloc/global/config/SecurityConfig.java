@@ -7,6 +7,7 @@ import com.aloc.aloc.global.jwt.service.JwtServiceImpl;
 import com.aloc.aloc.global.login.handler.LoginFailureHandler;
 import com.aloc.aloc.global.login.service.UserDetailsServiceImpl;
 import com.aloc.aloc.user.repository.UserRepository;
+import com.aloc.aloc.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
@@ -35,6 +36,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
   private final UserDetailsServiceImpl userDetailsService;
   private final UserRepository userRepository;
+  private final UserService userService;
   private final JwtServiceImpl jwtService;
   private final CustomOAuth2UserService customOAuth2UserService;
   private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
@@ -117,7 +119,7 @@ public class SecurityConfig {
 
   @Bean
   public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
-    return new JwtAuthenticationProcessingFilter(jwtService, userRepository);
+    return new JwtAuthenticationProcessingFilter(jwtService, userService, userRepository);
   }
 
   @Bean

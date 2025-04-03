@@ -3,10 +3,12 @@ package com.aloc.aloc.global.jwt.filter;
 import com.aloc.aloc.global.jwt.service.JwtService;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.repository.UserRepository;
+import com.aloc.aloc.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collections;
@@ -33,6 +35,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
+  private final UserService userService;
   private final UserRepository userRepository;
 
   private final GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
@@ -56,14 +59,24 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
       log.info("리프레시 토큰으로 엑세스 토큰 요청 들어옴");
       Optional<String> refreshToken = extractRefreshToken(request);
 
-      if (refreshToken.isPresent() && jwtService.isTokenValid(refreshToken.get())) {
-        checkRefreshTokenAndReIssueAccessToken(response, refreshToken.get());
+      if (refreshToken.isPresent()) {
+        if (jwtService.isTokenValid(refreshToken.get())) {
+          checkRefreshTokenAndReIssueAccessToken(response, refreshToken.get());
+        } else {
+          userService.logout(
+              userRepository.findByRefreshToken(refreshToken.get()).get().getOauthId());
+          // ✅ Refresh Token 쿠키도 브라우저에서 삭제
+          Cookie cookie = new Cookie("refreshToken", null);
+          cookie.setHttpOnly(true);
+          cookie.setSecure(true); // HTTPS 환경이라면 true, 아니면 false
+          cookie.setPath("/"); // 생성 시와 동일한 path 필요
+          cookie.setMaxAge(0); // 즉시 만료되도록 설정
+          response.addCookie(cookie);
+          response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        }
       } else {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        log.error(
-            "리프레시 토큰이 없거나, 리프레시 토큰이 올바르지 않습니다. refresh Token is present : {}, is Token valid : {}",
-            refreshToken.isPresent(),
-            jwtService.isTokenValid(refreshToken.get()));
+        log.error("전달받은 리프레시 토큰이 없습니다.");
       }
       return;
     }
