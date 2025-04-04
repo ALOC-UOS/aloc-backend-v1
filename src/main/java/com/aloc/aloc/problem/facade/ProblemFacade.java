@@ -1,6 +1,7 @@
 package com.aloc.aloc.problem.facade;
 
 import com.aloc.aloc.coin.dto.response.CoinResponseDto;
+import com.aloc.aloc.coin.enums.CoinType;
 import com.aloc.aloc.coin.service.CoinService;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.enums.CourseType;
@@ -47,8 +48,10 @@ public class ProblemFacade {
     user.updateUserBySolvingProblem();
 
     List<CoinResponseDto> coinResponseDtos = handleSolvedProblem(user, userCourseProblem);
+    boolean isCourseDone =
+        coinResponseDtos.stream().anyMatch(cr -> cr.getCoinType().equals(CoinType.COURSE_REWARD));
 
-    return ProblemSolvedResponseDto.success(coinResponseDtos);
+    return ProblemSolvedResponseDto.success(isCourseDone, coinResponseDtos);
   }
 
   private List<CoinResponseDto> handleSolvedProblem(
