@@ -5,8 +5,12 @@ import com.aloc.aloc.coin.entity.CoinHistory;
 import com.aloc.aloc.coin.enums.CoinType;
 import com.aloc.aloc.coin.repository.CoinHistoryRepository;
 import com.aloc.aloc.course.entity.Course;
+import com.aloc.aloc.course.enums.CourseType;
+import com.aloc.aloc.problem.dto.response.ProblemSolvedResponseDto;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.service.UserService;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,5 +65,24 @@ public class CoinService {
     userService.updateUserCoin(user, addedCoin);
     recordCoinHistory(user, coinResponseDto);
     return coinResponseDto;
+  }
+
+  @Transactional
+  public ProblemSolvedResponseDto giveCoinByCoinType(String oauthId, int coinType) {
+    User user = userService.getUser(oauthId);
+    List<CoinResponseDto> coinResponseDtos = new ArrayList<>();
+    coinResponseDtos.add(giveCoinBySolvingProblem(user));
+
+    if (coinType == 2 || coinType == 4) {
+      coinResponseDtos.add(giveCoinByStreakDays(user));
+    }
+
+    if (coinType == 3 || coinType == 4) {
+      Course sampleCourse =
+          new Course(
+              10000L, "테스트 코스", "테스트 코스입니다.", CourseType.DAILY, 10, 3, 8, 5, 2L, 10, 2L, null);
+      coinResponseDtos.add(giveCoinBySolvingCourse(user, sampleCourse));
+    }
+    return ProblemSolvedResponseDto.success(coinType > 2, coinResponseDtos);
   }
 }

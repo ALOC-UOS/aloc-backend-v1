@@ -12,12 +12,17 @@ public class ProblemSolvedResponseDto {
   @Schema(description = "해결 여부", example = "true")
   private Boolean isSolved;
 
+  @Schema(description = "코스 해결 여부", example = "true")
+  private Boolean isCourseDone;
+
   @Schema(description = "코인 획득 리스트")
   private List<CoinResponseDto> coinResponseDtos;
 
-  public static ProblemSolvedResponseDto success(List<CoinResponseDto> coinResponseDtos) {
+  public static ProblemSolvedResponseDto success(
+      boolean isCourseDone, List<CoinResponseDto> coinResponseDtos) {
     return ProblemSolvedResponseDto.builder()
         .isSolved(true)
+        .isCourseDone(isCourseDone)
         .coinResponseDtos(coinResponseDtos)
         .build();
   }
