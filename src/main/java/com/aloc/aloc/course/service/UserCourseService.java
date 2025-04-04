@@ -86,7 +86,9 @@ public class UserCourseService {
           for (UserCourseProblem ucp : userCourse.getUserCourseProblemList()) {
             if (ucp.getUserCourseProblemStatus().equals(UserCourseProblemStatus.HIDDEN)) {
               ucp.updateUserCourseProblemStatus(UserCourseProblemStatus.UNSOLVED);
-              break; // 하나만 변경 후 종료
+              break;
+            } else {
+              ucp.updateUserCourseProblemStatus(UserCourseProblemStatus.CLOSED);
             }
           }
         });
