@@ -84,6 +84,15 @@ public class UserFacade {
         .collect(Collectors.toList());
   }
 
+  public List<com.aloc.aloc.usercourse.dto.response.UserCourseResponseDto> getUserCoursesNew(
+      String oauthId) {
+    User user = userService.getUser(oauthId);
+    List<UserCourse> userCourses = userCourseService.getUserCoursesInProcessByUser(user);
+    return userCourses.stream()
+        .map(com.aloc.aloc.usercourse.dto.response.UserCourseResponseDto::of)
+        .toList();
+  }
+
   public List<UserCourseSimpleResponseDto> getSimpleUserCourses(String oauthId) {
     User user = userService.getUser(oauthId);
     List<UserCourse> userCourses = userCourseService.getUserCoursesInProcessByUser(user);
