@@ -17,6 +17,7 @@ import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.mapper.UserMapper;
 import com.aloc.aloc.user.service.UserService;
 import com.aloc.aloc.user.service.UserSortingService;
+import com.aloc.aloc.usercourse.dto.response.UserCourseProblemResponseDto;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -184,5 +185,19 @@ public class UserFacade {
 
     List<UserCourse> userCourses = userCourseService.getUserCoursesByUser(user);
     userCourseService.deleteUserCourses(userCourses);
+  }
+
+  public UserCourseProblemResponseDto getUserProblems(String oauthId, Long userCourseId) {
+    User user = userService.getUser(oauthId);
+    UserCourse userCourse = userCourseService.getUserCourseById(userCourseId);
+
+    List<UserCourseProblem> sortedProblems =
+        userCourse.getUserCourseProblemList().stream()
+            .sorted(Comparator.comparing(UserCourseProblem::getCreatedAt)) // createdAt 기준으로 오름차순 정렬
+            .toList();
+    int todayProblemId = userCourseProblemService.getTodayProblemId(sortedProblems);
+    List<ProblemResponseDto> problemResponseDtos =
+        userCourseProblemService.mapToProblemResponseDto(userCourse);
+    return UserCourseProblemResponseDto.of(todayProblemId, problemResponseDtos);
   }
 }
