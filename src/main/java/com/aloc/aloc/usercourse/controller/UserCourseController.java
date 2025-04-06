@@ -25,7 +25,7 @@ public class UserCourseController {
   @GetMapping("/user-courses")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "유저 코스 목록 조회", description = "유저가 현재 진행 중인 코스 목록을 조회합니다.")
-  public CustomApiResponse<List<UserCourseResponseDto>> getUser(
+  public CustomApiResponse<List<UserCourseResponseDto>> getUserCourse(
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
     return CustomApiResponse.onSuccess(userFacade.getUserCoursesNew(user.getUsername()));
   }
@@ -33,7 +33,7 @@ public class UserCourseController {
   @GetMapping("/user-courses/{userCourseId}/problems")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "유저 코스의 문제 목록 조회", description = "유저 코스 아이디로 해당 유저 코스에 속하는 문제 목록을 조회합니다.")
-  public CustomApiResponse<UserCourseProblemResponseDto> getUser(
+  public CustomApiResponse<UserCourseProblemResponseDto> getUserCourseProblem(
       @PathVariable(name = "userCourseId") Long userCourseId,
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
     return CustomApiResponse.onSuccess(
