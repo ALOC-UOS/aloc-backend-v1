@@ -3,6 +3,7 @@ package com.aloc.aloc.user.facade;
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.dto.response.CourseUserResponseDto;
 import com.aloc.aloc.course.entity.Course;
+import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.course.service.UserCourseService;
@@ -29,6 +30,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -201,7 +204,7 @@ public class UserFacade {
 
   private static void validateUserAndUserCourse(UserCourse userCourse, User user) {
     if (!userCourse.getUser().getId().equals(user.getId())) {
-      throw new SecurityException("접근 권한이 없는 유저코스입니다.");
+      throw new IllegalStateException("접근 권한이 없는 유저코스입니다.");
     }
   }
 
@@ -240,7 +243,7 @@ public class UserFacade {
     Course course = courseService.getCourseById(courseId);
     User user = userService.getUser(oauthId);
 
-    if (!isEligibleToCreateUserCourse(user, course)) {
+    if (!canUserEnrollInCourse(user, course)) {
       throw new IllegalStateException("코스는 최대 3개까지 신청할 수 있습니다.");
     }
     UserCourse userCourse = userCourseService.createUserCourse(user, course);
@@ -248,7 +251,7 @@ public class UserFacade {
     return CourseUserResponseDto.of(userCourse);
   }
 
-  private boolean isEligibleToCreateUserCourse(User user, Course course) {
+  private boolean canUserEnrollInCourse(User user, Course course) {
     List<UserCourse> userCourses =
         userCourseService.getAllByUserAndUserCourseState(user, UserCourseState.IN_PROGRESS);
     boolean hasSameCourse =
@@ -269,5 +272,27 @@ public class UserFacade {
 
     userCourseService.closeUserCourse(userCourse);
     return CourseUserResponseDto.of(userCourse);
+  }
+
+  public Page<CourseResponseDto> getCoursesByUser(
+      Pageable pageable, String oauthId, CourseType courseTypeOrNull) {
+    User user = userService.getUser(oauthId);
+    List<UserCourse> userCourses = userCourseService.getUserCoursesByUser(user);
+    Page<Course> courses = courseService.getCoursePageByCourseType(pageable, courseTypeOrNull);
+
+    return courses.map(
+        course -> {
+          Optional<UserCourse> latestUserCourse =
+              userCourses.stream()
+                  .filter(userCourse -> userCourse.getCourse().equals(course))
+                  .max(Comparator.comparing(UserCourse::getCreatedAt)); // 최신 createdAt 찾기
+
+          UserCourseState latestState =
+              latestUserCourse
+                  .map(UserCourse::getUserCourseState)
+                  .orElse(UserCourseState.NOT_STARTED); // 만약 없다면 null 처리
+
+          return CourseResponseDto.of(course, latestState);
+        });
   }
 }

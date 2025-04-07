@@ -5,6 +5,7 @@ import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
+import com.aloc.aloc.user.facade.UserFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Course API", description = "course 관련 API입니다.")
 public class CourseController {
   private final CourseService courseService;
+  private final UserFacade userFacade;
 
   @GetMapping("/courses")
   @SecurityRequirement(name = "JWT Auth")
@@ -35,7 +37,7 @@ public class CourseController {
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
     return CustomApiResponse.onSuccess(
         (user != null)
-            ? courseService.getCoursesByUser(pageable, user.getUsername(), courseType)
+            ? userFacade.getCoursesByUser(pageable, user.getUsername(), courseType)
             : courseService.getCourses(pageable, courseType));
   }
 
