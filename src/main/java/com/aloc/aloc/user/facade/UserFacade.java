@@ -183,6 +183,10 @@ public class UserFacade {
     User user = userService.getUser(oauthId);
     UserCourse userCourse = userCourseService.getUserCourseById(userCourseId);
 
+    if (!userCourse.getUser().getId().equals(user.getId())) {
+      throw new SecurityException("접근 권한이 없는 유저코스입니다.");
+    }
+
     List<UserCourseProblem> sortedProblems =
         userCourse.getUserCourseProblemList().stream()
             .sorted(Comparator.comparing(UserCourseProblem::getCreatedAt)) // createdAt 기준으로 오름차순 정렬
