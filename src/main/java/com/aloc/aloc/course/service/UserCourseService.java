@@ -2,15 +2,15 @@ package com.aloc.aloc.course.service;
 
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.entity.CourseProblem;
-import com.aloc.aloc.course.entity.UserCourse;
 import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.repository.UserCourseRepository;
 import com.aloc.aloc.problem.entity.Problem;
-import com.aloc.aloc.problem.entity.UserCourseProblem;
 import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
 import com.aloc.aloc.problem.service.UserCourseProblemService;
 import com.aloc.aloc.user.entity.User;
+import com.aloc.aloc.usercourse.entity.UserCourse;
+import com.aloc.aloc.usercourse.entity.UserCourseProblem;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -100,5 +100,9 @@ public class UserCourseService {
     return userCourseRepository
         .findById(id)
         .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저코스 아이디 입니다."));
+  }
+
+  public int getClearRank(UserCourse userCourse) {
+    return userCourseRepository.findClearRank(userCourse.getCourse(), userCourse.getUpdatedAt());
   }
 }

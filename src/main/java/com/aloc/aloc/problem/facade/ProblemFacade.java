@@ -3,19 +3,20 @@ package com.aloc.aloc.problem.facade;
 import com.aloc.aloc.coin.dto.response.CoinResponseDto;
 import com.aloc.aloc.coin.service.CoinService;
 import com.aloc.aloc.course.entity.Course;
-import com.aloc.aloc.course.entity.UserCourse;
 import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.problem.dto.response.ProblemSolvedResponseDto;
 import com.aloc.aloc.problem.entity.Problem;
-import com.aloc.aloc.problem.entity.UserCourseProblem;
 import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
 import com.aloc.aloc.problem.service.ProblemService;
 import com.aloc.aloc.problem.service.UserCourseProblemService;
 import com.aloc.aloc.scraper.SolvedCheckingService;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.service.UserService;
+import com.aloc.aloc.usercourse.entity.UserCourse;
+import com.aloc.aloc.usercourse.entity.UserCourseProblem;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -60,7 +61,14 @@ public class ProblemFacade {
 
     UserCourse userCourse = userCourseProblem.getUserCourse();
     Course course = userCourse.getCourse();
-    int problemIndex = userCourse.getUserCourseProblemList().indexOf(userCourseProblem);
+    // createdAt 오름차순으로 정렬된 리스트 생성
+    List<UserCourseProblem> sortedList =
+        userCourse.getUserCourseProblemList().stream()
+            .sorted(Comparator.comparing(UserCourseProblem::getCreatedAt))
+            .toList();
+
+    // 정렬된 리스트에서 인덱스 구하기
+    int problemIndex = sortedList.indexOf(userCourseProblem);
 
     if (isCourseCompleted(problemIndex, course)) {
       userCourse.updateUserCourseState(UserCourseState.SUCCESS);

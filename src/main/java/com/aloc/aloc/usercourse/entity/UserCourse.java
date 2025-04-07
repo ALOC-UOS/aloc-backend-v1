@@ -1,8 +1,8 @@
-package com.aloc.aloc.course.entity;
+package com.aloc.aloc.usercourse.entity;
 
+import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.global.domain.AuditingTimeEntity;
-import com.aloc.aloc.problem.entity.UserCourseProblem;
 import com.aloc.aloc.user.entity.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

@@ -1,11 +1,15 @@
 package com.aloc.aloc.user.facade;
 
-import com.aloc.aloc.course.entity.UserCourse;
+import com.aloc.aloc.course.dto.response.CourseResponseDto;
+import com.aloc.aloc.course.dto.response.CourseUserResponseDto;
+import com.aloc.aloc.course.entity.Course;
+import com.aloc.aloc.course.enums.CourseType;
+import com.aloc.aloc.course.enums.UserCourseState;
+import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.course.service.UserCourseService;
 import com.aloc.aloc.global.image.ImageService;
 import com.aloc.aloc.global.image.enums.ImageType;
 import com.aloc.aloc.problem.dto.response.ProblemResponseDto;
-import com.aloc.aloc.problem.entity.UserCourseProblem;
 import com.aloc.aloc.problem.service.UserCourseProblemService;
 import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
@@ -16,16 +20,18 @@ import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.mapper.UserMapper;
 import com.aloc.aloc.user.service.UserService;
 import com.aloc.aloc.user.service.UserSortingService;
+import com.aloc.aloc.usercourse.dto.response.SuccessUserCourseResponseDto;
 import com.aloc.aloc.usercourse.dto.response.UserCourseProblemResponseDto;
+import com.aloc.aloc.usercourse.entity.UserCourse;
+import com.aloc.aloc.usercourse.entity.UserCourseProblem;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -43,6 +49,7 @@ public class UserFacade {
   private final ImageService imageService;
   private final UserCourseService userCourseService;
   private final UserCourseProblemService userCourseProblemService;
+  private final CourseService courseService;
 
   public List<UserDetailResponseDto> getUsers() {
     List<User> users = userService.getActiveUsers();
@@ -183,9 +190,7 @@ public class UserFacade {
     User user = userService.getUser(oauthId);
     UserCourse userCourse = userCourseService.getUserCourseById(userCourseId);
 
-    if (!userCourse.getUser().getId().equals(user.getId())) {
-      throw new SecurityException("접근 권한이 없는 유저코스입니다.");
-    }
+    validateUserAndUserCourse(userCourse, user);
 
     List<UserCourseProblem> sortedProblems =
         userCourse.getUserCourseProblemList().stream()
@@ -195,5 +200,99 @@ public class UserFacade {
     List<ProblemResponseDto> problemResponseDtos =
         userCourseProblemService.mapToProblemResponseDto(userCourse);
     return UserCourseProblemResponseDto.of(todayProblemId, problemResponseDtos);
+  }
+
+  private static void validateUserAndUserCourse(UserCourse userCourse, User user) {
+    if (!userCourse.getUser().getId().equals(user.getId())) {
+      throw new IllegalStateException("접근 권한이 없는 유저코스입니다.");
+    }
+  }
+
+  public SuccessUserCourseResponseDto getUserCourse(String oauthId, Long userCourseId) {
+    User user = userService.getUser(oauthId);
+    UserCourse userCourse = userCourseService.getUserCourseById(userCourseId);
+    Course course = userCourse.getCourse();
+    validateUserAndUserCourse(userCourse, user);
+
+    int clearRank = userCourseService.getClearRank(userCourse);
+    int addedCoin = course.getProblemCnt() * 20;
+
+    // 추천된 코스 리스트 조회
+    List<Course> recommendedCourses = courseService.getRecommendedCourses(course);
+
+    // 유저가 이미 수강한 코스 ID 목록 조회
+    Set<Long> enrolledCourseIds =
+        userCourseService.getUserCoursesByUser(user).stream()
+            .map(uc -> uc.getCourse().getId())
+            .collect(Collectors.toSet());
+
+    // 아직 수강하지 않은 추천 코스 중에서, 생성 수 기준 정렬 후 상위 3개만 추출
+    List<CourseResponseDto> courses =
+        recommendedCourses.stream()
+            .filter(c -> !enrolledCourseIds.contains(c.getId())) // 수강하지 않은 것만
+            .sorted(Comparator.comparing(Course::getGenerateCnt).reversed()) // 최신 생성 순
+            .limit(3)
+            .map(c2 -> CourseResponseDto.of(c2, UserCourseState.NOT_STARTED))
+            .toList();
+
+    return SuccessUserCourseResponseDto.of(userCourse.getCourse(), clearRank, addedCoin, courses);
+  }
+
+  @Transactional
+  public CourseUserResponseDto createUserCourse(Long courseId, String oauthId) {
+    Course course = courseService.getCourseById(courseId);
+    User user = userService.getUser(oauthId);
+
+    if (!canUserEnrollInCourse(user, course)) {
+      throw new IllegalStateException("코스는 최대 3개까지 신청할 수 있습니다.");
+    }
+    UserCourse userCourse = userCourseService.createUserCourse(user, course);
+    course.addGenerateCnt();
+    return CourseUserResponseDto.of(userCourse);
+  }
+
+  private boolean canUserEnrollInCourse(User user, Course course) {
+    List<UserCourse> userCourses =
+        userCourseService.getAllByUserAndUserCourseState(user, UserCourseState.IN_PROGRESS);
+    boolean hasSameCourse =
+        userCourses.stream().anyMatch(uc -> uc.getCourse().getId().equals(course.getId()));
+
+    return userCourses.size() < 3 && !hasSameCourse;
+  }
+
+  @Transactional
+  public CourseUserResponseDto closeUserCourse(Long courseId, String oauthId) {
+    Course course = courseService.getCourseById(courseId);
+    User user = userService.getUser(oauthId);
+    UserCourse userCourse = userCourseService.getUserCourseByUserAndCourse(user, course);
+
+    if (userCourse.getUserCourseState() != UserCourseState.IN_PROGRESS) {
+      throw new IllegalArgumentException("진행 중인 코스가 아니라 포기할 수 없습니다.");
+    }
+
+    userCourseService.closeUserCourse(userCourse);
+    return CourseUserResponseDto.of(userCourse);
+  }
+
+  public Page<CourseResponseDto> getCoursesByUser(
+      Pageable pageable, String oauthId, CourseType courseTypeOrNull) {
+    User user = userService.getUser(oauthId);
+    List<UserCourse> userCourses = userCourseService.getUserCoursesByUser(user);
+    Page<Course> courses = courseService.getCoursePageByCourseType(pageable, courseTypeOrNull);
+
+    return courses.map(
+        course -> {
+          Optional<UserCourse> latestUserCourse =
+              userCourses.stream()
+                  .filter(userCourse -> userCourse.getCourse().equals(course))
+                  .max(Comparator.comparing(UserCourse::getCreatedAt)); // 최신 createdAt 찾기
+
+          UserCourseState latestState =
+              latestUserCourse
+                  .map(UserCourse::getUserCourseState)
+                  .orElse(UserCourseState.NOT_STARTED); // 만약 없다면 null 처리
+
+          return CourseResponseDto.of(course, latestState);
+        });
   }
 }

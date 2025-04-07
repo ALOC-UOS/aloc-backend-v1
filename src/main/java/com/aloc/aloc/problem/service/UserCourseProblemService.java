@@ -1,14 +1,14 @@
 package com.aloc.aloc.problem.service;
 
-import com.aloc.aloc.course.entity.UserCourse;
 import com.aloc.aloc.problem.dto.response.ProblemResponseDto;
 import com.aloc.aloc.problem.entity.Problem;
-import com.aloc.aloc.problem.entity.UserCourseProblem;
 import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
 import com.aloc.aloc.problem.repository.UserCourseProblemRepository;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.mapper.UserMapper;
+import com.aloc.aloc.usercourse.entity.UserCourse;
+import com.aloc.aloc.usercourse.entity.UserCourseProblem;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;

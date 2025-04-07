@@ -1,7 +1,7 @@
 package com.aloc.aloc.scraper;
 
 import com.aloc.aloc.problem.entity.Problem;
-import com.aloc.aloc.problem.entity.UserCourseProblem;
+import com.aloc.aloc.usercourse.entity.UserCourseProblem;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

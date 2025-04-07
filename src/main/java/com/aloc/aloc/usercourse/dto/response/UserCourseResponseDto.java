@@ -2,8 +2,8 @@ package com.aloc.aloc.usercourse.dto.response;
 
 import com.aloc.aloc.course.dto.response.RankResponseDto;
 import com.aloc.aloc.course.entity.Course;
-import com.aloc.aloc.course.entity.UserCourse;
 import com.aloc.aloc.course.enums.CourseType;
+import com.aloc.aloc.usercourse.entity.UserCourse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Builder;

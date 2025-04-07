@@ -1,6 +1,6 @@
 package com.aloc.aloc.course.dto.response;
 
-import com.aloc.aloc.course.entity.UserCourse;
+import com.aloc.aloc.usercourse.entity.UserCourse;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;

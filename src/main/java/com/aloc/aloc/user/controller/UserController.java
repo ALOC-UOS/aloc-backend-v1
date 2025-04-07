@@ -95,8 +95,7 @@ public class UserController {
   @Operation(summary = "유저가 코스선택", description = "유저가 코스를 선택합니다.")
   public CustomApiResponse<CourseUserResponseDto> createUserCourse(
       @PathVariable Long courseId, @Parameter(hidden = true) @AuthenticationPrincipal User user) {
-    return CustomApiResponse.onSuccess(
-        courseService.createUserCourse(courseId, user.getUsername()));
+    return CustomApiResponse.onSuccess(userFacade.createUserCourse(courseId, user.getUsername()));
   }
 
   @PatchMapping("/user/course/{courseId}")
@@ -104,6 +103,6 @@ public class UserController {
   @Operation(summary = "유저 코스 포기", description = "유저가 특정 코스를 포기합니다.")
   public CustomApiResponse<CourseUserResponseDto> closeUserCourse(
       @PathVariable Long courseId, @Parameter(hidden = true) @AuthenticationPrincipal User user) {
-    return CustomApiResponse.onSuccess(courseService.closeUserCourse(courseId, user.getUsername()));
+    return CustomApiResponse.onSuccess(userFacade.closeUserCourse(courseId, user.getUsername()));
   }
 }
