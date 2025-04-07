@@ -1,9 +1,9 @@
 package com.aloc.aloc.problem.dto.response;
 
 import com.aloc.aloc.problem.entity.Problem;
-import com.aloc.aloc.problem.entity.UserCourseProblem;
 import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
+import com.aloc.aloc.usercourse.entity.UserCourseProblem;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
