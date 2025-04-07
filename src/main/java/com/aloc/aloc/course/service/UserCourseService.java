@@ -95,4 +95,10 @@ public class UserCourseService {
   public void deleteUserCourses(List<UserCourse> userCourses) {
     userCourseRepository.deleteAll(userCourses);
   }
+
+  public UserCourse getUserCourseById(Long id) {
+    return userCourseRepository
+        .findById(id)
+        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저코스 아이디 입니다."));
+  }
 }

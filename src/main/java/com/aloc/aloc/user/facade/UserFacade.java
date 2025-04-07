@@ -10,13 +10,13 @@ import com.aloc.aloc.problem.service.UserCourseProblemService;
 import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
 import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
-import com.aloc.aloc.user.dto.response.UserCourseSimpleResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.mapper.UserMapper;
 import com.aloc.aloc.user.service.UserService;
 import com.aloc.aloc.user.service.UserSortingService;
+import com.aloc.aloc.usercourse.dto.response.UserCourseProblemResponseDto;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -84,11 +84,13 @@ public class UserFacade {
         .collect(Collectors.toList());
   }
 
-  public List<UserCourseSimpleResponseDto> getSimpleUserCourses(String oauthId) {
+  public List<com.aloc.aloc.usercourse.dto.response.UserCourseResponseDto> getUserCoursesNew(
+      String oauthId) {
     User user = userService.getUser(oauthId);
     List<UserCourse> userCourses = userCourseService.getUserCoursesInProcessByUser(user);
-
-    return userCourses.stream().map(UserCourseSimpleResponseDto::of).toList();
+    return userCourses.stream()
+        .map(com.aloc.aloc.usercourse.dto.response.UserCourseResponseDto::of)
+        .toList();
   }
 
   @Transactional
@@ -175,5 +177,23 @@ public class UserFacade {
 
     List<UserCourse> userCourses = userCourseService.getUserCoursesByUser(user);
     userCourseService.deleteUserCourses(userCourses);
+  }
+
+  public UserCourseProblemResponseDto getUserProblems(String oauthId, Long userCourseId) {
+    User user = userService.getUser(oauthId);
+    UserCourse userCourse = userCourseService.getUserCourseById(userCourseId);
+
+    if (!userCourse.getUser().getId().equals(user.getId())) {
+      throw new SecurityException("접근 권한이 없는 유저코스입니다.");
+    }
+
+    List<UserCourseProblem> sortedProblems =
+        userCourse.getUserCourseProblemList().stream()
+            .sorted(Comparator.comparing(UserCourseProblem::getCreatedAt)) // createdAt 기준으로 오름차순 정렬
+            .toList();
+    int todayProblemId = userCourseProblemService.getTodayProblemId(sortedProblems);
+    List<ProblemResponseDto> problemResponseDtos =
+        userCourseProblemService.mapToProblemResponseDto(userCourse);
+    return UserCourseProblemResponseDto.of(todayProblemId, problemResponseDtos);
   }
 }

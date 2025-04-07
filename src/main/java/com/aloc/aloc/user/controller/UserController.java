@@ -7,7 +7,6 @@ import com.aloc.aloc.profilebackgroundcolor.dto.response.ProfileBackgroundColorR
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
 import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
-import com.aloc.aloc.user.dto.response.UserCourseSimpleResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.facade.UserFacade;
 import io.swagger.v3.oas.annotations.Operation;
@@ -89,14 +88,6 @@ public class UserController {
   public CustomApiResponse<List<UserCourseResponseDto>> getUserCourses(
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
     return CustomApiResponse.onSuccess(userFacade.getUserCourses(user.getUsername()));
-  }
-
-  @GetMapping("/user/simple-courses")
-  @SecurityRequirement(name = "JWT Auth")
-  @Operation(summary = "유저의 코스 목록 불러오기", description = "간단한 버전의 유저의 코스목록을 불러옵니다.")
-  public CustomApiResponse<List<UserCourseSimpleResponseDto>> getSimpleUserCourses(
-      @Parameter(hidden = true) @AuthenticationPrincipal User user) {
-    return CustomApiResponse.onSuccess(userFacade.getSimpleUserCourses(user.getUsername()));
   }
 
   @PostMapping("/user/course/{courseId}")
