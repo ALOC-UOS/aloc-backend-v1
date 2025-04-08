@@ -43,14 +43,14 @@ public class Course extends AuditingTimeEntity {
     return Course.builder()
         .title(courseRequestDto.getTitle())
         .description((courseRequestDto.getDescription()))
-        .courseType(courseRequestDto.getCourseType())
+        .courseType(courseRequestDto.getType())
         .problemCnt(courseRequestDto.getProblemCnt())
         .minRank(courseRequestDto.getMinRank())
         .maxRank(courseRequestDto.getMaxRank())
         .generateCnt(0L)
         .successCnt(0L)
         .duration(
-            courseRequestDto.getCourseType().equals(CourseType.DAILY)
+            courseRequestDto.getType().equals(CourseType.DAILY)
                 ? courseRequestDto.getProblemCnt()
                 : courseRequestDto.getDuration())
         .build();

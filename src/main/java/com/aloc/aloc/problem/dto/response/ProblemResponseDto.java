@@ -37,7 +37,7 @@ public class ProblemResponseDto {
   @Schema(description = "문제 상태", example = "IN_PROGRESS")
   private UserCourseProblemStatus status;
 
-  @Schema(description = "해결한 유저들의 프로필 이미지", example = "uuid1, uuid2")
+  @Schema(description = "해결한 유저들의 id", example = "uuid1, uuid2")
   private List<UserDetailResponseDto> solvingUserList;
 
   public static ProblemResponseDto of(

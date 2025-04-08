@@ -21,6 +21,7 @@ import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.mapper.UserMapper;
 import com.aloc.aloc.user.service.UserService;
 import com.aloc.aloc.user.service.UserSortingService;
+import com.aloc.aloc.usercourse.dto.response.NewUserCourseResponseDto;
 import com.aloc.aloc.usercourse.dto.response.SuccessUserCourseResponseDto;
 import com.aloc.aloc.usercourse.dto.response.UserCourseProblemResponseDto;
 import com.aloc.aloc.usercourse.entity.UserCourse;
@@ -92,13 +93,10 @@ public class UserFacade {
         .collect(Collectors.toList());
   }
 
-  public List<com.aloc.aloc.usercourse.dto.response.UserCourseResponseDto> getUserCoursesNew(
-      String oauthId) {
+  public List<NewUserCourseResponseDto> getUserCoursesNew(String oauthId) {
     User user = userService.getUser(oauthId);
     List<UserCourse> userCourses = userCourseService.getUserCoursesInProcessByUser(user);
-    return userCourses.stream()
-        .map(com.aloc.aloc.usercourse.dto.response.UserCourseResponseDto::of)
-        .toList();
+    return userCourses.stream().map(NewUserCourseResponseDto::of).toList();
   }
 
   @Transactional

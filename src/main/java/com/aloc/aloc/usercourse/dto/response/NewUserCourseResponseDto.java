@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class UserCourseResponseDto {
+public class NewUserCourseResponseDto {
   @Schema(description = "유저 코스 고유 아이디", example = "1L")
   private Long userCourseId;
 
@@ -30,9 +30,9 @@ public class UserCourseResponseDto {
   @Schema(description = "랭크")
   private RankResponseDto rank;
 
-  public static UserCourseResponseDto of(UserCourse userCourse) {
+  public static NewUserCourseResponseDto of(UserCourse userCourse) {
     Course course = userCourse.getCourse();
-    return UserCourseResponseDto.builder()
+    return NewUserCourseResponseDto.builder()
         .userCourseId(userCourse.getId())
         .title(course.getTitle())
         .type(course.getCourseType())
