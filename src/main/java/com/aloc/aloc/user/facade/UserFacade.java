@@ -85,7 +85,7 @@ public class UserFacade {
                       .toList();
               int todayProblemId = userCourseProblemService.getTodayProblemId(sortedProblems);
               List<ProblemResponseDto> problemResponseDtos =
-                  userCourseProblemService.mapToProblemResponseDto(userCourse);
+                  userCourseProblemService.mapToProblemResponseDto(sortedProblems);
               return UserCourseResponseDto.of(
                   userCourse, userCourse.getCourse(), problemResponseDtos, todayProblemId);
             })
@@ -199,7 +199,7 @@ public class UserFacade {
             .toList();
     int todayProblemId = userCourseProblemService.getTodayProblemId(sortedProblems);
     List<ProblemResponseDto> problemResponseDtos =
-        userCourseProblemService.mapToProblemResponseDto(userCourse);
+        userCourseProblemService.mapToProblemResponseDto(sortedProblems);
     return UserCourseProblemResponseDto.of(todayProblemId, problemResponseDtos);
   }
 

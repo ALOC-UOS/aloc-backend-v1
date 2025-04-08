@@ -1,7 +1,6 @@
 package com.aloc.aloc.user.controller;
 
 import com.aloc.aloc.course.dto.response.CourseUserResponseDto;
-import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import com.aloc.aloc.profilebackgroundcolor.dto.response.ProfileBackgroundColorResponseDto;
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
@@ -28,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "User API", description = "User API 입니다.")
 public class UserController {
   private final UserFacade userFacade;
-  private final CourseService courseService;
   private final ProfileBackgroundColorService profileBackgroundColorService;
 
   @GetMapping("/users")
