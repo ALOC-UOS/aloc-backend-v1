@@ -10,8 +10,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProblemController {
   private final ProblemFacade problemFacade;
 
-  @PutMapping("/problem/{problemId}")
+  @PatchMapping("/problems/{problemId}")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "문제 해결", description = "문제 해결 여부를 확인합니다.")
   public CustomApiResponse<ProblemSolvedResponseDto> checkProblemSolved(

@@ -12,6 +12,7 @@ import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.usercourse.entity.UserCourse;
 import com.aloc.aloc.usercourse.entity.UserCourseProblem;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.AllArgsConstructor;
@@ -82,7 +83,13 @@ public class UserCourseService {
 
     userCourses.forEach(
         userCourse -> {
-          for (UserCourseProblem ucp : userCourse.getUserCourseProblemList()) {
+          List<UserCourseProblem> sortedProblems =
+              userCourse.getUserCourseProblemList().stream()
+                  .sorted(
+                      Comparator.comparing(
+                          UserCourseProblem::getCreatedAt)) // createdAt 기준으로 오름차순 정렬
+                  .toList();
+          for (UserCourseProblem ucp : sortedProblems) {
             if (ucp.getUserCourseProblemStatus().equals(UserCourseProblemStatus.HIDDEN)) {
               ucp.updateUserCourseProblemStatus(UserCourseProblemStatus.UNSOLVED);
               break;

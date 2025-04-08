@@ -82,8 +82,8 @@ public class UserCourseProblemService {
         .orElseThrow(() -> new NoSuchElementException("이미 해결했거나 도전 중인 문제가 아닙니다."));
   }
 
-  public List<ProblemResponseDto> mapToProblemResponseDto(UserCourse userCourse) {
-    return userCourse.getUserCourseProblemList().stream()
+  public List<ProblemResponseDto> mapToProblemResponseDto(List<UserCourseProblem> problems) {
+    return problems.stream()
         .filter(ucp -> ucp.getUserCourseProblemStatus() != UserCourseProblemStatus.HIDDEN)
         .map(
             ucp -> {

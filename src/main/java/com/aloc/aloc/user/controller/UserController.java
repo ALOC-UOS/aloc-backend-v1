@@ -1,7 +1,6 @@
 package com.aloc.aloc.user.controller;
 
 import com.aloc.aloc.course.dto.response.CourseUserResponseDto;
-import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import com.aloc.aloc.profilebackgroundcolor.dto.response.ProfileBackgroundColorResponseDto;
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
@@ -28,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "User API", description = "User API 입니다.")
 public class UserController {
   private final UserFacade userFacade;
-  private final CourseService courseService;
   private final ProfileBackgroundColorService profileBackgroundColorService;
 
   @GetMapping("/users")
@@ -73,7 +71,7 @@ public class UserController {
     userFacade.withdraw(user.getUsername());
   }
 
-  @PutMapping("/user/profile-background-color")
+  @PatchMapping("/user/profile-background-color")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "프로필 색상 변경", description = "프로필 색상을 변경합니다.")
   public CustomApiResponse<ProfileBackgroundColorResponseDto> changeColor(
@@ -90,7 +88,7 @@ public class UserController {
     return CustomApiResponse.onSuccess(userFacade.getUserCourses(user.getUsername()));
   }
 
-  @PostMapping("/user/course/{courseId}")
+  @PostMapping("/user/courses/{courseId}")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "유저가 코스선택", description = "유저가 코스를 선택합니다.")
   public CustomApiResponse<CourseUserResponseDto> createUserCourse(
@@ -98,7 +96,7 @@ public class UserController {
     return CustomApiResponse.onSuccess(userFacade.createUserCourse(courseId, user.getUsername()));
   }
 
-  @PatchMapping("/user/course/{courseId}")
+  @PatchMapping("/user/courses/{courseId}")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "유저 코스 포기", description = "유저가 특정 코스를 포기합니다.")
   public CustomApiResponse<CourseUserResponseDto> closeUserCourse(
