@@ -41,7 +41,7 @@ public class CourseController {
             : courseService.getCourses(pageable, courseType));
   }
 
-  @PatchMapping("/course/{courseId}")
+  @PatchMapping("/courses/{courseId}")
   @Operation(summary = "코스 정보 업데이트", description = "코스 정보를 업데이트 합니다.")
   public CustomApiResponse<CourseResponseDto> updateCourse(@PathVariable Long courseId) {
     return CustomApiResponse.onSuccess(courseService.updateCourse(courseId));

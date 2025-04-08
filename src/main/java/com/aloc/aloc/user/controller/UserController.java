@@ -73,7 +73,7 @@ public class UserController {
     userFacade.withdraw(user.getUsername());
   }
 
-  @PutMapping("/user/profile-background-color")
+  @PatchMapping("/user/profile-background-color")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "프로필 색상 변경", description = "프로필 색상을 변경합니다.")
   public CustomApiResponse<ProfileBackgroundColorResponseDto> changeColor(
@@ -90,7 +90,7 @@ public class UserController {
     return CustomApiResponse.onSuccess(userFacade.getUserCourses(user.getUsername()));
   }
 
-  @PostMapping("/user/course/{courseId}")
+  @PostMapping("/user/courses/{courseId}")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "유저가 코스선택", description = "유저가 코스를 선택합니다.")
   public CustomApiResponse<CourseUserResponseDto> createUserCourse(
@@ -98,7 +98,7 @@ public class UserController {
     return CustomApiResponse.onSuccess(userFacade.createUserCourse(courseId, user.getUsername()));
   }
 
-  @PatchMapping("/user/course/{courseId}")
+  @PatchMapping("/user/courses/{courseId}")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "유저 코스 포기", description = "유저가 특정 코스를 포기합니다.")
   public CustomApiResponse<CourseUserResponseDto> closeUserCourse(
