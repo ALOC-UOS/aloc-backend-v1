@@ -7,6 +7,7 @@ import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.course.service.UserCourseService;
+import com.aloc.aloc.global.apipayload.exception.AlreadyExistException;
 import com.aloc.aloc.global.image.ImageService;
 import com.aloc.aloc.global.image.enums.ImageType;
 import com.aloc.aloc.problem.dto.response.ProblemResponseDto;
@@ -243,21 +244,22 @@ public class UserFacade {
     Course course = courseService.getCourseById(courseId);
     User user = userService.getUser(oauthId);
 
-    if (!canUserEnrollInCourse(user, course)) {
-      throw new IllegalStateException("코스는 최대 3개까지 신청할 수 있습니다.");
-    }
+    checkEligibleToCreateUserCourse(user, course);
+
     UserCourse userCourse = userCourseService.createUserCourse(user, course);
     course.addGenerateCnt();
     return CourseUserResponseDto.of(userCourse);
   }
 
-  private boolean canUserEnrollInCourse(User user, Course course) {
+  private void checkEligibleToCreateUserCourse(User user, Course course) {
     List<UserCourse> userCourses =
         userCourseService.getAllByUserAndUserCourseState(user, UserCourseState.IN_PROGRESS);
-    boolean hasSameCourse =
-        userCourses.stream().anyMatch(uc -> uc.getCourse().getId().equals(course.getId()));
-
-    return userCourses.size() < 3 && !hasSameCourse;
+    if (userCourses.size() >= 3) {
+      throw new AlreadyExistException("최대 3개의 코스까지 진행할 수 있습니다.");
+    }
+    if (userCourses.stream().anyMatch(uc -> uc.getCourse().getId().equals(course.getId()))) {
+      throw new AlreadyExistException("이미 진행 중인 코스는 진행할 수 없습니다.");
+    }
   }
 
   @Transactional
