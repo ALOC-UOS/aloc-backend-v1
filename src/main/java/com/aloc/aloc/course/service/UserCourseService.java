@@ -57,9 +57,10 @@ public class UserCourseService {
     return userCourseRepository.save(userCourse);
   }
 
-  public UserCourse getUserCourseByUserAndCourse(User user, Course course) {
+  public UserCourse getUserCourseByUserAndCourseAndUserCourseState(
+      User user, Course course, UserCourseState state) {
     return userCourseRepository
-        .findByUserAndCourse(user, course)
+        .findByUserAndCourseAndUserCourseState(user, course, state)
         .orElseThrow(() -> new NoSuchElementException("존재하지 않는 코스입니다."));
   }
 
