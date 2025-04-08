@@ -15,7 +15,7 @@ public class CoinResponseDto {
   private int addedCoin;
 
   @Schema(description = "코인 획득 유형", example = "SOLVE_REWARD")
-  private CoinType coinType;
+  private CoinType type;
 
   @Schema(description = "설명", example = "문제 해결 보상")
   private String description;
@@ -25,7 +25,7 @@ public class CoinResponseDto {
     return CoinResponseDto.builder()
         .previousCoin(previousCoin)
         .addedCoin(addedCoin)
-        .coinType(coinType)
+        .type(coinType)
         .description(description)
         .build();
   }

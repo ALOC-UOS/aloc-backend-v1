@@ -21,6 +21,7 @@ import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.mapper.UserMapper;
 import com.aloc.aloc.user.service.UserService;
 import com.aloc.aloc.user.service.UserSortingService;
+import com.aloc.aloc.usercourse.dto.response.NewUserCourseResponseDto;
 import com.aloc.aloc.usercourse.dto.response.SuccessUserCourseResponseDto;
 import com.aloc.aloc.usercourse.dto.response.UserCourseProblemResponseDto;
 import com.aloc.aloc.usercourse.entity.UserCourse;
@@ -92,13 +93,10 @@ public class UserFacade {
         .collect(Collectors.toList());
   }
 
-  public List<com.aloc.aloc.usercourse.dto.response.UserCourseResponseDto> getUserCoursesNew(
-      String oauthId) {
+  public List<NewUserCourseResponseDto> getUserCoursesNew(String oauthId) {
     User user = userService.getUser(oauthId);
     List<UserCourse> userCourses = userCourseService.getUserCoursesInProcessByUser(user);
-    return userCourses.stream()
-        .map(com.aloc.aloc.usercourse.dto.response.UserCourseResponseDto::of)
-        .toList();
+    return userCourses.stream().map(NewUserCourseResponseDto::of).toList();
   }
 
   @Transactional
@@ -266,11 +264,9 @@ public class UserFacade {
   public CourseUserResponseDto closeUserCourse(Long courseId, String oauthId) {
     Course course = courseService.getCourseById(courseId);
     User user = userService.getUser(oauthId);
-    UserCourse userCourse = userCourseService.getUserCourseByUserAndCourse(user, course);
-
-    if (userCourse.getUserCourseState() != UserCourseState.IN_PROGRESS) {
-      throw new IllegalArgumentException("진행 중인 코스가 아니라 포기할 수 없습니다.");
-    }
+    UserCourse userCourse =
+        userCourseService.getUserCourseByUserAndCourseAndUserCourseState(
+            user, course, UserCourseState.IN_PROGRESS);
 
     userCourseService.closeUserCourse(userCourse);
     return CourseUserResponseDto.of(userCourse);

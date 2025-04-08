@@ -35,7 +35,7 @@ public class CoinHistory extends AuditingTimeEntity {
     return CoinHistory.builder()
         .user(user)
         .coin(coinResponseDto.getAddedCoin())
-        .coinType(coinResponseDto.getCoinType())
+        .coinType(coinResponseDto.getType())
         .description(coinResponseDto.getDescription())
         .build();
   }

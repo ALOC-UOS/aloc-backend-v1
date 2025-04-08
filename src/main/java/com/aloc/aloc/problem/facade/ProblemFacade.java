@@ -49,7 +49,7 @@ public class ProblemFacade {
 
     List<CoinResponseDto> coinResponseDtos = handleSolvedProblem(user, userCourseProblem);
     boolean isCourseDone =
-        coinResponseDtos.stream().anyMatch(cr -> cr.getCoinType().equals(CoinType.COURSE_REWARD));
+        coinResponseDtos.stream().anyMatch(cr -> cr.getType().equals(CoinType.COURSE_REWARD));
 
     return ProblemSolvedResponseDto.success(isCourseDone, coinResponseDtos);
   }
