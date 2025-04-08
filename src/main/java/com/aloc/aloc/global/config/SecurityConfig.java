@@ -67,7 +67,14 @@ public class SecurityConfig {
                         "/course")
                     .permitAll()
                     .requestMatchers(
-                        "/user", "/user/**", "/course/**", "/auth/logout", "/problem/**")
+                        "/user",
+                        "/user/**",
+                        "/course/**",
+                        "/auth/logout",
+                        "/problem/**",
+                        "/coin/**",
+                        "/user-courses",
+                        "/user-courses/**")
                     .authenticated()
                     .anyRequest()
                     .permitAll())
