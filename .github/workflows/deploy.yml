@@ -127,6 +127,7 @@ jobs:
 
             echo "🚀 Running new container..."
             docker run -d --name openaloc-backend \
+              --network monitoring-net \
               -e TZ=Asia/Seoul \
               -p 8080:8080 \
               -v /home/ubuntu/upload/user:/app/upload \
