@@ -64,6 +64,11 @@ public class UserCourseService {
         .orElseThrow(() -> new NoSuchElementException("존재하지 않는 코스입니다."));
   }
 
+  public Boolean existsByUserAndCourseAndUserCourseState(
+      User user, Course course, UserCourseState state) {
+    return userCourseRepository.existsByUserAndCourseAndUserCourseState(user, course, state);
+  }
+
   public void closeUserCourse(UserCourse userCourse) {
     userCourseProblemService.closeUserCourseProblems(userCourse.getUserCourseProblemList());
     userCourse.updateUserCourseState(UserCourseState.FAILED);
