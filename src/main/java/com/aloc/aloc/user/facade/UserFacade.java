@@ -258,6 +258,11 @@ public class UserFacade {
     if (userCourses.stream().anyMatch(uc -> uc.getCourse().getId().equals(course.getId()))) {
       throw new AlreadyExistException("이미 진행 중인 코스는 진행할 수 없습니다.");
     }
+
+    if (userCourseService.existsByUserAndCourseAndUserCourseState(
+        user, course, UserCourseState.SUCCESS)) {
+      throw new AlreadyExistException("이미 성공한 코스는 진행할 수 없습니다.");
+    }
   }
 
   @Transactional
