@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Course API", description = "course 관련 API입니다.")
+@RequestMapping("/courses")
 public class CourseController {
   private final CourseService courseService;
   private final UserFacade userFacade;
@@ -46,7 +47,7 @@ public class CourseController {
     @ApiResponse(responseCode = "401", description = "로그인 사용자 정보 없음"),
     @ApiResponse(responseCode = "500", description = "서버 오류")
   })
-  @GetMapping("/courses")
+  @GetMapping()
   public CustomApiResponse<Page<CourseResponseDto>> getCourses(
       @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC)
           Pageable pageable,
@@ -59,7 +60,7 @@ public class CourseController {
   }
 
   @PreAuthorize("hasRole('ADMIN')")
-  @PatchMapping("/courses/{courseId}")
+  @PatchMapping("/{courseId}")
   @Operation(
       summary = "코스 정보 업데이트",
       description = "지정한 코스의 랭크 범위를 업데이트합니다. 관리자 권한이 필요합니다.",
@@ -93,7 +94,7 @@ public class CourseController {
     @ApiResponse(responseCode = "500", description = "서버 내부 오류 (스크래핑 실패 등)")
   })
   @PreAuthorize("hasRole('ADMIN')")
-  @PostMapping("/course")
+  @PostMapping()
   @SecurityRequirement(name = "JWT Auth")
   public CustomApiResponse<CourseResponseDto> createCourse(
       @RequestBody @Valid CourseRequestDto courseRequestDto) throws IOException {

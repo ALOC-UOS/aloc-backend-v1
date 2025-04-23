@@ -1,8 +1,6 @@
 package com.aloc.aloc.global.apipayload;
 
-import com.aloc.aloc.global.apipayload.exception.AlreadyExistException;
-import com.aloc.aloc.global.apipayload.exception.AlreadyPurchasedException;
-import com.aloc.aloc.global.apipayload.exception.ScrapException;
+import com.aloc.aloc.global.apipayload.exception.*;
 import com.aloc.aloc.global.apipayload.status.ErrorStatus;
 import java.nio.file.AccessDeniedException;
 import java.util.NoSuchElementException;
@@ -71,5 +69,23 @@ public class GlobalExceptionHandler {
   public CustomApiResponse<String> handleAlreadyExistException(AlreadyExistException ex) {
     return CustomApiResponse.onFailure(
         ErrorStatus._CONFLICT.getCode(), ex.getMessage(), ErrorStatus._CONFLICT.getMessage());
+  }
+
+  @ExceptionHandler(AlreadySolvedProblemException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public CustomApiResponse<String> handleAlreadySolvedProblemException(
+      AlreadySolvedProblemException ex) {
+    return CustomApiResponse.onFailure(
+        ErrorStatus._CONFLICT.getCode(), ex.getMessage(), ErrorStatus._CONFLICT.getMessage());
+  }
+
+  @ExceptionHandler(ProblemNotYetSolvedException.class)
+  @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+  public CustomApiResponse<String> handleAlreadySolvedProblemException(
+      ProblemNotYetSolvedException ex) {
+    return CustomApiResponse.onFailure(
+        ErrorStatus._UNPROCESSABLE_ENTITY.getCode(),
+        ex.getMessage(),
+        ErrorStatus._UNPROCESSABLE_ENTITY.getMessage());
   }
 }
