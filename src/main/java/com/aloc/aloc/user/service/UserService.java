@@ -26,7 +26,7 @@ public class UserService {
   public User getUser(String oauthId) {
     return userRepository
         .findByOauthId(oauthId)
-        .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
+        .orElseThrow(() -> new IllegalStateException("해당 사용자가 존재하지 않습니다."));
   }
 
   @Transactional

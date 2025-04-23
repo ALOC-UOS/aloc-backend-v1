@@ -48,10 +48,10 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(NoSuchElementException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
   public CustomApiResponse<String> handleNoSuchElementException(NoSuchElementException ex) {
     return CustomApiResponse.onFailure(
-        ErrorStatus._BAD_REQUEST.getCode(), ex.getMessage(), ErrorStatus._BAD_REQUEST.getMessage());
+        ErrorStatus._NOT_FOUND.getCode(), ex.getMessage(), ErrorStatus._NOT_FOUND.getMessage());
   }
 
   @ExceptionHandler(FileUploadException.class)
