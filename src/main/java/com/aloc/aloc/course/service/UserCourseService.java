@@ -66,7 +66,7 @@ public class UserCourseService {
 
   public Boolean existsByUserAndCourseAndUserCourseState(
       User user, Course course, UserCourseState state) {
-    return existsByUserAndCourseAndUserCourseState(user, course, state);
+    return userCourseRepository.existsByUserAndCourseAndUserCourseState(user, course, state);
   }
 
   public void closeUserCourse(UserCourse userCourse) {
