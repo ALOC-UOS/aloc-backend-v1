@@ -99,7 +99,7 @@ public class UserCourseService {
             if (ucp.getUserCourseProblemStatus().equals(UserCourseProblemStatus.HIDDEN)) {
               ucp.updateUserCourseProblemStatus(UserCourseProblemStatus.UNSOLVED);
               break;
-            } else {
+            } else if (ucp.getUserCourseProblemStatus().equals(UserCourseProblemStatus.UNSOLVED)) {
               ucp.updateUserCourseProblemStatus(UserCourseProblemStatus.CLOSED);
             }
           }
