@@ -46,40 +46,82 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+	// 웹 애플리케이션 개발용 (Spring MVC, Tomcat 포함)
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // JPA 기반 ORM을 위한 스타터 (Hibernate + Spring Data JPA)
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // Spring Security 설정 및 인증/인가 기능
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // Bean Validation(JSR-380)용 의존성 (ex: @NotNull 등)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // AOP 기반 로깅, 트랜잭션 등 공통 관심사 분리용
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    // Actuator: 헬스체크, 메트릭, 모니터링 등 관리 포인트 제공
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // 개발 중 Docker Compose 통합 지원 (Spring Boot 3.1+)
+    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+
+    // JPA 인터페이스 정의 (명시적으로 추가한 듯)
     implementation 'javax.persistence:javax.persistence-api:2.2'
+
+    // H2 인메모리 DB (테스트/로컬용)
     runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'org.postgresql:postgresql'
+
+    // PostgreSQL DB 드라이버 (운영 환경용)
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // JWT 생성 및 파싱 (JJWT)
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    implementation 'commons-codec:commons-codec:1.5'
-    implementation 'com.auth0:java-jwt:4.4.0'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-	annotationProcessor 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.mockito:mockito-core'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation 'org.jsoup:jsoup:1.17.2'
-    implementation 'com.google.code.gson:gson:2.11.0'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
-    //swagger
-//    implementation 'org.springdoc:springdoc-openapi-ui:1.8.0'
+    // Auth0의 Java JWT (토큰 활용 시 추가 기능 많음)
+    implementation 'com.auth0:java-jwt:4.4.0'
+
+    // 토큰 서명 시 필요한 해시/인코딩 유틸
+    implementation 'commons-codec:commons-codec:1.5'
+
+    // SpringDoc OpenAPI 3 UI (Swagger 문서 UI 지원)
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+    // OAuth2 로그인(Google, Kakao 등) 클라이언트 설정
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-implementation 'io.micrometer:micrometer-registry-prometheus'
+    // Reactive 웹 프레임워크(WebClient 등), 단순 의존성일 수도 있음
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+    // Micrometer - Prometheus exporter (Grafana 연동용)
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    // HTML 파싱용 라이브러리 (스크래핑 시 사용)
+    implementation 'org.jsoup:jsoup:1.17.2'
+
+    // JSON 직렬화/역직렬화 (간편한 사용 시)
+    implementation 'com.google.code.gson:gson:2.11.0'
+
+    // @Getter, @Builder 등 어노테이션 처리
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.projectlombok:lombok'
+
+    // Spring 테스트 프레임워크 (MockMvc 등)
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // Spring Security 테스트 지원
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // Mockito mocking
+    testImplementation 'org.mockito:mockito-core'
+
+    // JUnit 런처
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {

@@ -1,4 +1,4 @@
-package com.aloc.aloc.problem.facade;
+package com.aloc.aloc.problem.service.facade;
 
 import com.aloc.aloc.coin.dto.response.CoinResponseDto;
 import com.aloc.aloc.coin.enums.CoinType;
