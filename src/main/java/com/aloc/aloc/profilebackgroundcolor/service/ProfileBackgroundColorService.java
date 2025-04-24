@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,8 +43,8 @@ public class ProfileBackgroundColorService {
         .getName();
   }
 
-  public ProfileBackgroundColorResponseDto changeColor(String oauthId) {
-    User user = userRepository.findByOauthId(oauthId).orElseThrow();
+  @Transactional
+  public ProfileBackgroundColorResponseDto changeColor(User user) {
     if (user.getCoin() < COLOR_CHANGE_MONEY) {
       throw new IllegalArgumentException("코인이 부족합니다.");
     }

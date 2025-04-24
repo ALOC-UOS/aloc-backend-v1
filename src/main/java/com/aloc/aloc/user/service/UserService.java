@@ -1,5 +1,6 @@
 package com.aloc.aloc.user.service;
 
+import com.aloc.aloc.global.apipayload.exception.NotFoundException;
 import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
@@ -26,7 +27,7 @@ public class UserService {
   public User getUser(String oauthId) {
     return userRepository
         .findByOauthId(oauthId)
-        .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
+        .orElseThrow(() -> new NotFoundException("해당 사용자가 존재하지 않습니다."));
   }
 
   @Transactional

@@ -6,6 +6,8 @@ import com.aloc.aloc.coin.service.CoinService;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.enums.UserCourseState;
+import com.aloc.aloc.global.apipayload.exception.AlreadySolvedProblemException;
+import com.aloc.aloc.global.apipayload.exception.ProblemNotYetSolvedException;
 import com.aloc.aloc.problem.dto.response.ProblemSolvedResponseDto;
 import com.aloc.aloc.problem.entity.Problem;
 import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
@@ -39,9 +41,12 @@ public class ProblemFacade {
     Problem problem = problemService.getProblemByProblemId(problemId);
     UserCourseProblem userCourseProblem =
         userCourseProblemService.getUserCourseProblemByProblem(problem);
+    if (userCourseProblem.getUserCourseProblemStatus().equals(UserCourseProblemStatus.SOLVED)) {
+      throw new AlreadySolvedProblemException("이미 해결한 문제입니다.");
+    }
 
     if (!solvedCheckingService.isProblemSolved(user.getBaekjoonId(), problem, userCourseProblem)) {
-      return ProblemSolvedResponseDto.fail();
+      throw new ProblemNotYetSolvedException("아직 문제의 채점이 완료되지 않았거나 해결되지 않았습니다.");
     }
     userService.updateUserBaekjoonRank(user);
     userCourseProblem.updateUserCourseProblemSolved();

@@ -1,0 +1,7 @@
+package com.aloc.aloc.global.apipayload.exception;
+
+public class NotFoundException extends RuntimeException {
+  public NotFoundException(String message) {
+    super(message);
+  }
+}

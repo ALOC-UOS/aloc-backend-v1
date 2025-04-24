@@ -15,7 +15,10 @@ public enum ErrorStatus implements BaseErrorCode {
   _UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "COMMON401", "인증이 필요합니다."),
   _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다."),
   _LOGIN_FAILURE(HttpStatus.BAD_REQUEST, "COMMON400", "Login Fail"),
-  _CONFLICT(HttpStatus.CONFLICT, "COMMON409", "이미 시도한 요청입니다.");
+  _CONFLICT(HttpStatus.CONFLICT, "COMMON409", "이미 시도한 요청입니다."),
+  _NOT_FOUND(HttpStatus.NOT_FOUND, "COMMON404", "데이터가 존재하지 않습니다."),
+  _UNPROCESSABLE_ENTITY(
+      HttpStatus.UNPROCESSABLE_ENTITY, "COMMON422", "요청은 문법적으로 맞지만 의미상으로 처리할 수 없습니다.");
 
   private final HttpStatus httpStatus;
   private final String code;
