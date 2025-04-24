@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(ProblemNotYetSolvedException.class)
   @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-  public CustomApiResponse<String> handleAlreadySolvedProblemException(
+  public CustomApiResponse<String> handleProblemNotYetSolvedException(
       ProblemNotYetSolvedException ex) {
     return CustomApiResponse.onFailure(ErrorStatus._UNPROCESSABLE_ENTITY, ex.getMessage());
   }
