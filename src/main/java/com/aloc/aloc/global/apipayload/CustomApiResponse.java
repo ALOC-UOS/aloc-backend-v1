@@ -1,6 +1,7 @@
 package com.aloc.aloc.global.apipayload;
 
 import com.aloc.aloc.global.apipayload.code.BaseCode;
+import com.aloc.aloc.global.apipayload.code.BaseErrorCode;
 import com.aloc.aloc.global.apipayload.status.SuccessStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -38,7 +39,11 @@ public class CustomApiResponse<T> {
   }
 
   // 실패한 경우 응답 생성
-  public static <T> CustomApiResponse<T> onFailure(String code, String message, T data) {
-    return new CustomApiResponse<>(false, code, message, data);
+  public static <T> CustomApiResponse<T> onFailure(BaseErrorCode code, T result) {
+    return new CustomApiResponse<>(
+        false,
+        code.getReasonHttpStatus().getCode(),
+        code.getReasonHttpStatus().getMessage(),
+        result);
   }
 }

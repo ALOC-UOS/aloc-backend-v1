@@ -24,9 +24,7 @@ public class LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     CustomApiResponse<String> apiResponse =
         CustomApiResponse.onFailure(
-            ErrorStatus._LOGIN_FAILURE.getCode(),
-            "Username or password is incorrect",
-            ErrorStatus._LOGIN_FAILURE.getMessage());
+            ErrorStatus._LOGIN_FAILURE, "Username or password is incorrect");
     objectMapper.writeValue(response.getWriter(), apiResponse);
     log.error(Exception.class.getName() + " : " + exception.getMessage());
     log.info("로그인 실패");

@@ -8,10 +8,13 @@ import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.course.service.UserCourseService;
 import com.aloc.aloc.global.apipayload.exception.AlreadyExistException;
+import com.aloc.aloc.global.apipayload.exception.NoContentException;
 import com.aloc.aloc.global.image.ImageService;
 import com.aloc.aloc.global.image.enums.ImageType;
 import com.aloc.aloc.problem.dto.response.ProblemResponseDto;
 import com.aloc.aloc.problem.service.UserCourseProblemService;
+import com.aloc.aloc.profilebackgroundcolor.dto.response.ProfileBackgroundColorResponseDto;
+import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
 import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
 import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
@@ -52,12 +55,13 @@ public class UserFacade {
   private final UserCourseService userCourseService;
   private final UserCourseProblemService userCourseProblemService;
   private final CourseService courseService;
+  private final ProfileBackgroundColorService profileBackgroundColorService;
 
   public List<UserDetailResponseDto> getUsers() {
     List<User> users = userService.getActiveUsers();
 
     if (users.isEmpty()) {
-      return List.of();
+      throw new NoContentException("조회 가능한 유저가 없습니다.");
     }
 
     List<User> sortedUserList = userSortingService.sortUserList(users);
@@ -68,7 +72,6 @@ public class UserFacade {
 
   public UserDetailResponseDto getUser(String oauthId) {
     User user = userService.getUser(oauthId);
-    log.info("유저 정보 조회 시 리프레시 토큰 : {}", user.getRefreshToken());
     return userMapper.mapToUserDetailResponseDto(user);
   }
 
@@ -101,46 +104,27 @@ public class UserFacade {
 
   @Transactional
   public UserDetailResponseDto updateUser(String oauthId, UserRequestDto userRequestDto) {
-    log.info("✅ [updateUser] 호출됨 - oauthId: {}", oauthId);
-    log.info("📥 [요청 값] userRequestDto: {}", userRequestDto);
-
     User user = userService.getUser(oauthId);
-    log.info("🔍 유저 조회 완료 - email: {}, authority: {}", user.getEmail(), user.getAuthority());
 
-    // 백준 ID 등록 + 권한 변경
     if (userRequestDto.getBaekjoonId() != null
         && user.getAuthority().equals(Authority.ROLE_NEW_USER)) {
-      log.info("🟡 백준 ID 존재 + ROLE_NEW_USER → 백준 ID 등록 및 권한 변경 처리");
 
       userService.checkBaekjoonId(userRequestDto.getBaekjoonId());
-      log.info("✅ 백준 ID 중복 검사 통과: {}", userRequestDto.getBaekjoonId());
 
       user.setBaekjoonId(userRequestDto.getBaekjoonId());
-      log.info("📌 백준 ID 설정됨: {}", user.getBaekjoonId());
 
       int extractedRank = baekjoonRankScrapingService.extractBaekjoonRank(user.getBaekjoonId());
       user.setRank(extractedRank);
-      log.info("📊 백준 랭크 추출 완료: {}", extractedRank);
-
       user.setAuthority(Authority.ROLE_USER);
-      log.info("🔄 권한 변경됨 → ROLE_USER");
     }
 
-    // 이름 설정
     if (StringUtils.hasText(userRequestDto.getName())) {
-      log.info("📝 이름 업데이트: {}", userRequestDto.getName());
       user.setName(userRequestDto.getName());
     }
 
-    // 저장
     userService.saveUser(user);
-    log.info("💾 유저 정보 저장 완료 - userId: {}, refreshToken: {}", user.getId(), user.getRefreshToken());
 
-    // 응답 생성
-    UserDetailResponseDto response = userMapper.mapToUserDetailResponseDto(user);
-    log.info("✅ [응답 반환] userDetailResponseDto: {}", response);
-
-    return response;
+    return userMapper.mapToUserDetailResponseDto(user);
   }
 
   @Transactional
@@ -256,7 +240,7 @@ public class UserFacade {
       throw new AlreadyExistException("최대 3개의 코스까지 진행할 수 있습니다.");
     }
     if (userCourses.stream().anyMatch(uc -> uc.getCourse().getId().equals(course.getId()))) {
-      throw new AlreadyExistException("이미 진행 중인 코스는 진행할 수 없습니다.");
+      throw new IllegalArgumentException("이미 진행 중인 코스는 진행할 수 없습니다.");
     }
 
     if (userCourseService.existsByUserAndCourseAndUserCourseState(
@@ -297,5 +281,11 @@ public class UserFacade {
 
           return CourseResponseDto.of(course, latestState);
         });
+  }
+
+  @Transactional
+  public ProfileBackgroundColorResponseDto changeColor(String oauthId) {
+    User user = userService.getUser(oauthId);
+    return profileBackgroundColorService.changeColor(user);
   }
 }
