@@ -1,7 +1,7 @@
 package com.aloc.aloc.usercourse.controller;
 
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
-import com.aloc.aloc.user.facade.UserFacade;
+import com.aloc.aloc.user.service.facade.UserFacade;
 import com.aloc.aloc.usercourse.dto.response.NewUserCourseResponseDto;
 import com.aloc.aloc.usercourse.dto.response.SuccessUserCourseResponseDto;
 import com.aloc.aloc.usercourse.dto.response.UserCourseProblemResponseDto;

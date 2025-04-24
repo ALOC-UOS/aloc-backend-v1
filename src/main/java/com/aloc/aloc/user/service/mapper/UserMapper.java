@@ -1,4 +1,4 @@
-package com.aloc.aloc.user.mapper;
+package com.aloc.aloc.user.service.mapper;
 
 import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;

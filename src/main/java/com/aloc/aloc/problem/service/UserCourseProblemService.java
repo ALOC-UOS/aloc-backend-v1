@@ -6,7 +6,7 @@ import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
 import com.aloc.aloc.problem.repository.UserCourseProblemRepository;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
-import com.aloc.aloc.user.mapper.UserMapper;
+import com.aloc.aloc.user.service.mapper.UserMapper;
 import com.aloc.aloc.usercourse.entity.UserCourse;
 import com.aloc.aloc.usercourse.entity.UserCourseProblem;
 import java.time.LocalDateTime;

@@ -1,4 +1,4 @@
-package com.aloc.aloc.user.facade;
+package com.aloc.aloc.user.service.facade;
 
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.dto.response.CourseUserResponseDto;
@@ -21,9 +21,9 @@ import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
-import com.aloc.aloc.user.mapper.UserMapper;
 import com.aloc.aloc.user.service.UserService;
 import com.aloc.aloc.user.service.UserSortingService;
+import com.aloc.aloc.user.service.mapper.UserMapper;
 import com.aloc.aloc.usercourse.dto.response.NewUserCourseResponseDto;
 import com.aloc.aloc.usercourse.dto.response.SuccessUserCourseResponseDto;
 import com.aloc.aloc.usercourse.dto.response.UserCourseProblemResponseDto;

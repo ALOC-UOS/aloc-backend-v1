@@ -6,7 +6,7 @@ import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import com.aloc.aloc.global.apipayload.status.SuccessStatus;
-import com.aloc.aloc.user.facade.UserFacade;
+import com.aloc.aloc.user.service.facade.UserFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
