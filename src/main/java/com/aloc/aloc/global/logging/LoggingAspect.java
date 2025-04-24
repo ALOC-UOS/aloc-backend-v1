@@ -18,12 +18,16 @@ public class LoggingAspect {
   private final MeterRegistry meterRegistry;
   private final AsyncWebhookNotifier asyncWebhookNotifier;
 
-  @Around(
-      "execution(* com.aloc.aloc..controller..*(..)) || execution(* com.aloc.aloc..service..*(..))")
+  @Around("execution(* com.aloc.aloc..controller..*(..))")
   public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
     long start = System.currentTimeMillis();
 
-    String method = joinPoint.getSignature().toShortString();
+    String method =
+        joinPoint.getSignature().getDeclaringType().getSimpleName()
+            + "."
+            + joinPoint.getSignature().getName()
+            + "(..)";
+
     log.info("▶️ Start: {}", method);
 
     Object[] args = joinPoint.getArgs();
