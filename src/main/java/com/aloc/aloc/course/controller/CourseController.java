@@ -5,6 +5,7 @@ import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
+import com.aloc.aloc.global.apipayload.status.SuccessStatus;
 import com.aloc.aloc.user.facade.UserFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,12 +39,18 @@ public class CourseController {
       summary = "코스 목록 조회",
       description =
           """
-    모든 코스 목록을 페이징 형태로 조회합니다.
-    로그인된 사용자는 각 코스에 대한 개인 진행 상태(`UserCourseState`) 정보도 함께 포함됩니다.
-    미로그인 시에는 모든 코스의 상태가 `NOT_STARTED`로 제공됩니다.
+        모든 코스 목록을 페이징 형태로 조회합니다.
+        로그인된 사용자는 각 코스에 대한 개인 진행 상태(`UserCourseState`) 정보도 함께 포함됩니다.
+        미로그인 시에는 모든 코스의 상태가 `NOT_STARTED`로 제공됩니다.
     """)
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "코스 목록 조회 성공"),
+    @ApiResponse(
+        responseCode = "200",
+        description = "코스 목록 조회 성공",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = CourseResponseDto.class))),
     @ApiResponse(responseCode = "401", description = "로그인 사용자 정보 없음"),
     @ApiResponse(responseCode = "500", description = "서버 오류")
   })
@@ -89,7 +96,10 @@ public class CourseController {
     - 문제 수집 결과는 Discord Webhook을 통해 알림으로 전송됩니다.
     """)
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "코스 생성 및 문제 스크래핑 성공"),
+    @ApiResponse(
+        responseCode = "201",
+        description = "코스 생성 및 문제 스크래핑 성공",
+        content = @Content(schema = @Schema(implementation = CourseResponseDto.class))),
     @ApiResponse(responseCode = "400", description = "요청 데이터가 유효하지 않음"),
     @ApiResponse(responseCode = "500", description = "서버 내부 오류 (스크래핑 실패 등)")
   })
@@ -98,6 +108,7 @@ public class CourseController {
   @SecurityRequirement(name = "JWT Auth")
   public CustomApiResponse<CourseResponseDto> createCourse(
       @RequestBody @Valid CourseRequestDto courseRequestDto) throws IOException {
-    return CustomApiResponse.onSuccess(courseService.createCourse(courseRequestDto));
+    return CustomApiResponse.of(
+        SuccessStatus._CREATED, courseService.createCourse(courseRequestDto));
   }
 }
