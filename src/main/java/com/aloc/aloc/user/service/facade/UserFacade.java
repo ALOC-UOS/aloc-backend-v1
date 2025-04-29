@@ -267,19 +267,23 @@ public class UserFacade {
     List<UserCourse> userCourses = userCourseService.getUserCoursesByUser(user);
     Page<Course> courses = courseService.getCoursePageByCourseType(pageable, courseTypeOrNull);
 
+    Map<Long, UserCourse> latestUserCourseMap =
+        userCourses.stream()
+            .collect(
+                Collectors.groupingBy(
+                    uc -> uc.getCourse().getId(),
+                    Collectors.collectingAndThen(
+                        Collectors.maxBy(Comparator.comparing(UserCourse::getCreatedAt)),
+                        optional -> optional.orElse(null))));
+
     return courses.map(
         course -> {
-          Optional<UserCourse> latestUserCourse =
-              userCourses.stream()
-                  .filter(userCourse -> userCourse.getCourse().equals(course))
-                  .max(Comparator.comparing(UserCourse::getCreatedAt)); // 최신 createdAt 찾기
-
-          UserCourseState latestState =
-              latestUserCourse
-                  .map(UserCourse::getUserCourseState)
-                  .orElse(UserCourseState.NOT_STARTED); // 만약 없다면 null 처리
-
-          return CourseResponseDto.of(course, latestState);
+          UserCourse latestUserCourse = latestUserCourseMap.get(course.getId());
+          UserCourseState state =
+              (latestUserCourse != null)
+                  ? latestUserCourse.getUserCourseState()
+                  : UserCourseState.NOT_STARTED;
+          return CourseResponseDto.of(course, state);
         });
   }
 
