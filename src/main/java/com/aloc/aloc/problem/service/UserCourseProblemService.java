@@ -76,9 +76,9 @@ public class UserCourseProblemService {
         || userCourseProblem.getUserCourseProblemStatus() == UserCourseProblemStatus.UNSOLVED;
   }
 
-  public UserCourseProblem getUserCourseProblemByProblem(Problem problem) {
+  public UserCourseProblem getUserCourseProblemByProblem(Problem problem, User user) {
     return userCourseProblemRepository
-        .findByProblemAndUserCourseProblemStatus(problem, UserCourseProblemStatus.UNSOLVED)
+        .findByUserAndProblemAndStatus(user, problem, UserCourseProblemStatus.UNSOLVED)
         .orElseThrow(() -> new NoSuchElementException("이미 해결했거나 도전 중인 문제가 아닙니다."));
   }
 
