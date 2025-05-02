@@ -6,6 +6,7 @@ import com.aloc.aloc.coin.service.CoinService;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.enums.UserCourseState;
+import com.aloc.aloc.course.service.UserCourseService;
 import com.aloc.aloc.global.apipayload.exception.AlreadySolvedProblemException;
 import com.aloc.aloc.global.apipayload.exception.ProblemNotYetSolvedException;
 import com.aloc.aloc.problem.dto.response.ProblemSolvedResponseDto;
@@ -34,13 +35,14 @@ public class ProblemFacade {
   private final UserCourseProblemService userCourseProblemService;
   private final SolvedCheckingService solvedCheckingService;
   private final CoinService coinService;
+  private final UserCourseService userCourseService;
 
   @Transactional
   public ProblemSolvedResponseDto checkProblemSolved(Integer problemId, String oauthId) {
     User user = userService.getUser(oauthId);
     Problem problem = problemService.getProblemByProblemId(problemId);
     UserCourseProblem userCourseProblem =
-        userCourseProblemService.getUserCourseProblemByProblem(problem);
+        userCourseProblemService.getUserCourseProblemByProblem(problem, user);
     if (userCourseProblem.getUserCourseProblemStatus().equals(UserCourseProblemStatus.SOLVED)) {
       throw new AlreadySolvedProblemException("이미 해결한 문제입니다.");
     }
