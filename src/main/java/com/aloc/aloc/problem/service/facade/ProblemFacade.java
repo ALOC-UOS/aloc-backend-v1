@@ -85,7 +85,7 @@ public class ProblemFacade {
       course.addSuccessCnt();
       coinResponseDtos.add(coinService.giveCoinBySolvingCourse(user, course));
     } else if (course.getCourseType() == CourseType.DEADLINE) {
-      activateNextProblem(userCourse, problemIndex);
+      activateNextProblem(sortedList, problemIndex);
     }
 
     return coinResponseDtos;
@@ -95,9 +95,9 @@ public class ProblemFacade {
     return userCourseIdx == course.getProblemCnt() - 1;
   }
 
-  private void activateNextProblem(UserCourse userCourse, int currentIndex) {
-    userCourse
-        .getUserCourseProblemList()
+  private void activateNextProblem(List<UserCourseProblem> sortedProblems, int currentIndex) {
+
+    sortedProblems
         .get(currentIndex + 1)
         .updateUserCourseProblemStatus(UserCourseProblemStatus.UNSOLVED);
   }
