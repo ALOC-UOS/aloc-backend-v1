@@ -43,10 +43,8 @@ public class CourseService {
 
   @Transactional
   public CourseResponseDto createCourse(CourseRequestDto courseRequestDto) throws IOException {
-    System.out.println("코스시작");
     Course course = Course.of(courseRequestDto);
     courseRepository.save(course);
-    // 스크랩핑 로직 추가
     problemScrapingService.createProblemsByCourse(course, courseRequestDto);
     return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
   }
@@ -58,7 +56,6 @@ public class CourseService {
   }
 
   public List<Course> getRecommendedCourses(Course course) {
-
     List<Long> algorithmIds =
         course.getCourseProblemList().stream()
             .flatMap(cp -> cp.getProblem().getProblemAlgorithmList().stream())
