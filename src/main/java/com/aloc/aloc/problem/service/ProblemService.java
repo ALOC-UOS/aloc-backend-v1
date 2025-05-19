@@ -17,8 +17,7 @@ public class ProblemService {
   }
 
   public Problem saveProblem(Problem problem) {
-    problemRepository.save(problem);
-    return problem;
+    return problemRepository.save(problem);
   }
 
   public Problem getProblemByProblemId(Integer problemId) {

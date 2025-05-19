@@ -6,7 +6,6 @@ import com.aloc.aloc.coin.service.CoinService;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.enums.UserCourseState;
-import com.aloc.aloc.course.service.UserCourseService;
 import com.aloc.aloc.global.apipayload.exception.AlreadySolvedProblemException;
 import com.aloc.aloc.global.apipayload.exception.ProblemNotYetSolvedException;
 import com.aloc.aloc.problem.dto.response.ProblemSolvedResponseDto;
@@ -19,7 +18,6 @@ import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.service.UserService;
 import com.aloc.aloc.usercourse.entity.UserCourse;
 import com.aloc.aloc.usercourse.entity.UserCourseProblem;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +33,6 @@ public class ProblemFacade {
   private final UserCourseProblemService userCourseProblemService;
   private final SolvedCheckingService solvedCheckingService;
   private final CoinService coinService;
-  private final UserCourseService userCourseService;
 
   @Transactional
   public ProblemSolvedResponseDto checkProblemSolved(Integer problemId, String oauthId) {
@@ -63,48 +60,30 @@ public class ProblemFacade {
 
   private List<CoinResponseDto> handleSolvedProblem(
       User user, UserCourseProblem userCourseProblem) {
-    List<CoinResponseDto> coinResponseDtos = new ArrayList<>();
-
-    // 기본 코인 지급
-    coinResponseDtos.add(coinService.giveCoinBySolvingProblem(user));
-    checkAndGiveStreakCoin(user, coinResponseDtos);
+    List<CoinResponseDto> rewards = coinService.rewardUser(user, userCourseProblem);
 
     UserCourse userCourse = userCourseProblem.getUserCourse();
     Course course = userCourse.getCourse();
-    // createdAt 오름차순으로 정렬된 리스트 생성
-    List<UserCourseProblem> sortedList =
+
+    List<UserCourseProblem> sorted =
         userCourse.getUserCourseProblemList().stream()
             .sorted(Comparator.comparing(UserCourseProblem::getCreatedAt))
             .toList();
 
-    // 정렬된 리스트에서 인덱스 구하기
-    int problemIndex = sortedList.indexOf(userCourseProblem);
-
-    if (isCourseCompleted(problemIndex, course)) {
+    int idx = sorted.indexOf(userCourseProblem);
+    if (idx == course.getProblemCnt() - 1) {
       userCourse.updateUserCourseState(UserCourseState.SUCCESS);
       course.addSuccessCnt();
-      coinResponseDtos.add(coinService.giveCoinBySolvingCourse(user, course));
     } else if (course.getCourseType() == CourseType.DEADLINE) {
-      activateNextProblem(sortedList, problemIndex);
+      activateNextProblem(sorted, idx);
     }
 
-    return coinResponseDtos;
-  }
-
-  private boolean isCourseCompleted(int userCourseIdx, Course course) {
-    return userCourseIdx == course.getProblemCnt() - 1;
+    return rewards;
   }
 
   private void activateNextProblem(List<UserCourseProblem> sortedProblems, int currentIndex) {
-
     sortedProblems
         .get(currentIndex + 1)
         .updateUserCourseProblemStatus(UserCourseProblemStatus.UNSOLVED);
-  }
-
-  private void checkAndGiveStreakCoin(User user, List<CoinResponseDto> coinResponseDtos) {
-    if (user.getConsecutiveSolvedDays() % 7 == 0) {
-      coinResponseDtos.add(coinService.giveCoinByStreakDays(user));
-    }
   }
 }
