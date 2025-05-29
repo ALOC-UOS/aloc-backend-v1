@@ -22,7 +22,7 @@ public class UserSortingService {
     if (rank == null) {
       rank = 0;
     }
-    return new Pair<>(-rank / 10, rank % 10);
+    return new Pair<>(rank / 10, rank % 10);
   }
 
   private record Pair<T extends Comparable<T>, U extends Comparable<U>>(T first, U second)
