@@ -24,4 +24,7 @@ public class CourseProblem {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "problem_id")
   private Problem problem;
+
+  @Column(name = "problem_order")
+  private Integer problemOrder;
 }

@@ -33,6 +33,9 @@ public class UserCourseProblem extends AuditingTimeEntity {
 
   private LocalDateTime solvedAt;
 
+  @Column(name = "problem_order")
+  private Integer problemOrder;
+
   public static UserCourseProblem of(UserCourse userCourse, Problem problem) {
     return UserCourseProblem.builder()
         .problem(problem)
