@@ -15,12 +15,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-@Slf4j
 public class UserCourseProblemService {
   private final UserCourseProblemRepository userCourseProblemRepository;
   private final UserMapper userMapper;
@@ -31,7 +29,6 @@ public class UserCourseProblemService {
           .get(i)
           .getUserCourseProblemStatus()
           .equals(UserCourseProblemStatus.HIDDEN)) {
-        log.info(userCourseProblems.get(i).getId().toString());
         return userCourseProblems.get(i - 1).getProblem().getProblemId();
       }
     }
@@ -101,5 +98,9 @@ public class UserCourseProblemService {
               return ProblemResponseDto.of(ucp, ucp.getProblem(), lastSolvedAt, solvingUserList);
             })
         .toList();
+  }
+
+  public List<UserCourseProblem> getByUserCourse(UserCourse userCourse) {
+    return userCourseProblemRepository.findAllByUserCourseOrderByProblemOrderAsc(userCourse);
   }
 }

@@ -3,6 +3,7 @@ package com.aloc.aloc.problem.repository;
 import com.aloc.aloc.problem.entity.Problem;
 import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
 import com.aloc.aloc.user.entity.User;
+import com.aloc.aloc.usercourse.entity.UserCourse;
 import com.aloc.aloc.usercourse.entity.UserCourseProblem;
 import java.util.List;
 import java.util.Optional;
@@ -25,4 +26,6 @@ public interface UserCourseProblemRepository extends JpaRepository<UserCoursePro
       @Param("user") User user,
       @Param("problem") Problem problem,
       @Param("status") UserCourseProblemStatus status);
+
+  List<UserCourseProblem> findAllByUserCourseOrderByProblemOrderAsc(UserCourse userCourse);
 }
