@@ -18,7 +18,6 @@ import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.service.UserService;
 import com.aloc.aloc.usercourse.entity.UserCourse;
 import com.aloc.aloc.usercourse.entity.UserCourseProblem;
-import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -65,25 +64,19 @@ public class ProblemFacade {
     UserCourse userCourse = userCourseProblem.getUserCourse();
     Course course = userCourse.getCourse();
 
-    List<UserCourseProblem> sorted =
-        userCourse.getUserCourseProblemList().stream()
-            .sorted(Comparator.comparing(UserCourseProblem::getCreatedAt))
-            .toList();
+    List<UserCourseProblem> sorted = userCourseProblemService.getByUserCourse(userCourse);
 
-    int idx = sorted.indexOf(userCourseProblem);
-    if (idx == course.getProblemCnt() - 1) {
+    if (userCourseProblem.getProblemOrder().equals(course.getProblemCnt())) {
       userCourse.updateUserCourseState(UserCourseState.SUCCESS);
       course.addSuccessCnt();
     } else if (course.getCourseType() == CourseType.DEADLINE) {
-      activateNextProblem(sorted, idx);
+      activateNextProblem(sorted, userCourseProblem.getProblemOrder() + 1);
     }
 
     return rewards;
   }
 
-  private void activateNextProblem(List<UserCourseProblem> sortedProblems, int currentIndex) {
-    sortedProblems
-        .get(currentIndex + 1)
-        .updateUserCourseProblemStatus(UserCourseProblemStatus.UNSOLVED);
+  private void activateNextProblem(List<UserCourseProblem> sortedProblems, int nextIdx) {
+    sortedProblems.get(nextIdx).updateUserCourseProblemStatus(UserCourseProblemStatus.UNSOLVED);
   }
 }

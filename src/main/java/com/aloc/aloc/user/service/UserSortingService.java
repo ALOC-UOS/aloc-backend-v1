@@ -26,7 +26,6 @@ public class UserSortingService {
   }
 
   private record Pair<T extends Comparable<T>, U extends Comparable<U>>(T first, U second)
-
       implements Comparable<Pair<T, U>> {
 
     @Override

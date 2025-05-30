@@ -5,8 +5,6 @@ import com.aloc.aloc.coin.enums.CoinType;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.usercourse.entity.UserCourseProblem;
-import java.util.Comparator;
-import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,12 +14,7 @@ public class CourseRewardPolicy implements CoinRewardPolicy {
   @Override
   public boolean supports(User user, UserCourseProblem userCourseProblem) {
     Course course = userCourseProblem.getUserCourse().getCourse();
-    List<UserCourseProblem> sorted =
-        userCourseProblem.getUserCourse().getUserCourseProblemList().stream()
-            .sorted(Comparator.comparing(UserCourseProblem::getCreatedAt))
-            .toList();
-    int idx = sorted.indexOf(userCourseProblem);
-    return idx == course.getProblemCnt() - 1; // 마지막 문제일 경우
+    return userCourseProblem.getProblemOrder().equals(course.getProblemCnt()); // 마지막 문제일 경우
   }
 
   @Override

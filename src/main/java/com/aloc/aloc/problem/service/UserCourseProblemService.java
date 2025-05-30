@@ -99,4 +99,8 @@ public class UserCourseProblemService {
             })
         .toList();
   }
+
+  public List<UserCourseProblem> getByUserCourse(UserCourse userCourse) {
+    return userCourseProblemRepository.findAllByUserCourseOrderByProblemOrderAsc(userCourse);
+  }
 }
