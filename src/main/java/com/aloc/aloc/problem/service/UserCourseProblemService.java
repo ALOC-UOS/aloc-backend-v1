@@ -52,8 +52,7 @@ public class UserCourseProblemService {
 
   public UserCourseProblem createUserCourseProblem(
       UserCourse userCourse, Problem problem, int problemOrder) {
-    UserCourseProblem userCourseProblem = UserCourseProblem.of(userCourse, problem);
-    userCourseProblem.setProblemOrder(problemOrder);
+    UserCourseProblem userCourseProblem = UserCourseProblem.of(userCourse, problem, problemOrder);
     return userCourseProblemRepository.save(userCourseProblem);
   }
 
