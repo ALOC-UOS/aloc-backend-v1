@@ -50,8 +50,9 @@ public class UserCourseProblemService {
         .toList();
   }
 
-  public UserCourseProblem createUserCourseProblem(UserCourse userCourse, Problem problem) {
-    UserCourseProblem userCourseProblem = UserCourseProblem.of(userCourse, problem);
+  public UserCourseProblem createUserCourseProblem(
+      UserCourse userCourse, Problem problem, int problemOrder) {
+    UserCourseProblem userCourseProblem = UserCourseProblem.of(userCourse, problem, problemOrder);
     return userCourseProblemRepository.save(userCourseProblem);
   }
 

@@ -36,11 +36,12 @@ public class UserCourseProblem extends AuditingTimeEntity {
   @Column(name = "problem_order")
   private Integer problemOrder;
 
-  public static UserCourseProblem of(UserCourse userCourse, Problem problem) {
+  public static UserCourseProblem of(UserCourse userCourse, Problem problem, int problemOrder) {
     return UserCourseProblem.builder()
         .problem(problem)
         .userCourse(userCourse)
         .userCourseProblemStatus(UserCourseProblemStatus.HIDDEN)
+        .problemOrder(problemOrder)
         .build();
   }
 

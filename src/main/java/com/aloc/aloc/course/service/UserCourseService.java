@@ -44,15 +44,18 @@ public class UserCourseService {
 
     List<Problem> problems =
         course.getCourseProblemList().stream().map(CourseProblem::getProblem).toList();
+
+    int order = 1;
     for (Problem problem : problems) {
       UserCourseProblem userCourseProblem =
-          userCourseProblemService.createUserCourseProblem(userCourse, problem);
+          userCourseProblemService.createUserCourseProblem(userCourse, problem, order);
 
-      if (userCourse.getUserCourseProblemList().isEmpty()) {
+      if (order == 1) {
         userCourseProblem.updateUserCourseProblemStatus(UserCourseProblemStatus.UNSOLVED);
         userCourseProblemService.saveUserCourserProblem(userCourseProblem);
       }
       userCourse.addUserCourseProblem(userCourseProblem);
+      order++;
     }
     return userCourseRepository.save(userCourse);
   }
