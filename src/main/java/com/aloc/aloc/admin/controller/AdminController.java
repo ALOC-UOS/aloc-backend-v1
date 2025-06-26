@@ -44,7 +44,7 @@ public class AdminController {
             description = "서버 내부 오류",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
       })
-  public CustomApiResponse<AdminDashboardResponseDto> getAlgorithms(
+  public CustomApiResponse<AdminDashboardResponseDto> getDashboard(
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
     return CustomApiResponse.onSuccess(adminService.getDashboard(user.getUsername()));
   }
