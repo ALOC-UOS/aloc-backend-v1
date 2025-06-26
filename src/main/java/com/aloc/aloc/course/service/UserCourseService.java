@@ -123,4 +123,8 @@ public class UserCourseService {
   public int getClearRank(UserCourse userCourse) {
     return userCourseRepository.findClearRank(userCourse.getCourse(), userCourse.getUpdatedAt());
   }
+
+  public long getUserCourseCountByUserCourseState(UserCourseState userCourseState) {
+    return userCourseRepository.countByUserCourseState(userCourseState);
+  }
 }

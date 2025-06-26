@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Course API", description = "course 관련 API입니다.")
-@RequestMapping("/courses")
+@RequestMapping("/api/courses")
 public class CourseController {
   private final CourseService courseService;
   private final UserFacade userFacade;

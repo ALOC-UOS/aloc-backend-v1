@@ -76,4 +76,14 @@ public class UserService {
     return lastSolvedAt != null
         && lastSolvedAt.toLocalDate().equals(LocalDateTime.now().minusDays(1).toLocalDate());
   }
+
+  public void validateAdmin(String oauthId) {
+    if (!getUser(oauthId).getAuthority().equals(Authority.ROLE_ADMIN)) {
+      throw new IllegalStateException("관리자만 이용가능한 서비스입니다.");
+    }
+  }
+
+  public long getTotalUserCount() {
+    return userRepository.countByAuthorityIn(ACTIVE_AUTHORITIES);
+  }
 }
