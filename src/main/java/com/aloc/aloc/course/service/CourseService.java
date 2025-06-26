@@ -65,4 +65,8 @@ public class CourseService {
 
     return courseRepository.findCoursesByAlgorithmIds(algorithmIds);
   }
+
+  public long getActiveCourseCount() {
+    return courseRepository.count();
+  }
 }

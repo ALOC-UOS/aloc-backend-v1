@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Problem API", description = "Problem API 입니다.")
-@RequestMapping("/problems")
+@RequestMapping("/api/problems")
 public class ProblemController {
   private final ProblemFacade problemFacade;
 

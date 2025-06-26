@@ -43,4 +43,6 @@ public interface UserCourseRepository extends JpaRepository<UserCourse, Long> {
       AND uc.updatedAt < :updatedAt
 """)
   int findClearRank(@Param("course") Course course, @Param("updatedAt") LocalDateTime updatedAt);
+
+  long countByUserCourseState(UserCourseState userCourseState);
 }

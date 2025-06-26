@@ -19,4 +19,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
   List<User> findAllByAuthorityIn(Set<Authority> authorities);
 
   boolean existsByBaekjoonId(String baekjoonId);
+
+  Long countByAuthorityIn(Set<Authority> authorities);
 }

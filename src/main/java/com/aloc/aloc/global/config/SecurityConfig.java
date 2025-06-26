@@ -61,23 +61,23 @@ public class SecurityConfig {
                         "/api/swagger-ui.html",
                         "/v3/api-docs/**",
                         "/oauth2/authorization/**",
-                        "/algorithm/**",
-                        "/users",
+                        "/api/algorithm/**",
+                        "/api/users",
                         "/oauth/callback",
-                        "/courses",
-                        "/auth/refresh",
-                        "/course",
+                        "/api/courses",
+                        "/api/auth/refresh",
+                        "/api/course",
                         "/actuator/**")
                     .permitAll()
                     .requestMatchers(
-                        "/user",
-                        "/user/**",
-                        "/courses/**",
-                        "/auth/logout",
-                        "/coin/**",
-                        "/user-courses",
-                        "/user-courses/**",
-                        "/problems/*")
+                        "/api/user",
+                        "/api/user/**",
+                        "/api/courses/**",
+                        "/api/auth/logout",
+                        "/api/coin/**",
+                        "/api/user-courses",
+                        "/api/user-courses/**",
+                        "/api/problems/*")
                     .authenticated()
                     .anyRequest()
                     .permitAll())
@@ -95,7 +95,7 @@ public class SecurityConfig {
         .logout(
             logout ->
                 logout
-                    .logoutUrl("/auth/logout")
+                    .logoutUrl("/api/auth/logout")
                     .logoutSuccessHandler(
                         (request, response, authentication) -> {
                           // ✅ Refresh Token 삭제 (DB에서)
