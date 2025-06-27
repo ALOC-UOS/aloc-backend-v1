@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "User API", description = "User API 입니다.")
+@RequestMapping("/api")
 public class UserController {
   private final UserFacade userFacade;
 
