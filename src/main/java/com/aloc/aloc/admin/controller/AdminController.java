@@ -1,6 +1,6 @@
 package com.aloc.aloc.admin.controller;
 
-import com.aloc.aloc.admin.dto.response.AdminCourseListResponseDto;
+import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
 import com.aloc.aloc.admin.service.AdminService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
@@ -52,7 +52,7 @@ public class AdminController {
     return CustomApiResponse.onSuccess(adminService.getDashboard(user.getUsername()));
   }
 
-  @GetMapping("/course")
+  @GetMapping("/courses")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "어드민 코스 목록 조회", description = "관리자 코스 목록 페이지에서 코스 목록을 조회합니다.")
   @ApiResponses(
@@ -64,7 +64,7 @@ public class AdminController {
                 @Content(
                     array =
                         @ArraySchema(
-                            schema = @Schema(implementation = AdminCourseListResponseDto.class)))),
+                            schema = @Schema(implementation = AdminCourseResponseDto.class)))),
         @ApiResponse(
             responseCode = "401",
             description = "인증되지 않았거나 관리자 권한이 없는 경우",
@@ -74,7 +74,7 @@ public class AdminController {
             description = "서버 내부 오류",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
       })
-  public CustomApiResponse<List<AdminCourseListResponseDto>> getCourseList(
+  public CustomApiResponse<List<AdminCourseResponseDto>> getCourseList(
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
     return CustomApiResponse.onSuccess(adminService.getCourseList(user.getUsername()));
   }

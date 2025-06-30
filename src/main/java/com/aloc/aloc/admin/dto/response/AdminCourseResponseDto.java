@@ -1,5 +1,6 @@
 package com.aloc.aloc.admin.dto.response;
 
+import com.aloc.aloc.course.dto.response.RankResponseDto;
 import com.aloc.aloc.course.enums.CourseType;
 import java.util.List;
 import lombok.Builder;
@@ -7,29 +8,23 @@ import lombok.Data;
 
 @Data
 @Builder
-public class AdminCourseListResponseDto {
+public class AdminCourseResponseDto {
   private String courseName;
   private CourseType courseType;
-  private Integer minRank;
-  private Integer maxRank;
-  private Integer averageRank;
+  private RankResponseDto rank;
   private List<Integer> algorithmIdList;
   private Long generateCnt;
 
-  public static AdminCourseListResponseDto of(
+  public static AdminCourseResponseDto of(
       String courseName,
       CourseType courseType,
-      Integer minRank,
-      Integer maxRank,
-      Integer averageRank,
+      RankResponseDto rank,
       List<Integer> algorithmIdList,
       Long generateCnt) {
-    return AdminCourseListResponseDto.builder()
+    return AdminCourseResponseDto.builder()
         .courseName(courseName)
         .courseType(courseType)
-        .minRank(minRank)
-        .maxRank(maxRank)
-        .averageRank(averageRank)
+        .rank(rank)
         .algorithmIdList(algorithmIdList)
         .generateCnt(generateCnt)
         .build();
