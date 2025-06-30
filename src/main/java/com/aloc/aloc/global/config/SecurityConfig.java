@@ -77,7 +77,8 @@ public class SecurityConfig {
                         "/api/coin/**",
                         "/api/user-courses",
                         "/api/user-courses/**",
-                        "/api/problems/*")
+                        "/api/problems/*",
+                        "/admin/**")
                     .authenticated()
                     .anyRequest()
                     .permitAll())
