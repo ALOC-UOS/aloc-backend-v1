@@ -39,10 +39,9 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
     // 요청 도메인 체크
     String host = request.getHeader("Host");
-    log.info(request.toString());
 
     String redirectUri =
-        host.contains("openaloc.store")
+        host != null && host.contains("openaloc.store")
             ? "https://openaloc.store/finish-google-sso"
             : "http://localhost:3000/finish-google-sso";
 
