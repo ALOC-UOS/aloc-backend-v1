@@ -33,7 +33,7 @@ public class AdminService {
 
   // algorithmIdList를 처리해 course의 다른 필드와 함께 하나의 Dto로 묶음
   private AdminCourseResponseDto toAdminCourseListResponseDto(Course course) {
-    List<String> algorithmsList =
+    List<String> algorithmList =
         course.getCourseProblemList().stream()
             .map(CourseProblem::getProblem)
             .flatMap(problem -> problem.getProblemAlgorithmList().stream())
@@ -48,7 +48,7 @@ public class AdminService {
         course.getTitle(),
         course.getCourseType(),
         rankResponseDto,
-        algorithmsList,
+        algorithmList,
         course.getGenerateCnt());
   }
 
