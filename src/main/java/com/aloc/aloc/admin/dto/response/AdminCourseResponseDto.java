@@ -12,20 +12,20 @@ public class AdminCourseResponseDto {
   private String courseName;
   private CourseType courseType;
   private RankResponseDto rank;
-  private List<Integer> algorithmIdList;
+  private List<String> algorithmsList;
   private Long generateCnt;
 
   public static AdminCourseResponseDto of(
       String courseName,
       CourseType courseType,
       RankResponseDto rank,
-      List<Integer> algorithmIdList,
+      List<String> algorithmsList,
       Long generateCnt) {
     return AdminCourseResponseDto.builder()
         .courseName(courseName)
         .courseType(courseType)
         .rank(rank)
-        .algorithmIdList(algorithmIdList)
+        .algorithmsList(algorithmsList)
         .generateCnt(generateCnt)
         .build();
   }
