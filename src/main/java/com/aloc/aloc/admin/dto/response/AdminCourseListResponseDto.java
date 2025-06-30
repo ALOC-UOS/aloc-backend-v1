@@ -16,7 +16,6 @@ public class AdminCourseListResponseDto {
   private List<Integer> algorithmIdList;
   private Long generateCnt;
 
-
   public static AdminCourseListResponseDto of(
       String courseName,
       CourseType courseType,

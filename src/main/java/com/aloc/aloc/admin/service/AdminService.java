@@ -34,12 +34,13 @@ public class AdminService {
 
   // algorithmIdList를 처리해 course의 다른 필드와 함께 하나의 Dto로 묶음
   private AdminCourseListResponseDto toAdminCourseListResponseDto(Course course) {
-    List<Integer> algorithmIdList = course.getCourseProblemList().stream()
-        .map(CourseProblem::getProblem)
-        .flatMap(problem -> problem.getProblemAlgorithmList().stream())
-        .map(pa -> pa.getAlgorithm().getAlgorithmId())
-        .distinct()
-        .collect(Collectors.toList());
+    List<Integer> algorithmIdList =
+        course.getCourseProblemList().stream()
+            .map(CourseProblem::getProblem)
+            .flatMap(problem -> problem.getProblemAlgorithmList().stream())
+            .map(pa -> pa.getAlgorithm().getAlgorithmId())
+            .distinct()
+            .collect(Collectors.toList());
 
     return AdminCourseListResponseDto.of(
         course.getTitle(),
@@ -48,15 +49,12 @@ public class AdminService {
         course.getMaxRank(),
         course.getAverageRank(),
         algorithmIdList,
-        course.getGenerateCnt()
-    );
+        course.getGenerateCnt());
   }
 
   public List<AdminCourseListResponseDto> getCourseList(String oauthId) {
     userService.validateAdmin(oauthId);
     List<Course> courseList = courseRepository.findAll();
-    return courseList.stream()
-        .map(this::toAdminCourseListResponseDto)
-        .collect(Collectors.toList());
+    return courseList.stream().map(this::toAdminCourseListResponseDto).collect(Collectors.toList());
   }
 }
