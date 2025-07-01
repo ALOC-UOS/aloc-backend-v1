@@ -1,5 +1,6 @@
 package com.aloc.aloc.admin.service;
 
+import com.aloc.aloc.admin.dto.request.AdminRoleChangeRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminCoinTransactionRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
@@ -13,6 +14,7 @@ import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.course.service.UserCourseService;
 import com.aloc.aloc.user.entity.User;
+import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.repository.UserRepository;
 import com.aloc.aloc.user.service.UserService;
 import jakarta.transaction.Transactional;
@@ -42,7 +44,6 @@ public class AdminService {
         0L);
   }
 
-  // algorithmIdList를 처리해 course의 다른 필드와 함께 하나의 Dto로 묶음
   private AdminCourseResponseDto toAdminCourseListResponseDto(Course course) {
     List<String> algorithmList =
         course.getCourseProblemList().stream()
@@ -99,6 +100,34 @@ public class AdminService {
     userRepository.saveAll(updatedUserList);
     coinHistoryRepository.saveAll(coinHistoryList);
 
+    return "success";
+  }
+
+  @Transactional
+  public String updateUserRole(
+      String oauthId, AdminRoleChangeRequestDto adminRoleChangeRequestDto) {
+    userService.validateAdmin(oauthId); // 요청자의 권한 검증
+    // 바꾸려는 권한이 ROLE_NEW_USER 인지 검증
+    if (adminRoleChangeRequestDto.getRole() == Authority.ROLE_NEW_USER) {
+      throw new IllegalArgumentException("ROLE_NEW_USER 권한으로 변경은 허용되지 않습니다.");
+    }
+
+    List<User> users = new ArrayList<>();
+    for (UUID uuid : adminRoleChangeRequestDto.getUserIds()) {
+      User user = userService.getUserById(uuid);
+
+      if (user.getAuthority() == Authority.ROLE_NEW_USER) {
+        throw new IllegalArgumentException("백준에 연동되지 않은 회원은 권한 변경이 불가합니다.");
+      }
+
+      if (user.getAuthority() == adminRoleChangeRequestDto.getRole()) {
+        continue;
+      }
+
+      user.setAuthority(adminRoleChangeRequestDto.getRole());
+      users.add(user);
+    }
+    userService.saveAllUser(users);
     return "success";
   }
 }

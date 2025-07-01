@@ -88,9 +88,14 @@ public class UserService {
     return userRepository.countByAuthorityIn(ACTIVE_AUTHORITIES);
   }
 
-  public User getUserById(UUID id) {
+  public User getUserById(UUID userId) {
     return userRepository
-        .findById(id)
-        .orElseThrow(() -> new NotFoundException("해당 사용자가 존재하지 않습니다."));
+        .findById(userId)
+        .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+  }
+
+  @Transactional
+  public void saveAllUser(List<User> users) {
+    userRepository.saveAll(users);
   }
 }
