@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.ErrorResponse;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -95,7 +96,7 @@ public class AdminController {
       })
   public CustomApiResponse<String> updateRole(
       @Parameter(hidden = true) @AuthenticationPrincipal User user,
-      @RequestBody AdminRoleChangeRequestDto adminRoleChangeRequestDto) {
+      @RequestBody @Valid AdminRoleChangeRequestDto adminRoleChangeRequestDto) {
     return CustomApiResponse.onSuccess(
         adminService.updateUserRole(user.getUsername(), adminRoleChangeRequestDto));
   }
