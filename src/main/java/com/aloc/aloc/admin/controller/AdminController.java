@@ -1,5 +1,6 @@
 package com.aloc.aloc.admin.controller;
 
+import com.aloc.aloc.admin.dto.request.AdminRoleChangeRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminCourseListResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
 import com.aloc.aloc.admin.service.AdminService;
@@ -17,9 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.ErrorResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -78,5 +77,29 @@ public class AdminController {
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
     return CustomApiResponse.onSuccess(adminService.getCourseList(user.getUsername()));
   }
+
+  @PatchMapping("/users/role")
+  @SecurityRequirement(name = "JWT Auth")
+  @Operation(summary = "어드민 유저 권한 변경", description = "관리자 유저 목록 페이지에서 여러명의 유저의 권한을 업데이트 합니다.")
+  @ApiResponses(
+	  value = {
+		  @ApiResponse(
+			  responseCode = "200",
+			  description = "성공적으로 권한이 변경되었습니다."),
+		  @ApiResponse(
+			  responseCode = "401",
+			  description = "인증되지 않았거나 관리자 권한이 없는 경우",
+			  content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+		  @ApiResponse(
+			  responseCode = "500",
+			  description = "서버 내부 오류",
+			  content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+	  })
+	public CustomApiResponse<String> updateRole(
+	  @Parameter(hidden = true) @AuthenticationPrincipal User user,
+	  @RequestBody AdminRoleChangeRequestDto adminRoleChangeRequestDto
+	  ) {
+	  return CustomApiResponse.onSuccess(adminService.updateUsersRole(user.getUsername(), adminRoleChangeRequestDto));
+	}
 }
 
