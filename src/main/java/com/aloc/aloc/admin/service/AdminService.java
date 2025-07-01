@@ -9,7 +9,6 @@ import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.repository.CourseRepository;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.course.service.UserCourseService;
-import com.aloc.aloc.global.apipayload.exception.BadRequestException;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.service.UserService;
@@ -74,14 +73,12 @@ public class AdminService {
 		  throw new IllegalArgumentException("ROLE_NEW_USER 권한으로 변경은 허용되지 않습니다.");
 	}
 
-
-
     List<User> users = new ArrayList<>();
     for (UUID uuid : adminRoleChangeRequestDto.getUserIds()) {
       User user = userService.getUserById(uuid);
 
       if (user.getAuthority() == Authority.ROLE_NEW_USER) {
-        throw new BadRequestException("백준에 연동되지 않은 회원은 권한 변경이 불가합니다.");
+        throw new IllegalArgumentException("백준에 연동되지 않은 회원은 권한 변경이 불가합니다.");
       }
 
       if (user.getAuthority() == adminRoleChangeRequestDto.getRole()) {
