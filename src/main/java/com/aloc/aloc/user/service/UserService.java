@@ -8,6 +8,7 @@ import com.aloc.aloc.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,5 +86,11 @@ public class UserService {
 
   public long getTotalUserCount() {
     return userRepository.countByAuthorityIn(ACTIVE_AUTHORITIES);
+  }
+
+  public User getUserById(UUID id) {
+    return userRepository
+        .findById(id)
+        .orElseThrow(() -> new NotFoundException("해당 사용자가 존재하지 않습니다."));
   }
 }

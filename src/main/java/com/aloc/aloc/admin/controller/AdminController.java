@@ -1,5 +1,6 @@
 package com.aloc.aloc.admin.controller;
 
+import com.aloc.aloc.admin.dto.response.AdminCoinTransactionRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
 import com.aloc.aloc.admin.service.AdminService;
@@ -18,6 +19,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -77,5 +80,33 @@ public class AdminController {
   public CustomApiResponse<List<AdminCourseResponseDto>> getCourseList(
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
     return CustomApiResponse.onSuccess(adminService.getCourseList(user.getUsername()));
+  }
+
+  @PatchMapping("/coin-transactions")
+  @SecurityRequirement(name = "JWT Auth")
+  @Operation(
+      summary = "코인 지급 및 회수",
+      description = "관리자 코인 지급 및 회수 페이지에서 선택한 유저들에게 코인을 지급하거나 차감합니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "성공적으로 코인을 지급하거나 차감합니다.",
+            content =
+                @Content(array = @ArraySchema(schema = @Schema(implementation = String.class)))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "인증되지 않았거나 관리자 권한이 없는 경우",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "서버 내부 오류",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+      })
+  public CustomApiResponse<String> postCoinTransactions(
+      @RequestBody AdminCoinTransactionRequestDto requestDto,
+      @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+    return CustomApiResponse.onSuccess(
+        adminService.processCoinTransactions(user.getUsername(), requestDto));
   }
 }
