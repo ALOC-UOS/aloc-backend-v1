@@ -9,6 +9,7 @@ import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.repository.CourseRepository;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.course.service.UserCourseService;
+import com.aloc.aloc.global.apipayload.exception.BadRequestException;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.service.UserService;
@@ -75,9 +76,8 @@ public class AdminService {
 		  User user = userService.getUserById(uuid);
 		  // 만약에 해당 유저의 권한이 ROLE_NEW_USER면 -> 백준 아이디가 널인 상태! 그러면 얘는 못바꿔  -> bad request 400
 		  if(user.getAuthority()== Authority.ROLE_NEW_USER){
-			  throw new IllegalArgumentException("백준에 연동되지 않은 회원은 권한 변경이 불가합니다.");
+			  throw new BadRequestException("백준에 연동되지 않은 회원은 권한 변경이 불가합니다.");
 		  }
-
 		  if(user.getAuthority()==adminRoleChangeRequestDto.getRole()){
 			continue;
 		  }

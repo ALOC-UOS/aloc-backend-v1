@@ -11,6 +11,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -85,5 +86,14 @@ public class UserService {
 
   public long getTotalUserCount() {
     return userRepository.countByAuthorityIn(ACTIVE_AUTHORITIES);
+  }
+
+  public User getUserById(UUID userId){
+	  return userRepository.findById(userId).orElseThrow(()->new NotFoundException("해당 유저를 찾을 수 없습니다."));
+  }
+
+  @Transactional
+	public void saveAllUser(List<User> users){
+	  userRepository.saveAll(users);
   }
 }
