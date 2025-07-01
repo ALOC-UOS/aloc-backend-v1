@@ -91,7 +91,7 @@ public class UserService {
   public User getUserById(UUID userId) {
     return userRepository
         .findById(userId)
-        .orElseThrow(() -> new NotFoundException("해당 유저를 찾을 수 없습니다."));
+        .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
   }
 
   @Transactional
