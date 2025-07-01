@@ -8,6 +8,7 @@ import com.aloc.aloc.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,12 @@ public class UserService {
   public User getUser(String oauthId) {
     return userRepository
         .findByOauthId(oauthId)
+        .orElseThrow(() -> new NotFoundException("해당 사용자가 존재하지 않습니다."));
+  }
+
+  public User getUserByUUID(UUID id) {
+    return userRepository
+        .findById(id)
         .orElseThrow(() -> new NotFoundException("해당 사용자가 존재하지 않습니다."));
   }
 

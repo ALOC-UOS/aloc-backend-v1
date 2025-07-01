@@ -13,10 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -77,5 +79,13 @@ public class AdminController {
   public CustomApiResponse<List<AdminCourseResponseDto>> getCourseList(
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
     return CustomApiResponse.onSuccess(adminService.getCourseList(user.getUsername()));
+  }
+
+  @DeleteMapping("admin/withdraw")
+  @SecurityRequirement(name = "JWT Auth")
+  @Operation(summary = "유저 추방", description = "관리자가 유저를 추방합니다.")
+  public void withDrawByAdmin(
+      @Parameter(hidden = true) @AuthenticationPrincipal User user, UUID uuid) {
+    adminService.killUser(user.getUsername(), uuid);
   }
 }

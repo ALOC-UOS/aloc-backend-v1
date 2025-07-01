@@ -8,8 +8,11 @@ import com.aloc.aloc.course.entity.CourseProblem;
 import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.course.service.UserCourseService;
+import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.service.UserService;
+import com.aloc.aloc.user.service.facade.UserFacade;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,7 @@ public class AdminService {
   private final UserService userService;
   private final CourseService courseService;
   private final UserCourseService userCourseService;
+  private final UserFacade userFacade;
 
   public AdminDashboardResponseDto getDashboard(String oauthId) {
     userService.validateAdmin(oauthId);
@@ -55,5 +59,12 @@ public class AdminService {
     userService.validateAdmin(oauthId);
     List<Course> courseList = courseService.getActiveCourses();
     return courseList.stream().map(this::toAdminCourseListResponseDto).collect(Collectors.toList());
+  }
+
+  public String killUser(String oauthId, UUID id) {
+    userService.validateAdmin(oauthId); // admin인지 검사하고
+    User deleteuser = userService.getUserByUUID(id); // id로 삭제할 유저를 가져오고
+    userFacade.withdraw(deleteuser.getOauthId()); // userFacade로 삭제하기
+    return "success";
   }
 }
