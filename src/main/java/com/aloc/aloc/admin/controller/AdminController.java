@@ -2,6 +2,7 @@ package com.aloc.aloc.admin.controller;
 
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
+import com.aloc.aloc.admin.dto.response.AdminWithdrawDto;
 import com.aloc.aloc.admin.service.AdminService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -84,8 +85,27 @@ public class AdminController {
   @DeleteMapping("admin/withdraw")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "유저 추방", description = "관리자가 유저를 추방합니다.")
-  public void withDrawByAdmin(
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "성공적으로 코스 목록을 반환합니다.",
+            content =
+                @Content(
+                    array =
+                        @ArraySchema(
+                            schema = @Schema(implementation = AdminCourseResponseDto.class)))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "인증되지 않았거나 관리자 권한이 없는 경우",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "서버 내부 오류",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+      })
+  public CustomApiResponse<AdminWithdrawDto> withdrawByAdmin(
       @Parameter(hidden = true) @AuthenticationPrincipal User user, UUID uuid) {
-    adminService.killUser(user.getUsername(), uuid);
+    return CustomApiResponse.onSuccess(adminService.killUser(user.getUsername(), uuid));
   }
 }

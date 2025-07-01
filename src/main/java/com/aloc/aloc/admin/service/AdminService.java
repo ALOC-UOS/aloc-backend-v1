@@ -2,6 +2,7 @@ package com.aloc.aloc.admin.service;
 
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
+import com.aloc.aloc.admin.dto.response.AdminWithdrawDto;
 import com.aloc.aloc.course.dto.response.RankResponseDto;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.entity.CourseProblem;
@@ -61,10 +62,10 @@ public class AdminService {
     return courseList.stream().map(this::toAdminCourseListResponseDto).collect(Collectors.toList());
   }
 
-  public String killUser(String oauthId, UUID id) {
+  public AdminWithdrawDto killUser(String oauthId, UUID id) {
     userService.validateAdmin(oauthId); // admin인지 검사하고
-    User deleteuser = userService.getUserByUUID(id); // id로 삭제할 유저를 가져오고
-    userFacade.withdraw(deleteuser.getOauthId()); // userFacade로 삭제하기
-    return "success";
+    User user = userService.getUserByUUID(id); // id로 삭제할 유저를 가져오고
+    userFacade.withdraw(user.getOauthId()); // userFacade로 삭제하기
+    return AdminWithdrawDto.of(user);
   }
 }

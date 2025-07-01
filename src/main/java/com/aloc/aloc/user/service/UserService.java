@@ -34,7 +34,7 @@ public class UserService {
   public User getUserByUUID(UUID id) {
     return userRepository
         .findById(id)
-        .orElseThrow(() -> new NotFoundException("해당 사용자가 존재하지 않습니다."));
+        .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
   }
 
   @Transactional
