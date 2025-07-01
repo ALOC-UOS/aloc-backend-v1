@@ -13,13 +13,11 @@ import com.aloc.aloc.global.apipayload.exception.BadRequestException;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.service.UserService;
-
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -68,23 +66,25 @@ public class AdminService {
   }
 
   @Transactional
-  public String updateUserRole(String oauthId, AdminRoleChangeRequestDto adminRoleChangeRequestDto) {
-	  userService.validateAdmin(oauthId); // api 요청자가 admin 인지 체크
-	  List<User> users = new ArrayList<>();
-	  for (UUID uuid : adminRoleChangeRequestDto.getUserIds()) {
-		  // 해당 uuid로 이 유저가 존재하는지 존재하면 가져오고 존크하지 않으면  error -> bad request 400
-		  User user = userService.getUserById(uuid);
-		  // 만약에 해당 유저의 권한이 ROLE_NEW_USER면 -> 백준 아이디가 널인 상태! 그러면 얘는 못바꿔  -> bad request 400
-		  if(user.getAuthority()== Authority.ROLE_NEW_USER){
-			  throw new BadRequestException("백준에 연동되지 않은 회원은 권한 변경이 불가합니다.");
-		  }
-		  if(user.getAuthority()==adminRoleChangeRequestDto.getRole()){
-			continue;
-		  }
-		  user.setAuthority(adminRoleChangeRequestDto.getRole());
-		  users.add(user);
-	  }
-	  userService.saveAllUser(users);
-	  return "success";
+  public String updateUserRole(
+      String oauthId, AdminRoleChangeRequestDto adminRoleChangeRequestDto) {
+    userService.validateAdmin(oauthId);
+    List<User> users = new ArrayList<>();
+    for (UUID uuid : adminRoleChangeRequestDto.getUserIds()) {
+      User user = userService.getUserById(uuid);
+
+      if (user.getAuthority() == Authority.ROLE_NEW_USER) {
+        throw new BadRequestException("백준에 연동되지 않은 회원은 권한 변경이 불가합니다.");
+      }
+
+      if (user.getAuthority() == adminRoleChangeRequestDto.getRole()) {
+        continue;
+      }
+
+      user.setAuthority(adminRoleChangeRequestDto.getRole());
+      users.add(user);
+    }
+    userService.saveAllUser(users);
+    return "success";
   }
 }

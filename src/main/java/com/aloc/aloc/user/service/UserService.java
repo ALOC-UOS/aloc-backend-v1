@@ -8,10 +8,10 @@ import com.aloc.aloc.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -88,12 +88,14 @@ public class UserService {
     return userRepository.countByAuthorityIn(ACTIVE_AUTHORITIES);
   }
 
-  public User getUserById(UUID userId){
-	  return userRepository.findById(userId).orElseThrow(()->new NotFoundException("해당 유저를 찾을 수 없습니다."));
+  public User getUserById(UUID userId) {
+    return userRepository
+        .findById(userId)
+        .orElseThrow(() -> new NotFoundException("해당 유저를 찾을 수 없습니다."));
   }
 
   @Transactional
-	public void saveAllUser(List<User> users){
-	  userRepository.saveAll(users);
+  public void saveAllUser(List<User> users) {
+    userRepository.saveAll(users);
   }
 }
