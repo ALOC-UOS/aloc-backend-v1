@@ -68,7 +68,14 @@ public class AdminService {
   @Transactional
   public String updateUserRole(
       String oauthId, AdminRoleChangeRequestDto adminRoleChangeRequestDto) {
-    userService.validateAdmin(oauthId);
+    userService.validateAdmin(oauthId); //요청자의 권한 검증
+	  // 바꾸려는 권한이 ROLE_NEW_USER 인지 검증
+	  if (adminRoleChangeRequestDto.getRole() == Authority.ROLE_NEW_USER){
+		  throw new IllegalArgumentException("ROLE_NEW_USER 권한으로 변경은 허용되지 않습니다.");
+	}
+
+
+
     List<User> users = new ArrayList<>();
     for (UUID uuid : adminRoleChangeRequestDto.getUserIds()) {
       User user = userService.getUserById(uuid);
