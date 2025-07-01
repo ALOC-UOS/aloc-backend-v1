@@ -89,7 +89,7 @@ public class AdminController {
       value = {
         @ApiResponse(
             responseCode = "200",
-            description = "성공적으로 코스 목록을 반환합니다.",
+            description = "성공적으로 유저를 방출하였습니다.",
             content =
                 @Content(
                     array =
