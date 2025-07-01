@@ -69,4 +69,8 @@ public class CourseService {
   public long getActiveCourseCount() {
     return courseRepository.count();
   }
+
+  public List<Course> getActiveCourses() {
+    return courseRepository.findAll();
+  }
 }

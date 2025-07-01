@@ -47,7 +47,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     // ✅ 기존: ID/PW 로그인용 URL → OAuth2 로그인 관련 URL로 수정
     String noCheckUrl = "/oauth2/authorization";
-    String refreshTokenUrl = "/auth/refresh";
+    String refreshTokenUrl = "/api/auth/refresh";
 
     // ✅ OAuth2 로그인 요청이면 필터 통과
     if (request.getRequestURI().startsWith(noCheckUrl)) {
