@@ -7,6 +7,7 @@ import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -81,7 +82,7 @@ public class AdminController {
         @ApiResponse(
             responseCode = "200",
             description = "성공적으로 사용자 정보를 반환합니다.",
-            content = @Content(schema = @Schema(implementation = UserDetailResponseDto.class))),
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserDetailResponseDto.class)))),
         @ApiResponse(
             responseCode = "401",
             description = "인증되지 않았거나 관리자 권한이 없는 경우",
