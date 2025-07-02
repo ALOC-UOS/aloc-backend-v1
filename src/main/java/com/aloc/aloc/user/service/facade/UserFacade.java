@@ -21,7 +21,6 @@ import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
-import com.aloc.aloc.user.repository.UserRepository;
 import com.aloc.aloc.user.service.UserService;
 import com.aloc.aloc.user.service.UserSortingService;
 import com.aloc.aloc.user.service.mapper.UserMapper;

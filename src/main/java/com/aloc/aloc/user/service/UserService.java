@@ -67,7 +67,6 @@ public class UserService {
         .forEach(
             user -> {
               if (!isUserSolvedYesterday(user)) {
-                user.setLastSolvedAt(null);
                 user.setConsecutiveSolvedDays(0);
               }
             });
@@ -92,5 +91,16 @@ public class UserService {
 
   public long getTotalUserCount() {
     return userRepository.countByAuthorityIn(ACTIVE_AUTHORITIES);
+  }
+
+  public User getUserById(UUID userId) {
+    return userRepository
+        .findById(userId)
+        .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+  }
+
+  @Transactional
+  public void saveAllUser(List<User> users) {
+    userRepository.saveAll(users);
   }
 }

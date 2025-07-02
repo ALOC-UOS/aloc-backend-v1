@@ -1,5 +1,7 @@
 package com.aloc.aloc.admin.controller;
 
+import com.aloc.aloc.admin.dto.request.AdminCoinTransactionRequestDto;
+import com.aloc.aloc.admin.dto.request.AdminRoleChangeRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminWithdrawResponseDto;
@@ -13,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -79,6 +82,55 @@ public class AdminController {
     return CustomApiResponse.onSuccess(adminService.getCourseList(user.getUsername()));
   }
 
+  @PatchMapping("/users/role")
+  @SecurityRequirement(name = "JWT Auth")
+  @Operation(summary = "어드민 유저 권한 변경", description = "관리자 유저 목록 페이지에서 여러명의 유저의 권한을 업데이트 합니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "성공적으로 권한이 변경되었습니다."),
+        @ApiResponse(
+            responseCode = "401",
+            description = "인증되지 않았거나 관리자 권한이 없는 경우",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "서버 내부 오류",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+      })
+  public CustomApiResponse<String> updateRole(
+      @Parameter(hidden = true) @AuthenticationPrincipal User user,
+      @RequestBody @Valid AdminRoleChangeRequestDto adminRoleChangeRequestDto) {
+    return CustomApiResponse.onSuccess(
+        adminService.updateUserRole(user.getUsername(), adminRoleChangeRequestDto));
+  }
+
+  @PatchMapping("/coin-transactions")
+  @SecurityRequirement(name = "JWT Auth")
+  @Operation(
+      summary = "코인 지급 및 회수",
+      description = "관리자 코인 지급 및 회수 페이지에서 선택한 유저들에게 코인을 지급하거나 차감합니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "성공적으로 코인을 지급하거나 차감합니다.",
+            content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "인증되지 않았거나 관리자 권한이 없는 경우",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "서버 내부 오류",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+      })
+  public CustomApiResponse<String> postCoinTransactions(
+      @RequestBody @Valid AdminCoinTransactionRequestDto requestDto,
+      @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+    return CustomApiResponse.onSuccess(
+        adminService.processCoinTransactions(user.getUsername(), requestDto));
+  }
+
   @DeleteMapping("admin/withdraw")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "유저 추방", description = "관리자가 유저를 추방합니다.")
@@ -87,8 +139,7 @@ public class AdminController {
         @ApiResponse(
             responseCode = "200",
             description = "성공적으로 유저를 방출하였습니다.",
-            content =
-                @Content(schema = @Schema(implementation = AdminWithdrawResponseDto.class))),
+            content = @Content(schema = @Schema(implementation = AdminWithdrawResponseDto.class))),
         @ApiResponse(
             responseCode = "401",
             description = "인증되지 않았거나 관리자 권한이 없는 경우",
