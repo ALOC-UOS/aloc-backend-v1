@@ -13,10 +13,10 @@ import com.aloc.aloc.global.image.ImageService;
 import com.aloc.aloc.global.image.enums.ImageType;
 import com.aloc.aloc.problem.dto.response.ProblemResponseDto;
 import com.aloc.aloc.problem.service.UserCourseProblemService;
-import com.aloc.aloc.profilebackgroundcolor.dto.response.UserProfileColorChangeResponseDto;
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
 import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
+import com.aloc.aloc.user.dto.response.UserColorChangeResponseDto;
 import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
@@ -288,8 +288,8 @@ public class UserFacade {
   }
 
   @Transactional
-  public UserProfileColorChangeResponseDto changeColor(String oauthId) {
+  public UserColorChangeResponseDto changeColor(String oauthId) {
     User user = userService.getUser(oauthId);
-    return userService.changeUserProfileColor(user);
+    return userService.changeColor(user);
   }
 }

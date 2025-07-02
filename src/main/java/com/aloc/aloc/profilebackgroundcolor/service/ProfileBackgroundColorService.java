@@ -2,6 +2,8 @@ package com.aloc.aloc.profilebackgroundcolor.service;
 
 import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
 import com.aloc.aloc.profilebackgroundcolor.repository.ProfileBackgroundColorRepository;
+import com.aloc.aloc.user.dto.response.ColorResponseDto;
+import com.aloc.aloc.user.repository.UserRepository;
 import java.util.List;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
@@ -10,34 +12,36 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ProfileBackgroundColorService {
-
   private final ProfileBackgroundColorRepository profileBackgroundColorRepository;
-  private static final Random RANDOM = new Random();
+  private final UserRepository userRepository;
+
+  private static final int COLOR_CHANGE_MONEY = 100;
 
   public ProfileBackgroundColor getColorByName(String name) {
     return profileBackgroundColorRepository
         .findByName(name)
-        .orElseThrow(() -> new IllegalArgumentException("해당 컬러가 없습니다: " + name));
+        .orElseThrow(() -> new IllegalArgumentException("해당 컬러가 없습니다. " + name));
   }
 
-  public ProfileBackgroundColor pickRandomColor() {
-    int draw = RANDOM.nextInt(100) + 1;
+  public String pickColor() {
+    Random random = new Random();
+    int draw = random.nextInt(100) + 1;
 
-    List<ProfileBackgroundColor> colors;
+    List<ProfileBackgroundColor> profileBackgroundColorList;
     if (draw <= 85) {
-      colors = profileBackgroundColorRepository.findByType("common");
+      profileBackgroundColorList = profileBackgroundColorRepository.findByType("common");
     } else if (draw <= 95) {
-      colors = profileBackgroundColorRepository.findByType("rare");
+      profileBackgroundColorList = profileBackgroundColorRepository.findByType("rare");
     } else {
-      colors = profileBackgroundColorRepository.findByType("special");
+      profileBackgroundColorList = profileBackgroundColorRepository.findByType("special");
     }
 
-    return colors.get(RANDOM.nextInt(colors.size()));
+    return profileBackgroundColorList
+        .get(random.nextInt(profileBackgroundColorList.size()))
+        .getName();
   }
 
-  public List<ProfileColorListResponseDto> getAllColors() {
-    return profileBackgroundColorRepository.findAll().stream()
-        .map(ProfileColorListResponseDto::fromEntity)
-        .toList();
+  public List<ColorResponseDto> getAllColors() {
+    return profileBackgroundColorRepository.findAll().stream().map(ColorResponseDto::of).toList();
   }
 }

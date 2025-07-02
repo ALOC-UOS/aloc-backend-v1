@@ -4,6 +4,8 @@ import com.aloc.aloc.admin.dto.request.AdminRoleChangeRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
 import com.aloc.aloc.admin.service.AdminService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
+import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
+import com.aloc.aloc.user.dto.response.ColorResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin")
 public class AdminController {
   private final AdminService adminService;
+  private final ProfileBackgroundColorService profileBackgroundColorService;
 
   @GetMapping("/dashboard")
   @SecurityRequirement(name = "JWT Auth")
@@ -69,5 +73,26 @@ public class AdminController {
       @RequestBody @Valid AdminRoleChangeRequestDto adminRoleChangeRequestDto) {
     return CustomApiResponse.onSuccess(
         adminService.updateUserRole(user.getUsername(), adminRoleChangeRequestDto));
+  }
+
+  @GetMapping("/colors")
+  @Operation(summary = "전체 배경 색상 조회", description = "모든 프로필 배경 색상 정보를 리스트 형태로 반환합니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "성공적으로 색상 목록을 반환합니다.",
+            content = @Content(schema = @Schema(implementation = ColorResponseDto.class))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "인증되지 않았거나 관리자 권한이 없는 경우",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "서버 내부 오류",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+      })
+  public CustomApiResponse<List<ColorResponseDto>> getAllColors() {
+    return CustomApiResponse.onSuccess(profileBackgroundColorService.getAllColors());
   }
 }

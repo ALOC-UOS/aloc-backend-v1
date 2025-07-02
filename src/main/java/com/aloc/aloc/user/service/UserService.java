@@ -2,9 +2,10 @@ package com.aloc.aloc.user.service;
 
 import com.aloc.aloc.global.apipayload.exception.NotFoundException;
 import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
-import com.aloc.aloc.profilebackgroundcolor.dto.response.UserProfileColorChangeResponseDto;
+import com.aloc.aloc.profilebackgroundcolor.repository.ProfileBackgroundColorRepository;
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
 import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
+import com.aloc.aloc.user.dto.response.UserColorChangeResponseDto;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.repository.UserRepository;
@@ -24,7 +25,8 @@ public class UserService {
   private static final int COLOR_CHANGE_MONEY = 100;
   private final UserRepository userRepository;
   private final BaekjoonRankScrapingService baekjoonRankScrapingService;
-  private final ProfileBackgroundColorService profileBackgroundColorService; // ⭐ 추가 : 색상 서비스 주입
+  private final ProfileBackgroundColorService profileBackgroundColorService;
+  private final ProfileBackgroundColorRepository profileBackgroundColorRepository;
 
   public List<User> getActiveUsers() {
     return userRepository.findAllByAuthorityIn(ACTIVE_AUTHORITIES);
@@ -105,24 +107,18 @@ public class UserService {
   }
 
   @Transactional
-  public UserProfileColorChangeResponseDto changeUserProfileColor(User user) {
+  public UserColorChangeResponseDto changeColor(User user) {
     if (user.getCoin() < COLOR_CHANGE_MONEY) {
       throw new IllegalArgumentException("코인이 부족합니다.");
     }
-
-    // 코인 차감
     user.setCoin(user.getCoin() - COLOR_CHANGE_MONEY);
 
-    // 랜덤 색상 선택
-    ProfileBackgroundColor color = profileBackgroundColorService.pickRandomColor();
+    String colorName = profileBackgroundColorService.pickColor();
+    ProfileBackgroundColor profileBackgroundColor =
+        profileBackgroundColorRepository.findById(colorName).orElseThrow();
+    user.setProfileColor(colorName);
 
-    // 유저 프로필 컬러 적용
-    user.setProfileColor(color.getName());
-
-    // 유저 저장
     userRepository.save(user);
-
-    // 유저의 남은 코인 + 컬러 DTO 로 반환
-    return UserProfileColorChangeResponseDto.of(user.getCoin(), color);
+    return UserColorChangeResponseDto.of(user.getCoin(), profileBackgroundColor);
   }
 }
