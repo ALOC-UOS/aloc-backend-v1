@@ -1,7 +1,6 @@
 package com.aloc.aloc.profilebackgroundcolor.service;
 
 import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
-import com.aloc.aloc.profilebackgroundcolor.dto.response.ProfileColorListResponseDto;
 import com.aloc.aloc.profilebackgroundcolor.repository.ProfileBackgroundColorRepository;
 import java.util.List;
 import java.util.Random;

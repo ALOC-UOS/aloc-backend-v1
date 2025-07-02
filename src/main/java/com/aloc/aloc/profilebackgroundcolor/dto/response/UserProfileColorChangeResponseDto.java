@@ -1,6 +1,7 @@
 package com.aloc.aloc.profilebackgroundcolor.dto.response;
 
 import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
+import com.aloc.aloc.user.dto.response.ColorResponseDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,13 +16,13 @@ public class UserProfileColorChangeResponseDto {
   private int userCoin;
 
   @Schema(description = "선택된 색상 정보")
-  private ProfileColorListResponseDto color;
+  private ColorResponseDto color;
 
   public static UserProfileColorChangeResponseDto of(
       int userCoin, ProfileBackgroundColor profileBackgroundColor) {
     return UserProfileColorChangeResponseDto.builder()
         .userCoin(userCoin)
-        .color(ProfileColorListResponseDto.fromEntity(profileBackgroundColor))
+        .color(ColorResponseDto.of(profileBackgroundColor))
         .build();
   }
 }

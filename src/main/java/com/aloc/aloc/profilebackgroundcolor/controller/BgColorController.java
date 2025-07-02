@@ -1,7 +1,6 @@
 package com.aloc.aloc.profilebackgroundcolor.controller;
 
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
-import com.aloc.aloc.profilebackgroundcolor.dto.response.ProfileColorListResponseDto;
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
