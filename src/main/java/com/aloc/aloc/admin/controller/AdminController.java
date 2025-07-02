@@ -158,13 +158,17 @@ public class AdminController {
   }
 
   @GetMapping("/colors")
+  @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "전체 배경 색상 조회", description = "모든 프로필 배경 색상 정보를 리스트 형태로 반환합니다.")
   @ApiResponses(
       value = {
         @ApiResponse(
             responseCode = "200",
             description = "성공적으로 색상 목록을 반환합니다.",
-            content = @Content(schema = @Schema(implementation = ColorResponseDto.class))),
+            content =
+                @Content(
+                    array =
+                        @ArraySchema(schema = @Schema(implementation = ColorResponseDto.class)))),
         @ApiResponse(
             responseCode = "401",
             description = "인증되지 않았거나 관리자 권한이 없는 경우",
