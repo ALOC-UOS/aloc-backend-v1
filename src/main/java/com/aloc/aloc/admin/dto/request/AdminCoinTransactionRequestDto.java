@@ -1,4 +1,4 @@
-package com.aloc.aloc.admin.dto.response;
+package com.aloc.aloc.admin.dto.request;
 
 import com.aloc.aloc.coin.enums.CoinType;
 import io.swagger.v3.oas.annotations.media.Schema;

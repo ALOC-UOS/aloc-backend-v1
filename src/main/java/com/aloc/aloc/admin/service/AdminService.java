@@ -1,7 +1,7 @@
 package com.aloc.aloc.admin.service;
 
+import com.aloc.aloc.admin.dto.request.AdminCoinTransactionRequestDto;
 import com.aloc.aloc.admin.dto.request.AdminRoleChangeRequestDto;
-import com.aloc.aloc.admin.dto.response.AdminCoinTransactionRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
 import com.aloc.aloc.coin.dto.response.CoinResponseDto;
