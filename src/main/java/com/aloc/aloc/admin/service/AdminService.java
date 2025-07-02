@@ -3,13 +3,13 @@ package com.aloc.aloc.admin.service;
 import com.aloc.aloc.admin.dto.request.AdminRoleChangeRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
+import com.aloc.aloc.admin.dto.response.AdminUserResponseDto;
 import com.aloc.aloc.course.dto.response.RankResponseDto;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.entity.CourseProblem;
 import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.course.service.UserCourseService;
-import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.service.UserService;
@@ -95,8 +95,10 @@ public class AdminService {
   }
 
   @Transactional
-  public List<UserDetailResponseDto> getAllUsers(String oauthId) {
+  public List<AdminUserResponseDto> getAllUsersForAdmin(String oauthId) {
     userService.validateAdmin(oauthId);
-    return userFacade.getAllUsers();
+    return userFacade.getAllUsers().stream()
+        .map(AdminUserResponseDto::of)
+        .collect(Collectors.toList());
   }
 }
