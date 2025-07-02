@@ -32,6 +32,10 @@ public class UserService {
     return userRepository.findAllByAuthorityIn(ACTIVE_AUTHORITIES);
   }
 
+  public List<User> findAllUsers() {
+    return userRepository.findAll();
+  }
+
   public User getUser(String oauthId) {
     return userRepository
         .findByOauthId(oauthId)

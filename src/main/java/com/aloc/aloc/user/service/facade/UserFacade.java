@@ -70,6 +70,17 @@ public class UserFacade {
         .collect(Collectors.toList());
   }
 
+  public List<User> getAllUsers() {
+    List<User> users = userService.findAllUsers();
+
+    if (users.isEmpty()) {
+      throw new NoContentException("조회 가능한 유저가 없습니다.");
+    }
+
+    List<User> sortedUserList = userSortingService.sortUserList(users);
+    return sortedUserList;
+  }
+
   public UserDetailResponseDto getUser(String oauthId) {
     User user = userService.getUser(oauthId);
     return userMapper.mapToUserDetailResponseDto(user);

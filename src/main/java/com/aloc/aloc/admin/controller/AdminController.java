@@ -4,6 +4,7 @@ import com.aloc.aloc.admin.dto.request.AdminCoinTransactionRequestDto;
 import com.aloc.aloc.admin.dto.request.AdminRoleChangeRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
+import com.aloc.aloc.admin.dto.response.AdminUserResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminWithdrawResponseDto;
 import com.aloc.aloc.admin.service.AdminService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
@@ -105,6 +106,33 @@ public class AdminController {
       @RequestBody @Valid AdminRoleChangeRequestDto adminRoleChangeRequestDto) {
     return CustomApiResponse.onSuccess(
         adminService.updateUserRole(user.getUsername(), adminRoleChangeRequestDto));
+  }
+
+  @GetMapping("/users")
+  @SecurityRequirement(name = "JWT Auth")
+  @Operation(summary = "전체 사용자 정보 조회", description = "관리자 메인 페이지에서 모든 사용자의 특정 정보를 조회합니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "성공적으로 사용자 정보를 반환합니다.",
+            content =
+                @Content(
+                    array =
+                        @ArraySchema(
+                            schema = @Schema(implementation = AdminUserResponseDto.class)))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "인증되지 않았거나 관리자 권한이 없는 경우",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "서버 내부 오류",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+      })
+  public CustomApiResponse<List<AdminUserResponseDto>> getAllUsersForAdmin(
+      @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+    return CustomApiResponse.onSuccess(adminService.getAllUsersForAdmin(user.getUsername()));
   }
 
   @PatchMapping("/coin-transactions")
