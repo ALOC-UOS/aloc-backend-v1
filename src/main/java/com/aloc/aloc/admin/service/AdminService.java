@@ -1,8 +1,11 @@
 package com.aloc.aloc.admin.service;
 
+import com.aloc.aloc.admin.dto.request.AdminCoinTransactionRequestDto;
 import com.aloc.aloc.admin.dto.request.AdminRoleChangeRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
+import com.aloc.aloc.coin.dto.response.CoinResponseDto;
+import com.aloc.aloc.coin.service.CoinService;
 import com.aloc.aloc.course.dto.response.RankResponseDto;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.entity.CourseProblem;
@@ -26,6 +29,7 @@ public class AdminService {
   private final UserService userService;
   private final CourseService courseService;
   private final UserCourseService userCourseService;
+  private final CoinService coinService;
 
   public AdminDashboardResponseDto getDashboard(String oauthId) {
     userService.validateAdmin(oauthId);
@@ -61,6 +65,24 @@ public class AdminService {
     userService.validateAdmin(oauthId);
     List<Course> courseList = courseService.getActiveCourses();
     return courseList.stream().map(this::toAdminCourseListResponseDto).collect(Collectors.toList());
+  }
+
+  @Transactional
+  public String processCoinTransactions(String oauthId, AdminCoinTransactionRequestDto requestDto) {
+    userService.validateAdmin(oauthId);
+
+    for (UUID userId : requestDto.getUserIds()) {
+      User user = userService.getUserById(userId);
+      CoinResponseDto coinResponseDto =
+          CoinResponseDto.of(
+              user.getCoin(),
+              requestDto.getCoin(),
+              requestDto.getCoinType(),
+              requestDto.getDescription());
+
+      coinService.updateUserCoin(user, coinResponseDto);
+    }
+    return "success";
   }
 
   @Transactional
