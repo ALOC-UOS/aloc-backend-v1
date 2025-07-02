@@ -169,7 +169,7 @@ public class UserFacade {
 
     List<UserCourse> userCourses = userCourseService.getUserCoursesByUser(user);
     userCourseService.deleteUserCourses(userCourses);
-    userRepository.save(user);
+    userService.saveUser(user);
   }
 
   public UserCourseProblemResponseDto getUserProblems(String oauthId, Long userCourseId) {

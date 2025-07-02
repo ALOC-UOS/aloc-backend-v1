@@ -8,13 +8,13 @@ import lombok.Data;
 
 @Data
 @Builder
-public class AdminWithdrawDto {
+public class AdminWithdrawResponseDto {
   private UUID userId;
   private String name;
   private Authority authority;
 
-  public static AdminWithdrawDto of(User user) {
-    return AdminWithdrawDto.builder()
+  public static AdminWithdrawResponseDto of(User user) {
+    return AdminWithdrawResponseDto.builder()
         .userId(user.getId())
         .name(user.getName())
         .authority(user.getAuthority())

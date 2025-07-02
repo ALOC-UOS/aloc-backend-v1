@@ -2,7 +2,7 @@ package com.aloc.aloc.admin.controller;
 
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
-import com.aloc.aloc.admin.dto.response.AdminWithdrawDto;
+import com.aloc.aloc.admin.dto.response.AdminWithdrawResponseDto;
 import com.aloc.aloc.admin.service.AdminService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,10 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.ErrorResponse;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -91,10 +88,7 @@ public class AdminController {
             responseCode = "200",
             description = "성공적으로 유저를 방출하였습니다.",
             content =
-                @Content(
-                    array =
-                        @ArraySchema(
-                            schema = @Schema(implementation = AdminCourseResponseDto.class)))),
+                @Content(schema = @Schema(implementation = AdminWithdrawResponseDto.class))),
         @ApiResponse(
             responseCode = "401",
             description = "인증되지 않았거나 관리자 권한이 없는 경우",
@@ -104,8 +98,8 @@ public class AdminController {
             description = "서버 내부 오류",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
       })
-  public CustomApiResponse<AdminWithdrawDto> withdrawByAdmin(
-      @Parameter(hidden = true) @AuthenticationPrincipal User user, UUID uuid) {
+  public CustomApiResponse<AdminWithdrawResponseDto> withdrawByAdmin(
+      @Parameter(hidden = true) @AuthenticationPrincipal User user, @RequestParam UUID uuid) {
     return CustomApiResponse.onSuccess(adminService.killUser(user.getUsername(), uuid));
   }
 }
