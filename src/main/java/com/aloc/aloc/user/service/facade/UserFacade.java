@@ -57,7 +57,6 @@ public class UserFacade {
   private final UserCourseProblemService userCourseProblemService;
   private final CourseService courseService;
   private final ProfileBackgroundColorService profileBackgroundColorService;
-  private final UserRepository userRepository;
 
   public List<UserDetailResponseDto> getUsers() {
     List<User> users = userService.getActiveUsers();
