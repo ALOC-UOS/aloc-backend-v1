@@ -32,4 +32,16 @@ public class CoinService {
     }
     return responses;
   }
+
+  @Transactional
+  public void updateUserCoin(User user, CoinResponseDto coinResponseDto) {
+    int current = user.getCoin();
+    int addedCoin = coinResponseDto.getAddedCoin();
+    if (current + addedCoin < 0) {
+      throw new IllegalArgumentException("차감되는 코인이 현재 코인코다 클 수 없습니다");
+    }
+
+    userService.updateUserCoin(user, coinResponseDto.getAddedCoin());
+    coinHistoryRepository.save(CoinHistory.of(user, coinResponseDto));
+  }
 }

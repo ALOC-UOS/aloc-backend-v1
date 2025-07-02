@@ -3,8 +3,8 @@ package com.aloc.aloc.user.controller;
 import com.aloc.aloc.course.dto.response.CourseUserResponseDto;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import com.aloc.aloc.global.apipayload.status.SuccessStatus;
-import com.aloc.aloc.profilebackgroundcolor.dto.response.ProfileBackgroundColorResponseDto;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
+import com.aloc.aloc.user.dto.response.UserColorChangeResponseDto;
 import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.service.facade.UserFacade;
@@ -138,13 +138,12 @@ public class UserController {
             responseCode = "200",
             description = "색상 변경 성공",
             content =
-                @Content(
-                    schema = @Schema(implementation = ProfileBackgroundColorResponseDto.class))),
+                @Content(schema = @Schema(implementation = UserColorChangeResponseDto.class))),
         @ApiResponse(responseCode = "400", description = "코인이 부족하거나 잘못된 요청"),
         @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
         @ApiResponse(responseCode = "404", description = "사용자 정보 없음")
       })
-  public CustomApiResponse<ProfileBackgroundColorResponseDto> changeColor(
+  public CustomApiResponse<UserColorChangeResponseDto> changeColor(
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
     return CustomApiResponse.onSuccess(userFacade.changeColor(user.getUsername()));
   }
