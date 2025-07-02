@@ -167,6 +167,7 @@ public class UserFacade {
 
     List<UserCourse> userCourses = userCourseService.getUserCoursesByUser(user);
     userCourseService.deleteUserCourses(userCourses);
+    userService.saveUser(user);
   }
 
   public UserCourseProblemResponseDto getUserProblems(String oauthId, Long userCourseId) {

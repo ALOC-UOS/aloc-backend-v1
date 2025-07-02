@@ -1,8 +1,12 @@
 package com.aloc.aloc.admin.service;
 
+import com.aloc.aloc.admin.dto.request.AdminCoinTransactionRequestDto;
 import com.aloc.aloc.admin.dto.request.AdminRoleChangeRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
+import com.aloc.aloc.admin.dto.response.AdminWithdrawResponseDto;
+import com.aloc.aloc.coin.dto.response.CoinResponseDto;
+import com.aloc.aloc.coin.service.CoinService;
 import com.aloc.aloc.course.dto.response.RankResponseDto;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.entity.CourseProblem;
@@ -12,6 +16,7 @@ import com.aloc.aloc.course.service.UserCourseService;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.service.UserService;
+import com.aloc.aloc.user.service.facade.UserFacade;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +31,8 @@ public class AdminService {
   private final UserService userService;
   private final CourseService courseService;
   private final UserCourseService userCourseService;
+  private final UserFacade userFacade;
+  private final CoinService coinService;
 
   public AdminDashboardResponseDto getDashboard(String oauthId) {
     userService.validateAdmin(oauthId);
@@ -61,6 +68,31 @@ public class AdminService {
     userService.validateAdmin(oauthId);
     List<Course> courseList = courseService.getActiveCourses();
     return courseList.stream().map(this::toAdminCourseListResponseDto).collect(Collectors.toList());
+  }
+
+  public AdminWithdrawResponseDto killUser(String oauthId, UUID id) {
+    userService.validateAdmin(oauthId); // admin인지 검사하고
+    User user = userService.getUserByUUID(id); // id로 삭제할 유저를 가져오고
+    userFacade.withdraw(user.getOauthId()); // userFacade로 삭제하기
+    return AdminWithdrawResponseDto.of(user);
+  }
+
+  @Transactional
+  public String processCoinTransactions(String oauthId, AdminCoinTransactionRequestDto requestDto) {
+    userService.validateAdmin(oauthId);
+
+    for (UUID userId : requestDto.getUserIds()) {
+      User user = userService.getUserById(userId);
+      CoinResponseDto coinResponseDto =
+          CoinResponseDto.of(
+              user.getCoin(),
+              requestDto.getCoin(),
+              requestDto.getCoinType(),
+              requestDto.getDescription());
+
+      coinService.updateUserCoin(user, coinResponseDto);
+    }
+    return "success";
   }
 
   @Transactional
