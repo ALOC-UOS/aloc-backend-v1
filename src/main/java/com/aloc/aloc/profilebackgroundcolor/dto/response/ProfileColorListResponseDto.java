@@ -10,8 +10,6 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class ProfileColorListResponseDto {
-  //  @Schema(description = "유저의 남은 코인", example = "100")
-  //  private int userCoin;
   @Schema(description = "컬러 이름", example = "Red")
   private String name;
 
