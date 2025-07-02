@@ -112,8 +112,7 @@ public class AdminController {
         @ApiResponse(
             responseCode = "200",
             description = "성공적으로 코인을 지급하거나 차감합니다.",
-            content =
-                @Content(array = @ArraySchema(schema = @Schema(implementation = String.class)))),
+            content = @Content(schema = @Schema(implementation = String.class))),
         @ApiResponse(
             responseCode = "401",
             description = "인증되지 않았거나 관리자 권한이 없는 경우",
@@ -124,7 +123,7 @@ public class AdminController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
       })
   public CustomApiResponse<String> postCoinTransactions(
-      @RequestBody AdminCoinTransactionRequestDto requestDto,
+      @RequestBody @Valid AdminCoinTransactionRequestDto requestDto,
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
     return CustomApiResponse.onSuccess(
         adminService.processCoinTransactions(user.getUsername(), requestDto));
