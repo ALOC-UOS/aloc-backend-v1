@@ -9,9 +9,11 @@ import com.aloc.aloc.course.entity.CourseProblem;
 import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.course.service.UserCourseService;
+import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.service.UserService;
+import com.aloc.aloc.user.service.facade.UserFacade;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,7 @@ public class AdminService {
   private final UserService userService;
   private final CourseService courseService;
   private final UserCourseService userCourseService;
+  private final UserFacade userFacade;
 
   public AdminDashboardResponseDto getDashboard(String oauthId) {
     userService.validateAdmin(oauthId);
@@ -89,5 +92,11 @@ public class AdminService {
     }
     userService.saveAllUser(users);
     return "success";
+  }
+
+  @Transactional
+  public List<UserDetailResponseDto> getAllUsers(String oauthId) {
+    userService.validateAdmin(oauthId);
+    return userFacade.getAllUsers();
   }
 }

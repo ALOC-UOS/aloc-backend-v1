@@ -31,6 +31,7 @@ import com.aloc.aloc.usercourse.entity.UserCourse;
 import com.aloc.aloc.usercourse.entity.UserCourseProblem;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,8 +58,8 @@ public class UserFacade {
   private final CourseService courseService;
   private final ProfileBackgroundColorService profileBackgroundColorService;
 
-  public List<UserDetailResponseDto> getUsers() {
-    List<User> users = userService.getActiveUsers();
+  private List<UserDetailResponseDto> prepareUserDetails(Supplier<List<User>> userSupplier) {
+    List<User> users = userSupplier.get();
 
     if (users.isEmpty()) {
       throw new NoContentException("조회 가능한 유저가 없습니다.");
@@ -68,6 +69,14 @@ public class UserFacade {
     return sortedUserList.stream()
         .map(userMapper::mapToUserDetailResponseDto)
         .collect(Collectors.toList());
+  }
+
+  public List<UserDetailResponseDto> getUsers() {
+    return prepareUserDetails(userService::getActiveUsers);
+  }
+
+  public List<UserDetailResponseDto> getAllUsers() {
+    return prepareUserDetails(userService::findAllUsers);
   }
 
   public UserDetailResponseDto getUser(String oauthId) {
