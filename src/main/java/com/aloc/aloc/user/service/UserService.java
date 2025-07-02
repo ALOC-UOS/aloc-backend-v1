@@ -31,6 +31,12 @@ public class UserService {
         .orElseThrow(() -> new NotFoundException("해당 사용자가 존재하지 않습니다."));
   }
 
+  public User getUserByUUID(UUID id) {
+    return userRepository
+        .findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
+  }
+
   @Transactional
   public void logout(String oauthId) {
     User user = getUser(oauthId);
