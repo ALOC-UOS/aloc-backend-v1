@@ -61,7 +61,6 @@ public class UserService {
         .forEach(
             user -> {
               if (!isUserSolvedYesterday(user)) {
-                user.setLastSolvedAt(null);
                 user.setConsecutiveSolvedDays(0);
               }
             });

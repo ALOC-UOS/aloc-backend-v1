@@ -5,8 +5,7 @@ import com.aloc.aloc.admin.dto.request.AdminRoleChangeRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
 import com.aloc.aloc.coin.dto.response.CoinResponseDto;
-import com.aloc.aloc.coin.entity.CoinHistory;
-import com.aloc.aloc.coin.repository.CoinHistoryRepository;
+import com.aloc.aloc.coin.service.CoinService;
 import com.aloc.aloc.course.dto.response.RankResponseDto;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.entity.CourseProblem;
@@ -15,7 +14,6 @@ import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.course.service.UserCourseService;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
-import com.aloc.aloc.user.repository.UserRepository;
 import com.aloc.aloc.user.service.UserService;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
@@ -31,8 +29,7 @@ public class AdminService {
   private final UserService userService;
   private final CourseService courseService;
   private final UserCourseService userCourseService;
-  private final CoinHistoryRepository coinHistoryRepository;
-  private final UserRepository userRepository;
+  private final CoinService coinService;
 
   public AdminDashboardResponseDto getDashboard(String oauthId) {
     userService.validateAdmin(oauthId);
@@ -74,32 +71,17 @@ public class AdminService {
   public String processCoinTransactions(String oauthId, AdminCoinTransactionRequestDto requestDto) {
     userService.validateAdmin(oauthId);
 
-    List<CoinHistory> coinHistoryList = new ArrayList<>();
-    List<User> updatedUserList = new ArrayList<>();
-
     for (UUID userId : requestDto.getUserIds()) {
       User user = userService.getUserById(userId);
+      CoinResponseDto coinResponseDto =
+          CoinResponseDto.of(
+              user.getCoin(),
+              requestDto.getCoin(),
+              requestDto.getCoinType(),
+              requestDto.getDescription());
 
-      int current = user.getCoin();
-      int addedCoin = requestDto.getCoin();
-      int newBalance = current + addedCoin;
-      if (newBalance < 0) {
-        throw new IllegalArgumentException("차감되는 코인이 현재 코인코다 클 수 없습니다");
-      }
-
-      user.setCoin(newBalance);
-      updatedUserList.add(user);
-
-      coinHistoryList.add(
-          CoinHistory.of(
-              user,
-              CoinResponseDto.of(
-                  current, addedCoin, requestDto.getCoinType(), requestDto.getDescription())));
+      coinService.updateUserCoin(user, coinResponseDto);
     }
-
-    userRepository.saveAll(updatedUserList);
-    coinHistoryRepository.saveAll(coinHistoryList);
-
     return "success";
   }
 
