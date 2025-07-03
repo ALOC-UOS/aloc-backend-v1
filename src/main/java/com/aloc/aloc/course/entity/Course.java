@@ -61,6 +61,11 @@ public class Course extends AuditingTimeEntity {
   }
 
   public void calculateAverageRank() {
+    if (this.courseProblemList == null || this.courseProblemList.isEmpty()) {
+      this.averageRank = 0;
+      return;
+    } // 빈 코스를 만들게 되면 averageRank에서 오류 발생 -> 이에 대한 예외처리
+
     Integer totalRank = 0;
     for (CourseProblem courseProblem : this.courseProblemList) {
       totalRank += courseProblem.getProblem().getRank();
@@ -84,11 +89,19 @@ public class Course extends AuditingTimeEntity {
             .orElseThrow(() -> new IllegalStateException("No problems in the course")); // 없으면 예외 처리
   }
 
+  public void addCourseProblem(CourseProblem courseProblem) {
+    this.courseProblemList.add(courseProblem);
+  }
+
   public void addGenerateCnt() {
     this.generateCnt += 1L;
   }
 
   public void addSuccessCnt() {
     this.successCnt += 1L;
+  }
+
+  public void setProblemCnt(Integer problemCnt) {
+    this.problemCnt = problemCnt;
   }
 }

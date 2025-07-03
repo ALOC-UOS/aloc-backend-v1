@@ -73,34 +73,39 @@ public class ProblemScrapingService {
   }
 
   @Transactional
-  public void createCourseByProblemId(Course course, List<Integer> problemIdList)
-      throws IOException {
-    List<Problem> problems =
-        problemIdList.stream()
-            .map(
-                problemId -> {
-                  try {
-                    String url = getProblemUrl(problemId);
-                    String jsonString = fetchJsonFromUrl(url);
-                    Problem problem = parseProblem(jsonString);
-                    return problemService.saveProblem(problem);
-                  } catch (Exception e) {
-                    log.warn("문제 ID {} 가져오는 중 오류: {}", problemId, e.getMessage());
-                    return null;
-                  }
-                })
-            .filter(Objects::nonNull)
-            .toList();
-    List<CourseProblem> courseProblemList =
-        problems.stream()
-            .map(problem -> CourseProblem.builder().problem(problem).course(course).build())
-            .toList();
+  public void createCourseByProblemId(Course course, Integer problemId) throws IOException {
+    try {
+      Optional<Problem> optionalProblem = problemService.findProblemByProblemId(problemId);
+      Problem problem;
 
-    courseProblemRepository.saveAll(courseProblemList);
-    course.addAllCourseProblems(courseProblemList);
-    course.calculateAverageRank();
-    course.updateRankRange();
-    discordWebhookService.sendScrapResultEmbed(course, problems);
+      if (optionalProblem.isPresent()) {
+        problem = optionalProblem.get();
+      } else {
+        String url = getProblemUrl(problemId);
+        String jsonString = fetchJsonFromUrl(url);
+        Problem scrapedProblem = parseProblem(jsonString);
+        problem = problemService.saveProblem(scrapedProblem);
+      }
+
+      CourseProblem courseProblem = CourseProblem.builder().problem(problem).course(course).build();
+
+      courseProblemRepository.save(courseProblem);
+      course.addCourseProblem(courseProblem);
+
+      if (course.getProblemCnt() == null) {
+        course.setProblemCnt(1);
+      } else {
+        course.setProblemCnt(course.getProblemCnt() + 1);
+      }
+
+      course.calculateAverageRank();
+      course.updateRankRange();
+
+      discordWebhookService.sendScrapResultEmbed(course, List.of(problem));
+    } catch (Exception e) {
+      log.warn("문제 ID {} 가져오는 중 오류: {}", problemId, e.getMessage());
+      throw e;
+    }
   }
 
   private List<Integer> generateRankList(int minRank, int maxRank) {

@@ -50,18 +50,12 @@ public class CourseService {
   }
 
   @Transactional
-  public CourseResponseDto createCourseByProblem(
-      CourseRequestDto courseRequestDto, List<Integer> problemIdList) throws IOException {
+  public CourseResponseDto createEmptyCourse(CourseRequestDto courseRequestDto) throws IOException {
     Course course = Course.of(courseRequestDto);
-
-    if (problemIdList.size() % 7 != 0) {
-      throw new IllegalArgumentException("problemIdList는 7의 배수여야 합니다.");
-    }
-
+    course.calculateAverageRank();
     courseRepository.save(course);
-    problemScrapingService.createCourseByProblemId(course, problemIdList);
     return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
-  }
+  } // 빈 코스를 생성
 
   public Course getCourseById(Long courseId) {
     return courseRepository
