@@ -49,6 +49,15 @@ public class CourseService {
     return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
   }
 
+  @Transactional
+  public CourseResponseDto createCourseByProblem(
+      CourseRequestDto courseRequestDto, List<Integer> problemIdList) throws IOException {
+    Course course = Course.of(courseRequestDto);
+    courseRepository.save(course);
+    problemScrapingService.createCourseByProblemId(course, courseRequestDto, problemIdList);
+    return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
+  }
+
   public Course getCourseById(Long courseId) {
     return courseRepository
         .findById(courseId)
