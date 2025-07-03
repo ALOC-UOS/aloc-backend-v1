@@ -5,6 +5,7 @@ import com.aloc.aloc.user.enums.Authority;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,6 +15,9 @@ public class AdminUserResponseDto {
 
   private static final DateTimeFormatter FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+
+  @Schema(description = "유저 UUID", example = "550e8400-e29b-41d4-a716-446655440000")
+  private UUID id;
 
   @Schema(description = "유저 이름", example = "김철수")
   private String name;
@@ -53,6 +57,7 @@ public class AdminUserResponseDto {
             : "null";
 
     return AdminUserResponseDto.builder()
+        .id(user.getId())
         .name(user.getName())
         .email(user.getEmail())
         .authority(user.getAuthority())
