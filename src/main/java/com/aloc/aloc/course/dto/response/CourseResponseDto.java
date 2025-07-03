@@ -6,10 +6,10 @@ import com.aloc.aloc.course.enums.UserCourseState;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 
 @Builder
-@Getter
+@Data
 public class CourseResponseDto {
   @Schema(description = "코스아이디", example = "1")
   private Long id;
