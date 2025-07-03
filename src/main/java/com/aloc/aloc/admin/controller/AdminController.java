@@ -6,7 +6,12 @@ import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminWithdrawResponseDto;
 import com.aloc.aloc.admin.service.AdminService;
+import com.aloc.aloc.course.dto.request.CourseByProblemRequestDto;
+import com.aloc.aloc.course.dto.request.CourseRequestDto;
+import com.aloc.aloc.course.dto.response.CourseResponseDto;
+import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
+import com.aloc.aloc.global.apipayload.status.SuccessStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -16,9 +21,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.ErrorResponse;
@@ -29,6 +36,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin")
 public class AdminController {
   private final AdminService adminService;
+  private final CourseService courseService;
 
   @GetMapping("/dashboard")
   @SecurityRequirement(name = "JWT Auth")
@@ -152,5 +160,80 @@ public class AdminController {
   public CustomApiResponse<AdminWithdrawResponseDto> withdrawByAdmin(
       @Parameter(hidden = true) @AuthenticationPrincipal User user, @RequestParam UUID uuid) {
     return CustomApiResponse.onSuccess(adminService.killUser(user.getUsername(), uuid));
+  }
+
+  @Operation(
+      summary = "문제 번호로 코스 생성",
+      description =
+          """
+				새로운 코스를 생성합니다.
+
+				- 지정된 문제들로 코스를 구성합니다.
+				- 문제 수집 결과는 Discord Webhook을 통해 알림으로 전송됩니다.
+				""")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "201",
+        description = "코스 생성 및 문제 스크래핑 성공",
+        content = @Content(schema = @Schema(implementation = CourseResponseDto.class))),
+    @ApiResponse(responseCode = "400", description = "요청 데이터가 유효하지 않음"),
+    @ApiResponse(responseCode = "500", description = "서버 내부 오류 (스크래핑 실패 등)")
+  })
+  @PreAuthorize("hasRole('ADMIN')")
+  @PostMapping("/problemIds")
+  @SecurityRequirement(name = "JWT Auth")
+  public CustomApiResponse<CourseResponseDto> createCourseById(
+      @RequestBody @Valid CourseByProblemRequestDto courseByProblemRequestDto) throws IOException {
+    CourseResponseDto responseDto =
+        courseService.createCourseByProblem(
+            courseByProblemRequestDto.getCourseRequestDto(),
+            courseByProblemRequestDto.getProblemList());
+    return CustomApiResponse.of(SuccessStatus._CREATED, responseDto);
+  }
+
+  @Operation(
+      summary = "코스 생성",
+      description =
+          """
+	  새로운 코스를 생성합니다.
+
+	  - 코스 생성 후 알고리즘, 난이도 범위를 기반으로 문제를 자동으로 수집합니다.
+	  - 문제 수집 결과는 Discord Webhook을 통해 알림으로 전송됩니다.
+	  """)
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "201",
+        description = "코스 생성 및 문제 스크래핑 성공",
+        content = @Content(schema = @Schema(implementation = CourseResponseDto.class))),
+    @ApiResponse(responseCode = "400", description = "요청 데이터가 유효하지 않음"),
+    @ApiResponse(responseCode = "500", description = "서버 내부 오류 (스크래핑 실패 등)")
+  })
+  @PreAuthorize("hasRole('ADMIN')")
+  @PostMapping()
+  @SecurityRequirement(name = "JWT Auth")
+  public CustomApiResponse<CourseResponseDto> createCourse(
+      @RequestBody @Valid CourseRequestDto courseRequestDto) throws IOException {
+    return CustomApiResponse.of(
+        SuccessStatus._CREATED, courseService.createCourse(courseRequestDto));
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @PatchMapping("/{courseId}")
+  @Operation(
+      summary = "코스 정보 업데이트",
+      description = "지정한 코스의 랭크 범위를 업데이트합니다. 관리자 권한이 필요합니다.",
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "코스 정보 업데이트 성공",
+            content = @Content(schema = @Schema(implementation = CourseResponseDto.class))),
+        @ApiResponse(responseCode = "400", description = "잘못된 코스 ID"),
+        @ApiResponse(responseCode = "401", description = "인증 실패"),
+        @ApiResponse(responseCode = "403", description = "관리자 권한 없음"),
+        @ApiResponse(responseCode = "404", description = "코스를 찾을 수 없음")
+      })
+  @SecurityRequirement(name = "JWT Auth")
+  public CustomApiResponse<CourseResponseDto> updateCourse(@PathVariable Long courseId) {
+    return CustomApiResponse.onSuccess(courseService.updateCourse(courseId));
   }
 }

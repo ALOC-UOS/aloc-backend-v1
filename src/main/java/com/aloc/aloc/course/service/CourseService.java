@@ -53,6 +53,11 @@ public class CourseService {
   public CourseResponseDto createCourseByProblem(
       CourseRequestDto courseRequestDto, List<Integer> problemIdList) throws IOException {
     Course course = Course.of(courseRequestDto);
+
+    if (problemIdList.size() % 7 != 0) {
+      throw new IllegalArgumentException("problemIdList는 7의 배수여야 합니다.");
+    }
+
     courseRepository.save(course);
     problemScrapingService.createCourseByProblemId(course, problemIdList);
     return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
