@@ -38,13 +38,13 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     jwtService.setRefreshTokenCookie(response, refreshToken);
 
     // 요청 도메인 체크
-    String host = request.getHeader("Host");
-    log.info("host : " + host);
+    String origin = request.getHeader("Origin");
+    log.info("host : " + origin);
     String redirectUri;
-    if (host != null) {
-      if (host.contains("dashboard.openaloc.store")) {
+    if (origin != null) {
+      if (origin.contains("dashboard.openaloc.store")) {
         redirectUri = "https://dashboard.openaloc.store/finish-google-sso";
-      } else if (host.contains("openaloc.store")) {
+      } else if (origin.contains("openaloc.store")) {
         redirectUri = "https://openaloc.store/finish-google-sso";
       } else {
         redirectUri = "http://localhost:3000/finish-google-sso";
