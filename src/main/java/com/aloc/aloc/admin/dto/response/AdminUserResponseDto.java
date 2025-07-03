@@ -34,9 +34,7 @@ public class AdminUserResponseDto {
   @Schema(description = "코인", example = "100")
   private Integer coin;
 
-  @Schema(
-      description = "유저 생성 일자 (ISO-8601 UTC Z)",
-      example = "2024-03-04T00:00:00.000Z")
+  @Schema(description = "유저 생성 일자 (ISO-8601 UTC Z)", example = "2024-03-04T00:00:00.000Z")
   private String createdAt;
 
   @Schema(
