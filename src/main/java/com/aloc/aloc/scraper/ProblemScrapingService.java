@@ -73,8 +73,7 @@ public class ProblemScrapingService {
   }
 
   @Transactional
-  public void createCourseByProblemId(
-      Course course, CourseRequestDto courseRequestDto, List<Integer> problemIdList)
+  public void createCourseByProblemId(Course course, List<Integer> problemIdList)
       throws IOException {
     List<Problem> problems =
         problemIdList.stream()
@@ -83,7 +82,8 @@ public class ProblemScrapingService {
                   try {
                     String url = getProblemUrl(problemId);
                     String jsonString = fetchJsonFromUrl(url);
-                    return parseProblem(jsonString);
+                    Problem problem = parseProblem(jsonString);
+                    return problemService.saveProblem(problem);
                   } catch (Exception e) {
                     log.warn("문제 ID {} 가져오는 중 오류: {}", problemId, e.getMessage());
                     return null;
@@ -268,6 +268,9 @@ public class ProblemScrapingService {
         } else if (responseCode == 429) { // Too Many Requests
           // API 제한에 걸린 경우, 더 오래 기다립니다.
           Thread.sleep(retryDelayMs * 2);
+        } else if (responseCode == 404) {
+          throw new IllegalArgumentException("잘못된 API 요청입니다. URL: " + url);
+          // 없는 problem에 접근할 경우 예외 처리
         } else {
           System.out.println("HTTP Error: " + responseCode + " for URL: " + url);
         }

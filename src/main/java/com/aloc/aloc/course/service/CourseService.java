@@ -54,7 +54,7 @@ public class CourseService {
       CourseRequestDto courseRequestDto, List<Integer> problemIdList) throws IOException {
     Course course = Course.of(courseRequestDto);
     courseRepository.save(course);
-    problemScrapingService.createCourseByProblemId(course, courseRequestDto, problemIdList);
+    problemScrapingService.createCourseByProblemId(course, problemIdList);
     return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
   }
 
