@@ -1,6 +1,5 @@
 package com.aloc.aloc.user.service;
 
-import com.aloc.aloc.global.apipayload.exception.NotFoundException;
 import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
 import com.aloc.aloc.profilebackgroundcolor.repository.ProfileBackgroundColorRepository;
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
@@ -39,7 +38,7 @@ public class UserService {
   public User getUser(String oauthId) {
     return userRepository
         .findByOauthId(oauthId)
-        .orElseThrow(() -> new NotFoundException("해당 사용자가 존재하지 않습니다."));
+        .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
   }
 
   public User getUserByUUID(UUID id) {
