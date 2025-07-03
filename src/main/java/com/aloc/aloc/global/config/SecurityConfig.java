@@ -1,6 +1,7 @@
 package com.aloc.aloc.global.config;
 
 import com.aloc.aloc.auth.handler.OAuth2AuthenticationSuccessHandler;
+import com.aloc.aloc.auth.service.CustomAuthorizationRequestResolver;
 import com.aloc.aloc.auth.service.CustomOAuth2UserService;
 import com.aloc.aloc.global.jwt.filter.JwtAuthenticationProcessingFilter;
 import com.aloc.aloc.global.jwt.service.JwtServiceImpl;
@@ -42,6 +43,7 @@ public class SecurityConfig {
   private final JwtServiceImpl jwtService;
   private final CustomOAuth2UserService customOAuth2UserService;
   private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+  private final CustomAuthorizationRequestResolver customAuthorizationRequestResolver;
 
   // 특정 HTTP 요청에 대한 웹 기반 보안 구성
   @Bean
@@ -127,6 +129,10 @@ public class SecurityConfig {
         .oauth2Login(
             oauth2 ->
                 oauth2
+                    .authorizationEndpoint(
+                        authorization ->
+                            authorization.authorizationRequestResolver(
+                                customAuthorizationRequestResolver))
                     .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                     .successHandler(oAuth2AuthenticationSuccessHandler));
 

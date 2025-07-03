@@ -37,30 +37,20 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     jwtService.updateRefreshToken(oauthId, refreshToken);
     jwtService.setRefreshTokenCookie(response, refreshToken);
 
-    String origin = request.getHeader("Origin");
-    if (origin == null) {
-      origin = request.getHeader("Referer");
-    }
-    log.info("inferred origin : {}", origin);
-
-    String redirectUri;
-    if (origin != null) {
-      if (origin.contains("dashboard.openaloc.store")) {
-        redirectUri = "https://dashboard.openaloc.store/finish-google-sso";
-      } else if (origin.contains("openaloc.store")) {
-        redirectUri = "https://openaloc.store/finish-google-sso";
-      } else {
-        redirectUri = "http://localhost:3000/finish-google-sso";
-      }
-    } else {
+    String redirectUri = request.getParameter("state");
+    log.info("✅ 들어온 리다이렉트 URI: {}", redirectUri);
+    if (redirectUri == null) {
       redirectUri = "http://localhost:3000/finish-google-sso";
     }
-    log.info("redirect uri : {}", redirectUri);
 
-    // ✅ 쿼리파라미터로 토큰 전달 (주의: refreshToken은 보안상 권장 안됨!)
+    log.info("✅ 최종 리다이렉트 URI: {}", redirectUri);
+
+    // ✅ 쿼리파라미터로 토큰 전달
     String redirectWithToken = String.format("%s?accessToken=%s", redirectUri, accessToken);
+
     User user = userRepository.findByOauthId(oauthId).orElseThrow();
     log.info("✅ 저장 후 user의 refreshToken: {}", user.getRefreshToken());
+
     // ✅ 리다이렉트
     response.sendRedirect(redirectWithToken);
   }
