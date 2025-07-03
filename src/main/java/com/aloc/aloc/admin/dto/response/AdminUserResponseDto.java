@@ -35,7 +35,7 @@ public class AdminUserResponseDto {
   private Integer coin;
 
   @Schema(
-      description = "유저 생성 일자 (ISO-8601 UTC Z) 또는 \"null\"",
+      description = "유저 생성 일자 (ISO-8601 UTC Z)",
       example = "2024-03-04T00:00:00.000Z")
   private String createdAt;
 
@@ -49,12 +49,12 @@ public class AdminUserResponseDto {
     String created =
         user.getCreatedAt() != null
             ? user.getCreatedAt().atOffset(ZoneOffset.UTC).format(FORMATTER)
-            : "null";
+            : "";
 
     String lastSolved =
         user.getLastSolvedAt() != null
             ? user.getLastSolvedAt().atOffset(ZoneOffset.UTC).format(FORMATTER)
-            : "null";
+            : "";
 
     return AdminUserResponseDto.builder()
         .id(user.getId())
