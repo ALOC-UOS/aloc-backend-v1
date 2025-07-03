@@ -37,9 +37,12 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     jwtService.updateRefreshToken(oauthId, refreshToken);
     jwtService.setRefreshTokenCookie(response, refreshToken);
 
-    // 요청 도메인 체크
     String origin = request.getHeader("Origin");
-    log.info("host : " + origin);
+    if (origin == null) {
+      origin = request.getHeader("Referer");
+    }
+    log.info("inferred origin : {}", origin);
+
     String redirectUri;
     if (origin != null) {
       if (origin.contains("dashboard.openaloc.store")) {
@@ -52,7 +55,8 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     } else {
       redirectUri = "http://localhost:3000/finish-google-sso";
     }
-    log.info("redirect uri : " + redirectUri);
+    log.info("redirect uri : {}", redirectUri);
+
     // ✅ 쿼리파라미터로 토큰 전달 (주의: refreshToken은 보안상 권장 안됨!)
     String redirectWithToken = String.format("%s?accessToken=%s", redirectUri, accessToken);
     User user = userRepository.findByOauthId(oauthId).orElseThrow();
