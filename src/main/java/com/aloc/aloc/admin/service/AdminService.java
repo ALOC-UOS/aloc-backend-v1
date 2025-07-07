@@ -7,17 +7,22 @@ import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminWithdrawResponseDto;
 import com.aloc.aloc.coin.dto.response.CoinResponseDto;
 import com.aloc.aloc.coin.service.CoinService;
+import com.aloc.aloc.course.dto.request.AddProblemToCourseRequestDto;
+import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.dto.response.RankResponseDto;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.entity.CourseProblem;
 import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.course.service.UserCourseService;
+import com.aloc.aloc.scraper.ProblemScrapingService;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.service.UserService;
 import com.aloc.aloc.user.service.facade.UserFacade;
 import jakarta.transaction.Transactional;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -33,8 +38,9 @@ public class AdminService {
   private final UserCourseService userCourseService;
   private final UserFacade userFacade;
   private final CoinService coinService;
+	private final ProblemScrapingService problemScrapingService;
 
-  public AdminDashboardResponseDto getDashboard(String oauthId) {
+	public AdminDashboardResponseDto getDashboard(String oauthId) {
     userService.validateAdmin(oauthId);
     return AdminDashboardResponseDto.of(
         userService.getTotalUserCount(),
@@ -121,5 +127,16 @@ public class AdminService {
     }
     userService.saveAllUser(users);
     return "success";
+  }
+
+  @Transactional
+  public CourseResponseDto addProblemToCourse(String username, AddProblemToCourseRequestDto requestDto) throws IOException {
+
+	  userService.validateAdmin(username);
+
+	  Course course = courseService.getCourseById(requestDto.getCourseId());
+	  problemScrapingService.createCourseByProblemId(course, requestDto.getProblemId());
+
+	  return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
   }
 }

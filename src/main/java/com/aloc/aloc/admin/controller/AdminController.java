@@ -221,13 +221,15 @@ public class AdminController {
   @PostMapping("/addProblem")
   @SecurityRequirement(name = "JWT Auth")
   public CustomApiResponse<CourseResponseDto> addProblemToCourse(
-      @RequestBody AddProblemToCourseRequestDto addProblemToCourseRequestDto) throws IOException {
-    Course course = courseService.getCourseById(addProblemToCourseRequestDto.getCourseId());
+      @RequestBody AddProblemToCourseRequestDto addProblemToCourseRequestDto,
+	  @Parameter(hidden = true) @AuthenticationPrincipal User user) throws IOException {
 
-    problemScrapingService.createCourseByProblemId(
-        course, addProblemToCourseRequestDto.getProblemId());
-
-    CourseResponseDto responseDto = CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
+	  //Course course = courseService.getCourseById(addProblemToCourseRequestDto.getCourseId());
+//
+	  //problemScrapingService.createCourseByProblemId(
+      //  course, addProblemToCourseRequestDto.getProblemId());
+	  //CourseResponseDto responseDto = CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
+	  CourseResponseDto responseDto = adminService.addProblemToCourse(user.getUsername(), addProblemToCourseRequestDto);
 
     return CustomApiResponse.onSuccess(responseDto);
   }
