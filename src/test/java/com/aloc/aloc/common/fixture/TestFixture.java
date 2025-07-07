@@ -1,12 +1,16 @@
 package com.aloc.aloc.common.fixture;
 
+import com.aloc.aloc.coin.dto.response.CoinResponseDto;
+import com.aloc.aloc.coin.enums.CoinType;
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.dto.response.RankResponseDto;
 import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.enums.UserCourseState;
+import com.aloc.aloc.problem.dto.response.ProblemSolvedResponseDto;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class TestFixture {
 
@@ -47,5 +51,23 @@ public class TestFixture {
     user.setBaekjoonId("baekjooid");
     user.setRank(32);
     return user;
+  }
+
+  public static List<CoinResponseDto> getMockCoinResponseDto() {
+    return List.of(
+        CoinResponseDto.builder()
+            .previousCoin(100)
+            .addedCoin(10)
+            .type(CoinType.SOLVE_REWARD)
+            .description("문제 해결 보상")
+            .build());
+  }
+
+  public static ProblemSolvedResponseDto getMockProblemSolvedResponseDto() {
+    return ProblemSolvedResponseDto.builder()
+        .isSolved(true)
+        .isCourseDone(true)
+        .coinResponseDtos(getMockCoinResponseDto())
+        .build();
   }
 }
