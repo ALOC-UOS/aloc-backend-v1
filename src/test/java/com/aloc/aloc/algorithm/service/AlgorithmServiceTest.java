@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import com.aloc.aloc.algorithm.dto.response.AlgorithmResponseDto;
 import com.aloc.aloc.algorithm.entity.Algorithm;
 import com.aloc.aloc.algorithm.repository.AlgorithmRepository;
 
@@ -19,6 +20,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.any;
+
+
+//테스트 함수 목록
+//[getAlgorithmsByIds] 메서드 테스트
+//[getAlgorithmsByIds] 없는 알고리즘 아이디 조회 테스트
+//[getOrCreateAlgorithm] 기존 알고리즘 조회 테스트
+//[getOrCreateAlgorithm] 새 알고리즘 생성 테스트
+//[getAlgorithms] 정상 케이스 테스트
+//[getAlgorithms] 빈 목록 케이스 테스트
 
 @ExtendWith(MockitoExtension.class)
 public class AlgorithmServiceTest {
@@ -33,7 +43,7 @@ public class AlgorithmServiceTest {
 
     //[getAlgorithmsByIds] 메서드 테스트
     @Test
-    void getAlgorithmsByIds() {
+    void getAlgorithmsByIds_normalCase() {
         //given
         //id 1인 객체를 생성
         Integer algorithmId = 1;
@@ -97,7 +107,7 @@ public class AlgorithmServiceTest {
 
     //[getOrCreateAlgorithm] 새 알고리즘 생성 테스트
     @Test
-    void getOrCreateAlgorithm_새_알고리즘_생성() {
+    void getOrCreateAlgorithm_newAlgorithm() {
         // given
         Integer algorithmId = 2;
         String koreanName = "그래프";
@@ -121,6 +131,56 @@ public class AlgorithmServiceTest {
         // then
         assertThat(result).isEqualTo(newAlgorithm);
         verify(algorithmRepository).save(any(Algorithm.class)); // save가 호출됨
+    }
+
+
+
+    //[getAlgorithms] 정상 케이스 테스트
+    @Test
+    void getAlgorithms_normalCase() {
+        // given
+        Algorithm algorithm1 = Algorithm.builder()
+            .algorithmId(1)
+            .koreanName("정렬")
+            .englishName("Sort")
+            .build();
+            
+        Algorithm algorithm2 = Algorithm.builder()
+            .algorithmId(2)
+            .koreanName("그래프")
+            .englishName("Graph")
+            .build();
+            
+        List<Algorithm> algorithms = List.of(algorithm1, algorithm2);
+        given(algorithmRepository.findAll()).willReturn(algorithms);
+
+        // when
+        List<AlgorithmResponseDto> result = algorithmService.getAlgorithms();
+
+        // then
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getAlgorithmId()).isEqualTo(1);
+        assertThat(result.get(0).getName()).isEqualTo("정렬");
+        assertThat(result.get(1).getAlgorithmId()).isEqualTo(2);
+        assertThat(result.get(1).getName()).isEqualTo("그래프");
+        verify(algorithmRepository).findAll();
+    }
+
+    //[getAlgorithms] 빈 목록 케이스 테스트
+    @Test
+    void getAlgorithms_emptyList() {
+        // given
+        //algorithmRepository에서 findAll 메서드를 호출하면 빈 리스트를 반환
+        given(algorithmRepository.findAll()).willReturn(List.of());
+
+        // when
+        //getAlgorithms 메서드를 호출하고 반환된 객체를 List<AlgorithmResponseDto> result에 저장
+        List<AlgorithmResponseDto> result = algorithmService.getAlgorithms();
+
+        // then
+        //result가 빈 리스트인지 확인
+        assertThat(result).isEmpty();
+        verify(algorithmRepository).findAll();
     }
 
 }
