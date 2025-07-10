@@ -16,6 +16,9 @@ import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.any;
 
 @ExtendWith(MockitoExtension.class)
 public class AlgorithmServiceTest {
@@ -66,5 +69,58 @@ public class AlgorithmServiceTest {
             .hasMessageContaining("존재하지 않은 알고리즘 아이디가 포함되어 있습니다.");
     }
 
+    //[getOrCreateAlgorithm] 기존 알고리즘 조회 테스트
+    @Test
+    void getOrCreateAlgorithm_existingAlgorithm() {
+        // given
+        Integer algorithmId = 1;
+        String koreanName = "정렬";
+        String englishName = "Sort";
+        
+        Algorithm existingAlgorithm = Algorithm.builder()
+            .algorithmId(algorithmId)
+            .koreanName("기존 한글명")
+            .englishName("Existing English Name")
+            .build();
+        
+        given(algorithmRepository.findByAlgorithmId(algorithmId))
+            .willReturn(Optional.of(existingAlgorithm));
+
+        // when
+        Algorithm result = algorithmService.getOrCreateAlgorithm(algorithmId, koreanName, englishName);
+
+        // then
+        assertThat(result).isEqualTo(existingAlgorithm);
+        verify(algorithmRepository, never()).save(any(Algorithm.class)); // save는 호출되지 않음
+    }
+
+
+    //[getOrCreateAlgorithm] 새 알고리즘 생성 테스트
+    @Test
+    void getOrCreateAlgorithm_새_알고리즘_생성() {
+        // given
+        Integer algorithmId = 2;
+        String koreanName = "그래프";
+        String englishName = "Graph";
+        
+        Algorithm newAlgorithm = Algorithm.builder()
+            .algorithmId(algorithmId)
+            .koreanName(koreanName)
+            .englishName(englishName)
+            .build();
+        //algorithmRepository에서 algorithmId 2인 객체를 조회하면 Optional.empty()를 반환
+        given(algorithmRepository.findByAlgorithmId(algorithmId))
+            .willReturn(Optional.empty());
+        //algorithmRepository에서 save 메서드를 호출하면 newAlgorithm 객체를 반환
+        given(algorithmRepository.save(any(Algorithm.class)))
+            .willReturn(newAlgorithm);
+
+        // when
+        Algorithm result = algorithmService.getOrCreateAlgorithm(algorithmId, koreanName, englishName);
+
+        // then
+        assertThat(result).isEqualTo(newAlgorithm);
+        verify(algorithmRepository).save(any(Algorithm.class)); // save가 호출됨
+    }
 
 }
