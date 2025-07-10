@@ -1,5 +1,6 @@
 package com.aloc.aloc.common.fixture;
 
+import com.aloc.aloc.algorithm.entity.Algorithm;
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.dto.response.RankResponseDto;
 import com.aloc.aloc.course.enums.CourseType;
@@ -47,5 +48,21 @@ public class TestFixture {
     user.setBaekjoonId("baekjooid");
     user.setRank(32);
     return user;
+  }
+
+  public static Algorithm getMockAlgorithm() {
+    return Algorithm.builder()
+        .algorithmId(1)
+        .koreanName("정렬")
+        .englishName("Sort")
+        .build();
+  }
+
+  public static Algorithm getMockAlgorithm(Integer algorithmId, String koreanName, String englishName) {
+    return Algorithm.builder()
+        .algorithmId(algorithmId)
+        .koreanName(koreanName)
+        .englishName(englishName)
+        .build();
   }
 }

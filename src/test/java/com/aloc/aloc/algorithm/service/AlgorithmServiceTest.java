@@ -10,6 +10,8 @@ import static org.mockito.Mockito.verify;
 import com.aloc.aloc.algorithm.dto.response.AlgorithmResponseDto;
 import com.aloc.aloc.algorithm.entity.Algorithm;
 import com.aloc.aloc.algorithm.repository.AlgorithmRepository;
+import com.aloc.aloc.common.fixture.TestFixture;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -79,12 +81,7 @@ public class AlgorithmServiceTest {
     String koreanName = "정렬";
     String englishName = "Sort";
 
-    Algorithm existingAlgorithm =
-        Algorithm.builder()
-            .algorithmId(algorithmId)
-            .koreanName("기존 한글명")
-            .englishName("Existing English Name")
-            .build();
+    Algorithm existingAlgorithm = TestFixture.getMockAlgorithm(algorithmId, koreanName, englishName);
 
     given(algorithmRepository.findByAlgorithmId(algorithmId))
         .willReturn(Optional.of(existingAlgorithm));
@@ -105,12 +102,8 @@ public class AlgorithmServiceTest {
     String koreanName = "그래프";
     String englishName = "Graph";
 
-    Algorithm newAlgorithm =
-        Algorithm.builder()
-            .algorithmId(algorithmId)
-            .koreanName(koreanName)
-            .englishName(englishName)
-            .build();
+    Algorithm newAlgorithm = TestFixture.getMockAlgorithm(algorithmId, koreanName, englishName);
+
     // algorithmRepository에서 algorithmId 2인 객체를 조회하면 Optional.empty()를 반환
     given(algorithmRepository.findByAlgorithmId(algorithmId)).willReturn(Optional.empty());
     // algorithmRepository에서 save 메서드를 호출하면 newAlgorithm 객체를 반환
@@ -128,11 +121,8 @@ public class AlgorithmServiceTest {
   @Test
   void getAlgorithmsNormalCase() {
     // given
-    Algorithm algorithm1 =
-        Algorithm.builder().algorithmId(1).koreanName("정렬").englishName("Sort").build();
-
-    Algorithm algorithm2 =
-        Algorithm.builder().algorithmId(2).koreanName("그래프").englishName("Graph").build();
+    Algorithm algorithm1 = TestFixture.getMockAlgorithm(1, "정렬", "Sort");
+    Algorithm algorithm2 = TestFixture.getMockAlgorithm(2, "그래프", "Graph");
 
     List<Algorithm> algorithms = List.of(algorithm1, algorithm2);
     given(algorithmRepository.findAll()).willReturn(algorithms);
