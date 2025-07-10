@@ -12,8 +12,10 @@ import com.aloc.aloc.algorithm.repository.AlgorithmRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
 public class AlgorithmServiceTest {
@@ -26,6 +28,7 @@ public class AlgorithmServiceTest {
     @InjectMocks
     private AlgorithmService algorithmService;
 
+    //[getAlgorithmsByIds] 메서드 테스트
     @Test
     void getAlgorithmsByIds() {
         //given
@@ -47,4 +50,21 @@ public class AlgorithmServiceTest {
         //result의 크기가 1이고, 첫 번째 요소의 algorithmId가 1인지 확인
         assertThat(result).containsExactly(algorithm);
     }
-}   
+
+    //[getAlgorithmById] 없는 알고리즘 아이디 조회 테스트
+    @Test
+    void getAlgorithmsById_NotFound() {
+        //given
+        //mock에서는 존재하지 않는 아이디를 조회하면 Optional.empty()를 반환
+        Integer nonExistentId = 999;
+        given(algorithmRepository.findByAlgorithmId(nonExistentId)).willReturn(Optional.empty());
+
+        //when&then
+        assertThatThrownBy(() -> algorithmService.getAlgorithmsByIds(List.of(nonExistentId)))
+            //NoSuchElementException 예외가 발생하고, 메시지에 "존재하지 않은 알고리즘 아이디가 포함되어 있습니다."가 포함되어 있는지 확인
+            .isInstanceOf(NoSuchElementException.class)
+            .hasMessageContaining("존재하지 않은 알고리즘 아이디가 포함되어 있습니다.");
+    }
+
+
+}
