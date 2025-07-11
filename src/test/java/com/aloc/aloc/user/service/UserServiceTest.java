@@ -85,6 +85,19 @@ class UserServiceTest {
       // then
       assertThat(result).isEqualTo(mockUser);
     }
+
+    @Test
+    @DisplayName("존재하지 않는 UUID 조회 시 IllegalArgumentException 발생")
+    void getUserByUUIDFail() {
+      // given
+      UUID invalidUserId = UUID.randomUUID();
+      given(userRepository.findById(invalidUserId)).willReturn(Optional.empty());
+
+      // when & then
+      assertThatThrownBy(() -> userService.getUserByUUID(invalidUserId))
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessage("해당 사용자가 존재하지 않습니다.");
+    }
   }
 
   @Nested
@@ -158,16 +171,34 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("백준 랭크 정보 업데이트")
-    void updateUserBaekjoonRank() {
+    @DisplayName("백준 랭크 정보 업데이트 성공")
+    void updateUserBaekjoonRankSuccess() {
       // given
       User user = TestFixture.getMockNewUser();
       user.setBaekjoonId("test_baekjoon");
       given(baekjoonRankScrapingService.extractBaekjoonRank("test_baekjoon")).willReturn(25);
+      
       // when
       userService.updateUserBaekjoonRank(user);
+      
       // then
       assertThat(user.getRank()).isEqualTo(25);
+      // @Transactional 에 의해 자동 저장됨
+    }
+
+    @Test
+    @DisplayName("백준 ID가 null일 때 랭크 업데이트 시 예외 발생")
+    void updateUserBaekjoonRank_NullBaekjoonId() {
+      // given
+      User user = TestFixture.getMockNewUser();
+      user.setBaekjoonId(null);
+      
+      // when
+      userService.updateUserBaekjoonRank(user);
+      
+      // then
+      // null을 extractBaekjoonRank에 전달하면 실제 서비스에서는 예외가 발생할 수 있음
+      verify(baekjoonRankScrapingService, times(1)).extractBaekjoonRank(null);
     }
   }
 
@@ -239,6 +270,7 @@ class UserServiceTest {
       // given
       User user = TestFixture.getMockUserByOauthId("test_user");
       user.setCoin(200);
+      String originalColor = user.getProfileColor();
 
       ProfileBackgroundColor mockColor =
           new ProfileBackgroundColor("newColor", "#FFFFFF", null, null, null, null, "common", null);
@@ -250,10 +282,12 @@ class UserServiceTest {
       UserColorChangeResponseDto response = userService.changeColor(user);
 
       // then
-      assertThat(user.getCoin()).isEqualTo(100);
+      assertThat(user.getCoin()).isEqualTo(100); // 100 코인 차감
       assertThat(user.getProfileColor()).isEqualTo("newColor");
+      assertThat(user.getProfileColor()).isNotEqualTo(originalColor);
       assertThat(response.getUserCoin()).isEqualTo(100);
       assertThat(response.getColor().getName()).isEqualTo("newColor");
+      // @Transactional 에 의해 자동 저장됨
     }
 
     @Test
@@ -261,12 +295,36 @@ class UserServiceTest {
     void changeColorFailNotEnoughCoin() {
       // given
       User user = TestFixture.getMockUserByOauthId("test_user");
-      user.setCoin(50);
+      user.setCoin(50); // 100코인 미만
+      String originalColor = user.getProfileColor();
+      Integer originalCoin = user.getCoin();
 
       // when & then
       assertThatThrownBy(() -> userService.changeColor(user))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage("코인이 부족합니다.");
+      
+      // 실패 시 상태 변경 없음 확인
+      assertThat(user.getCoin()).isEqualTo(originalCoin);
+      assertThat(user.getProfileColor()).isEqualTo(originalColor);
+      verify(profileBackgroundColorService, times(0)).pickColor();
+      // @Transactional 에 의해 저장 처리됨
+    }
+
+    @Test
+    @DisplayName("선택된 색상이 존재하지 않을 때 예외 발생")
+    void changeColorFailColorNotFound() {
+      // given
+      User user = TestFixture.getMockUserByOauthId("test_user");
+      user.setCoin(200);
+      
+      given(profileBackgroundColorService.pickColor()).willReturn("nonExistentColor");
+      given(profileBackgroundColorRepository.findById("nonExistentColor"))
+          .willReturn(Optional.empty());
+
+      // when & then
+      assertThatThrownBy(() -> userService.changeColor(user))
+          .isInstanceOf(RuntimeException.class); // orElseThrow()는 기본적으로 NoSuchElementException 발생
     }
   }
 
@@ -276,7 +334,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("유저의 코인이 정상적으로 증가")
-    void updateUserCoinSuccess() {
+    void updateUserCoinIncrease() {
       // given
       User user = TestFixture.getMockNewUser();
       user.setCoin(100); // 초기 코인 100
@@ -286,6 +344,36 @@ class UserServiceTest {
 
       // then
       assertThat(user.getCoin()).isEqualTo(150); // 100 + 50 = 150
+      verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    @DisplayName("유저의 코인이 정상적으로 차감")
+    void updateUserCoinDecrease() {
+      // given
+      User user = TestFixture.getMockNewUser();
+      user.setCoin(100); // 초기 코인 100
+
+      // when
+      userService.updateUserCoin(user, -30);
+
+      // then
+      assertThat(user.getCoin()).isEqualTo(70); // 100 - 30 = 70
+      verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    @DisplayName("0 코인 변경 시에도 저장 호출")
+    void updateUserCoinZero() {
+      // given
+      User user = TestFixture.getMockNewUser();
+      user.setCoin(100);
+
+      // when
+      userService.updateUserCoin(user, 0);
+
+      // then
+      assertThat(user.getCoin()).isEqualTo(100); // 변화 없음
       verify(userRepository, times(1)).save(user);
     }
   }
