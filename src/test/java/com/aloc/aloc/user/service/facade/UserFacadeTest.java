@@ -6,7 +6,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import com.aloc.aloc.common.fixture.TestFixture;
-import com.aloc.aloc.course.dto.response.CourseUserResponseDto;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.enums.UserCourseState;
@@ -37,7 +36,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class UserFacadeTest {
@@ -45,12 +43,8 @@ class UserFacadeTest {
   @Mock private UserSortingService userSortingService;
   @Mock private UserMapper userMapper;
   @Mock private UserService userService;
-  @Mock private BaekjoonRankScrapingService baekjoonRankScrapingService;
-  @Mock private ImageService imageService;
   @Mock private UserCourseService userCourseService;
   @Mock private UserCourseProblemService userCourseProblemService;
-  @Mock private CourseService courseService;
-  @Mock private ProfileBackgroundColorService profileBackgroundColorService;
 
   @InjectMocks private UserFacade userFacade;
 
