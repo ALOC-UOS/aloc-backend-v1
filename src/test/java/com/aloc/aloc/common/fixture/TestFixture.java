@@ -51,14 +51,11 @@ public class TestFixture {
   }
 
   public static Algorithm getMockAlgorithm() {
-    return Algorithm.builder()
-        .algorithmId(1)
-        .koreanName("정렬")
-        .englishName("Sort")
-        .build();
+    return Algorithm.builder().algorithmId(1).koreanName("정렬").englishName("Sort").build();
   }
 
-  public static Algorithm getMockAlgorithm(Integer algorithmId, String koreanName, String englishName) {
+  public static Algorithm getMockAlgorithm(
+      Integer algorithmId, String koreanName, String englishName) {
     return Algorithm.builder()
         .algorithmId(algorithmId)
         .koreanName(koreanName)

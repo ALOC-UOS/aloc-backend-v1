@@ -11,7 +11,6 @@ import com.aloc.aloc.algorithm.dto.response.AlgorithmResponseDto;
 import com.aloc.aloc.algorithm.entity.Algorithm;
 import com.aloc.aloc.algorithm.repository.AlgorithmRepository;
 import com.aloc.aloc.common.fixture.TestFixture;
-
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -81,7 +80,8 @@ public class AlgorithmServiceTest {
     String koreanName = "정렬";
     String englishName = "Sort";
 
-    Algorithm existingAlgorithm = TestFixture.getMockAlgorithm(algorithmId, koreanName, englishName);
+    Algorithm existingAlgorithm =
+        TestFixture.getMockAlgorithm(algorithmId, koreanName, englishName);
 
     given(algorithmRepository.findByAlgorithmId(algorithmId))
         .willReturn(Optional.of(existingAlgorithm));
