@@ -7,8 +7,6 @@ import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminWithdrawResponseDto;
 import com.aloc.aloc.coin.dto.response.CoinResponseDto;
 import com.aloc.aloc.coin.service.CoinService;
-import com.aloc.aloc.course.dto.request.AddProblemToCourseRequestDto;
-import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.dto.response.RankResponseDto;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.entity.CourseProblem;
@@ -21,7 +19,6 @@ import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.service.UserService;
 import com.aloc.aloc.user.service.facade.UserFacade;
 import jakarta.transaction.Transactional;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -128,15 +125,15 @@ public class AdminService {
     return "success";
   }
 
-  @Transactional
-  public CourseResponseDto addProblemToCourse(
-      String username, AddProblemToCourseRequestDto requestDto) throws IOException {
-
-    userService.validateAdmin(username);
-
-    Course course = courseService.getCourseById(requestDto.getCourseId());
-    problemScrapingService.createCourseByProblemId(course, requestDto.getProblemId());
-
-    return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
-  }
+  // @Transactional
+  // public CourseResponseDto addProblemToCourse(
+  //    String username, AddProblemToCourseRequestDto requestDto) throws IOException {
+  //
+  //  userService.validateAdmin(username);
+  //
+  //  Course course = courseService.getCourseById(requestDto.getCourseId());
+  //  problemScrapingService.createCourseByProblemId(course, requestDto.getProblemId());
+  //
+  //  return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
+  // }
 }

@@ -1,5 +1,6 @@
 package com.aloc.aloc.course.service;
 
+import com.aloc.aloc.course.dto.request.AddProblemToCourseRequestDto;
 import com.aloc.aloc.course.dto.request.CourseRequestDto;
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.entity.Course;
@@ -90,5 +91,17 @@ public class CourseService {
 
   public List<Course> getActiveCourses() {
     return courseRepository.findAll();
+  }
+
+  @jakarta.transaction.Transactional
+  public CourseResponseDto addProblemToCourse(
+      String username, AddProblemToCourseRequestDto requestDto) throws IOException {
+
+    userService.validateAdmin(username);
+
+    Course course = getCourseById(requestDto.getCourseId());
+    problemScrapingService.createCourseByProblemId(course, requestDto.getProblemId());
+
+    return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
   }
 }

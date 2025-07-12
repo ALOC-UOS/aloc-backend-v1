@@ -235,7 +235,7 @@ public class AdminController {
       throws IOException {
 
     return CustomApiResponse.onSuccess(
-        adminService.addProblemToCourse(user.getUsername(), addProblemToCourseRequestDto));
+        courseService.addProblemToCourse(user.getUsername(), addProblemToCourseRequestDto));
   }
 
   @PreAuthorize("hasRole('ADMIN')")
