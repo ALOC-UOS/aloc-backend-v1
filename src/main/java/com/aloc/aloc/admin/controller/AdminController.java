@@ -6,7 +6,6 @@ import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminWithdrawResponseDto;
 import com.aloc.aloc.admin.service.AdminService;
-import com.aloc.aloc.course.dto.request.AddProblemToCourseRequestDto;
 import com.aloc.aloc.course.dto.request.CourseRequestDto;
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.service.CourseService;
@@ -227,15 +226,16 @@ public class AdminController {
     @ApiResponse(responseCode = "400", description = "요청 데이터가 유효하지 않음"),
     @ApiResponse(responseCode = "500", description = "서버 내부 오류 (스크래핑 실패 등)")
   })
-  @PostMapping("/courses/{courseId}/problem")
+  @PostMapping("/courses/{courseId}/problem/{problemId}")
   @SecurityRequirement(name = "JWT Auth")
   public CustomApiResponse<CourseResponseDto> addProblemToCourse(
-      @RequestBody AddProblemToCourseRequestDto addProblemToCourseRequestDto,
+      @PathVariable Long courseId,
+      @PathVariable Long problemId,
       @Parameter(hidden = true) @AuthenticationPrincipal User user)
       throws IOException {
 
     return CustomApiResponse.onSuccess(
-        courseService.addProblemToCourse(user.getUsername(), addProblemToCourseRequestDto));
+        courseService.addProblemToCourse(user.getUsername(), courseId, problemId));
   }
 
   @PreAuthorize("hasRole('ADMIN')")

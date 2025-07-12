@@ -1,6 +1,5 @@
 package com.aloc.aloc.course.service;
 
-import com.aloc.aloc.course.dto.request.AddProblemToCourseRequestDto;
 import com.aloc.aloc.course.dto.request.CourseRequestDto;
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.entity.Course;
@@ -94,13 +93,13 @@ public class CourseService {
   }
 
   @jakarta.transaction.Transactional
-  public CourseResponseDto addProblemToCourse(
-      String username, AddProblemToCourseRequestDto requestDto) throws IOException {
+  public CourseResponseDto addProblemToCourse(String username, Long courseId, Long problemId)
+      throws IOException {
 
     userService.validateAdmin(username);
 
-    Course course = getCourseById(requestDto.getCourseId());
-    problemScrapingService.createCourseByProblemId(course, requestDto.getProblemId());
+    Course course = getCourseById(courseId);
+    problemScrapingService.createCourseByProblemId(course, Math.toIntExact(problemId));
 
     return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
   }
