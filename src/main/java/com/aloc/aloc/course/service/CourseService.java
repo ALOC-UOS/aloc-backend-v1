@@ -92,7 +92,7 @@ public class CourseService {
     return courseRepository.findAll();
   }
 
-  @jakarta.transaction.Transactional
+  @Transactional
   public CourseResponseDto addProblemToCourse(String username, Long courseId, Long problemId)
       throws IOException {
 
