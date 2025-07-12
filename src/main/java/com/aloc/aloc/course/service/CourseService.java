@@ -7,6 +7,7 @@ import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.repository.CourseRepository;
 import com.aloc.aloc.scraper.ProblemScrapingService;
+import com.aloc.aloc.user.service.UserService;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CourseService {
   private final CourseRepository courseRepository;
   private final ProblemScrapingService problemScrapingService;
+  private final UserService userService;
 
   public Page<CourseResponseDto> getCourses(Pageable pageable, CourseType courseTypeOrNull) {
     Page<Course> courses = getCoursePageByCourseType(pageable, courseTypeOrNull);
@@ -28,7 +30,9 @@ public class CourseService {
   }
 
   @Transactional
-  public CourseResponseDto updateCourse(Long courseId) {
+  public CourseResponseDto updateCourse(String user, Long courseId) {
+    userService.validateAdmin(user);
+
     Course course = getCourseById(courseId);
     course.updateRankRange();
     courseRepository.save(course);
@@ -42,7 +46,10 @@ public class CourseService {
   }
 
   @Transactional
-  public CourseResponseDto createCourse(CourseRequestDto courseRequestDto) throws IOException {
+  public CourseResponseDto createCourse(String user, CourseRequestDto courseRequestDto)
+      throws IOException {
+    userService.validateAdmin(user); // user가 admin인지 검사
+
     Course course = Course.of(courseRequestDto);
     courseRepository.save(course);
     problemScrapingService.createProblemsByCourse(course, courseRequestDto);
@@ -50,7 +57,10 @@ public class CourseService {
   }
 
   @Transactional
-  public CourseResponseDto createEmptyCourse(CourseRequestDto courseRequestDto) throws IOException {
+  public CourseResponseDto createEmptyCourse(String user, CourseRequestDto courseRequestDto)
+      throws IOException {
+    userService.validateAdmin(user);
+
     Course course = Course.of(courseRequestDto);
     course.calculateAverageRank();
     courseRepository.save(course);

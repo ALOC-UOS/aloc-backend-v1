@@ -92,11 +92,8 @@ public class ProblemScrapingService {
       courseProblemRepository.save(courseProblem);
       course.addCourseProblem(courseProblem);
 
-      if (course.getProblemCnt() == null) {
-        course.setProblemCnt(1);
-      } else {
-        course.setProblemCnt(course.getProblemCnt() + 1);
-      }
+      long count = courseProblemRepository.countByCourseId(course.getId());
+      course.setProblemCnt((int) count);
 
       course.calculateAverageRank();
       course.updateRankRange();
@@ -274,7 +271,7 @@ public class ProblemScrapingService {
           // API 제한에 걸린 경우, 더 오래 기다립니다.
           Thread.sleep(retryDelayMs * 2);
         } else if (responseCode == 404) {
-          throw new IllegalArgumentException("잘못된 API 요청입니다. URL: " + url);
+          throw new IllegalArgumentException("존재하지 않는 문제번호입니다. URL: " + url);
           // 없는 problem에 접근할 경우 예외 처리
         } else {
           System.out.println("HTTP Error: " + responseCode + " for URL: " + url);

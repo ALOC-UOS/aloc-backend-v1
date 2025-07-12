@@ -9,8 +9,6 @@ import com.aloc.aloc.admin.service.AdminService;
 import com.aloc.aloc.course.dto.request.AddProblemToCourseRequestDto;
 import com.aloc.aloc.course.dto.request.CourseRequestDto;
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
-import com.aloc.aloc.course.entity.Course;
-import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import com.aloc.aloc.global.apipayload.status.SuccessStatus;
@@ -187,11 +185,15 @@ public class AdminController {
   @PostMapping("/course")
   @SecurityRequirement(name = "JWT Auth")
   public CustomApiResponse<CourseResponseDto> createCourse(
-      @RequestBody @Valid CourseRequestDto courseRequestDto) throws IOException {
+      @RequestBody @Valid CourseRequestDto courseRequestDto,
+      @Parameter(hidden = true) @AuthenticationPrincipal User user)
+      throws IOException {
+
     return CustomApiResponse.of(
-        SuccessStatus._CREATED, courseService.createCourse(courseRequestDto));
+        SuccessStatus._CREATED, courseService.createCourse(user.getUsername(), courseRequestDto));
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @Operation(summary = "빈 코스 생성", description = "비어있는 코스를 생성")
   @ApiResponses({
     @ApiResponse(
@@ -201,41 +203,43 @@ public class AdminController {
     @ApiResponse(responseCode = "400", description = "요청 데이터가 유효하지 않음"),
     @ApiResponse(responseCode = "500", description = "서버 내부 오류 (스크래핑 실패 등)")
   })
-  @PostMapping("/emptycourse")
+  @PostMapping("/courses/empty")
   @SecurityRequirement(name = "JWT Auth")
   public CustomApiResponse<CourseResponseDto> createEmptyCourse(
-      @RequestBody @Valid CourseRequestDto courseRequestDto) throws IOException {
+      @RequestBody @Valid CourseRequestDto courseRequestDto,
+      @Parameter(hidden = true) @AuthenticationPrincipal User user)
+      throws IOException {
+
     return CustomApiResponse.of(
-        SuccessStatus._CREATED, courseService.createEmptyCourse(courseRequestDto));
-  }
-
-  @Operation(summary = "problem 추가", description = "코스에 problem을 추가 \n 기존에 존재하는 problem은 매핑, 존재하지 않으면 스크래핑")
-  @ApiResponses({
-	  @ApiResponse(
-		  responseCode = "201",
-		  description = "코스에 문제 추가 성공",
-		  content = @Content(schema = @Schema(implementation = CourseResponseDto.class))),
-	  @ApiResponse(responseCode = "400", description = "요청 데이터가 유효하지 않음"),
-	  @ApiResponse(responseCode = "500", description = "서버 내부 오류 (스크래핑 실패 등)")
-  })
-  @PostMapping("/addProblem")
-  @SecurityRequirement(name = "JWT Auth")
-  public CustomApiResponse<CourseResponseDto> addProblemToCourse(
-      @RequestBody AddProblemToCourseRequestDto addProblemToCourseRequestDto,
-	  @Parameter(hidden = true) @AuthenticationPrincipal User user) throws IOException {
-
-	  //Course course = courseService.getCourseById(addProblemToCourseRequestDto.getCourseId());
-//
-	  //problemScrapingService.createCourseByProblemId(
-      //  course, addProblemToCourseRequestDto.getProblemId());
-	  //CourseResponseDto responseDto = CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
-	  CourseResponseDto responseDto = adminService.addProblemToCourse(user.getUsername(), addProblemToCourseRequestDto);
-
-    return CustomApiResponse.onSuccess(responseDto);
+        SuccessStatus._CREATED,
+        courseService.createEmptyCourse(user.getUsername(), courseRequestDto));
   }
 
   @PreAuthorize("hasRole('ADMIN')")
-  @PatchMapping("/{courseId}")
+  @Operation(
+      summary = "problem 추가",
+      description = "코스에 problem을 추가 \n 기존에 존재하는 problem은 매핑, 존재하지 않으면 스크래핑")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "201",
+        description = "코스에 문제 추가 성공",
+        content = @Content(schema = @Schema(implementation = CourseResponseDto.class))),
+    @ApiResponse(responseCode = "400", description = "요청 데이터가 유효하지 않음"),
+    @ApiResponse(responseCode = "500", description = "서버 내부 오류 (스크래핑 실패 등)")
+  })
+  @PostMapping("/courses/{courseId}/problem")
+  @SecurityRequirement(name = "JWT Auth")
+  public CustomApiResponse<CourseResponseDto> addProblemToCourse(
+      @RequestBody AddProblemToCourseRequestDto addProblemToCourseRequestDto,
+      @Parameter(hidden = true) @AuthenticationPrincipal User user)
+      throws IOException {
+
+    return CustomApiResponse.onSuccess(
+        adminService.addProblemToCourse(user.getUsername(), addProblemToCourseRequestDto));
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @PatchMapping("courses/{courseId}")
   @Operation(
       summary = "코스 정보 업데이트",
       description = "지정한 코스의 랭크 범위를 업데이트합니다. 관리자 권한이 필요합니다.",
@@ -250,7 +254,8 @@ public class AdminController {
         @ApiResponse(responseCode = "404", description = "코스를 찾을 수 없음")
       })
   @SecurityRequirement(name = "JWT Auth")
-  public CustomApiResponse<CourseResponseDto> updateCourse(@PathVariable Long courseId) {
-    return CustomApiResponse.onSuccess(courseService.updateCourse(courseId));
+  public CustomApiResponse<CourseResponseDto> updateCourse(
+      @PathVariable Long courseId, @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+    return CustomApiResponse.onSuccess(courseService.updateCourse(user.getUsername(), courseId));
   }
 }

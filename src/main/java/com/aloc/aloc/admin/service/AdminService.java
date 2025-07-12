@@ -21,7 +21,6 @@ import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.service.UserService;
 import com.aloc.aloc.user.service.facade.UserFacade;
 import jakarta.transaction.Transactional;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +37,9 @@ public class AdminService {
   private final UserCourseService userCourseService;
   private final UserFacade userFacade;
   private final CoinService coinService;
-	private final ProblemScrapingService problemScrapingService;
+  private final ProblemScrapingService problemScrapingService;
 
-	public AdminDashboardResponseDto getDashboard(String oauthId) {
+  public AdminDashboardResponseDto getDashboard(String oauthId) {
     userService.validateAdmin(oauthId);
     return AdminDashboardResponseDto.of(
         userService.getTotalUserCount(),
@@ -130,13 +129,14 @@ public class AdminService {
   }
 
   @Transactional
-  public CourseResponseDto addProblemToCourse(String username, AddProblemToCourseRequestDto requestDto) throws IOException {
+  public CourseResponseDto addProblemToCourse(
+      String username, AddProblemToCourseRequestDto requestDto) throws IOException {
 
-	  userService.validateAdmin(username);
+    userService.validateAdmin(username);
 
-	  Course course = courseService.getCourseById(requestDto.getCourseId());
-	  problemScrapingService.createCourseByProblemId(course, requestDto.getProblemId());
+    Course course = courseService.getCourseById(requestDto.getCourseId());
+    problemScrapingService.createCourseByProblemId(course, requestDto.getProblemId());
 
-	  return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
+    return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
   }
 }
