@@ -149,6 +149,7 @@ public class AdminService {
     return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
   }
 
+  @Transactional
   public CourseResponseDto createCourse(String user, CourseRequestDto courseRequestDto)
       throws IOException {
     userService.validateAdmin(user); // user가 admin인지 검사
@@ -165,6 +166,7 @@ public class AdminService {
     return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
   }
 
+  @Transactional
   public CourseResponseDto updateCourse(String user, Long courseId) {
     userService.validateAdmin(user);
 

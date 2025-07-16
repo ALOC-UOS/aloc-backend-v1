@@ -255,7 +255,7 @@ public class AdminController {
     @ApiResponse(responseCode = "400", description = "요청 데이터가 유효하지 않음"),
     @ApiResponse(responseCode = "500", description = "서버 내부 오류 (스크래핑 실패 등)")
   })
-  @PostMapping("/courses/empty")
+  @PostMapping("/course/empty")
   @SecurityRequirement(name = "JWT Auth")
   public CustomApiResponse<CourseResponseDto> createEmptyCourse(
       @RequestBody @Valid EmptyCourseRequestDto emptyCourseRequestDto,
