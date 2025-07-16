@@ -1,5 +1,6 @@
 package com.aloc.aloc.course.service;
 
+import com.aloc.aloc.admin.dto.request.EmptyCourseRequestDto;
 import com.aloc.aloc.course.dto.request.CourseRequestDto;
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.entity.Course;
@@ -28,11 +29,10 @@ public class CourseService {
   }
 
   @Transactional
-  public CourseResponseDto updateCourse(Long courseId) {
+  public Course updateCourse(Long courseId) {
     Course course = getCourseById(courseId);
     course.updateRankRange();
-    courseRepository.save(course);
-    return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
+    return courseRepository.save(course);
   }
 
   public Page<Course> getCoursePageByCourseType(Pageable pageable, CourseType courseTypeOrNull) {
@@ -42,11 +42,18 @@ public class CourseService {
   }
 
   @Transactional
-  public CourseResponseDto createCourse(CourseRequestDto courseRequestDto) throws IOException {
+  public Course createCourse(CourseRequestDto courseRequestDto) throws IOException {
     Course course = Course.of(courseRequestDto);
     courseRepository.save(course);
     problemScrapingService.createProblemsByCourse(course, courseRequestDto);
-    return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
+    return course;
+  }
+
+  @Transactional
+  public Course createEmptyCourse(EmptyCourseRequestDto emptyCourseRequestDto) {
+    Course course = Course.ofEmpty(emptyCourseRequestDto);
+    course.calculateAverageRank();
+    return courseRepository.save(course);
   }
 
   public Course getCourseById(Long courseId) {
