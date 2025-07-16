@@ -4,6 +4,7 @@ import com.aloc.aloc.admin.dto.request.AdminCoinTransactionRequestDto;
 import com.aloc.aloc.admin.dto.request.AdminRoleChangeRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
+import com.aloc.aloc.admin.dto.response.AdminUserResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminWithdrawResponseDto;
 import com.aloc.aloc.admin.service.AdminService;
 import com.aloc.aloc.course.dto.request.CourseRequestDto;
@@ -11,7 +12,9 @@ import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import com.aloc.aloc.global.apipayload.status.SuccessStatus;
+import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
 import com.aloc.aloc.scraper.ProblemScrapingService;
+import com.aloc.aloc.user.dto.response.ColorResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -36,6 +39,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin")
 public class AdminController {
   private final AdminService adminService;
+  private final ProfileBackgroundColorService profileBackgroundColorService;
   private final CourseService courseService;
   private final ProblemScrapingService problemScrapingService;
 
@@ -113,6 +117,33 @@ public class AdminController {
         adminService.updateUserRole(user.getUsername(), adminRoleChangeRequestDto));
   }
 
+  @GetMapping("/users")
+  @SecurityRequirement(name = "JWT Auth")
+  @Operation(summary = "전체 사용자 정보 조회", description = "관리자 메인 페이지에서 모든 사용자의 특정 정보를 조회합니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "성공적으로 사용자 정보를 반환합니다.",
+            content =
+                @Content(
+                    array =
+                        @ArraySchema(
+                            schema = @Schema(implementation = AdminUserResponseDto.class)))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "인증되지 않았거나 관리자 권한이 없는 경우",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "서버 내부 오류",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+      })
+  public CustomApiResponse<List<AdminUserResponseDto>> getAllUsersForAdmin(
+      @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+    return CustomApiResponse.onSuccess(adminService.getAllUsersForAdmin(user.getUsername()));
+  }
+
   @PatchMapping("/coin-transactions")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(
@@ -161,6 +192,31 @@ public class AdminController {
   public CustomApiResponse<AdminWithdrawResponseDto> withdrawByAdmin(
       @Parameter(hidden = true) @AuthenticationPrincipal User user, @RequestParam UUID uuid) {
     return CustomApiResponse.onSuccess(adminService.killUser(user.getUsername(), uuid));
+  }
+
+  @GetMapping("/colors")
+  @SecurityRequirement(name = "JWT Auth")
+  @Operation(summary = "전체 배경 색상 조회", description = "모든 프로필 배경 색상 정보를 리스트 형태로 반환합니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "성공적으로 색상 목록을 반환합니다.",
+            content =
+                @Content(
+                    array =
+                        @ArraySchema(schema = @Schema(implementation = ColorResponseDto.class)))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "인증되지 않았거나 관리자 권한이 없는 경우",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "서버 내부 오류",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+      })
+  public CustomApiResponse<List<ColorResponseDto>> getAllColors() {
+    return CustomApiResponse.onSuccess(profileBackgroundColorService.getAllColors());
   }
 
   @Operation(

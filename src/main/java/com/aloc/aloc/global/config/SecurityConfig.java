@@ -1,6 +1,7 @@
 package com.aloc.aloc.global.config;
 
 import com.aloc.aloc.auth.handler.OAuth2AuthenticationSuccessHandler;
+import com.aloc.aloc.auth.service.CustomAuthorizationRequestResolver;
 import com.aloc.aloc.auth.service.CustomOAuth2UserService;
 import com.aloc.aloc.global.jwt.filter.JwtAuthenticationProcessingFilter;
 import com.aloc.aloc.global.jwt.service.JwtServiceImpl;
@@ -42,6 +43,7 @@ public class SecurityConfig {
   private final JwtServiceImpl jwtService;
   private final CustomOAuth2UserService customOAuth2UserService;
   private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+  private final CustomAuthorizationRequestResolver customAuthorizationRequestResolver;
 
   // 특정 HTTP 요청에 대한 웹 기반 보안 구성
   @Bean
@@ -55,6 +57,8 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             (authorize) ->
                 authorize
+                    .requestMatchers("/admin/**")
+                    .hasRole("ADMIN")
                     .requestMatchers(
                         "/swagger-ui/**",
                         "/api-docs/**",
@@ -77,8 +81,7 @@ public class SecurityConfig {
                         "/api/coin/**",
                         "/api/user-courses",
                         "/api/user-courses/**",
-                        "/api/problems/*",
-                        "/admin/**")
+                        "/api/problems/*")
                     .authenticated()
                     .anyRequest()
                     .permitAll())
@@ -90,9 +93,13 @@ public class SecurityConfig {
                             response.sendError(
                                 HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Access Denied"))
                     .accessDeniedHandler(
-                        (request, response, accessDeniedException) ->
-                            response.sendError(
-                                HttpServletResponse.SC_FORBIDDEN, "Forbidden: Missing token")))
+                        (request, response, accessDeniedException) -> {
+                          if (request.getRequestURI().startsWith("/admin")) {
+                            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Not Found");
+                          } else {
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
+                          }
+                        }))
         .logout(
             logout ->
                 logout
@@ -122,6 +129,10 @@ public class SecurityConfig {
         .oauth2Login(
             oauth2 ->
                 oauth2
+                    .authorizationEndpoint(
+                        authorization ->
+                            authorization.authorizationRequestResolver(
+                                customAuthorizationRequestResolver))
                     .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                     .successHandler(oAuth2AuthenticationSuccessHandler));
 
@@ -164,7 +175,8 @@ public class SecurityConfig {
             "http://localhost:3000",
             "https://openaloc.store", // ✅ 프론트엔드 도메인 추가
             "https://www.openaloc.store",
-            "https://api.openaloc.store"));
+            "https://api.openaloc.store",
+            "https://dashboard.openaloc.store"));
     corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH"));
     corsConfiguration.setAllowedHeaders(List.of("*"));
     corsConfiguration.setAllowCredentials(true);

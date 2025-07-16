@@ -1,7 +1,10 @@
 package com.aloc.aloc.user.service;
 
-import com.aloc.aloc.global.apipayload.exception.NotFoundException;
+import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
+import com.aloc.aloc.profilebackgroundcolor.repository.ProfileBackgroundColorRepository;
+import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
 import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
+import com.aloc.aloc.user.dto.response.UserColorChangeResponseDto;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.repository.UserRepository;
@@ -18,17 +21,24 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
   private static final Set<Authority> ACTIVE_AUTHORITIES =
       Set.of(Authority.ROLE_USER, Authority.ROLE_ADMIN);
+  private static final int COLOR_CHANGE_MONEY = 100;
   private final UserRepository userRepository;
   private final BaekjoonRankScrapingService baekjoonRankScrapingService;
+  private final ProfileBackgroundColorService profileBackgroundColorService;
+  private final ProfileBackgroundColorRepository profileBackgroundColorRepository;
 
   public List<User> getActiveUsers() {
     return userRepository.findAllByAuthorityIn(ACTIVE_AUTHORITIES);
   }
 
+  public List<User> findAllUsers() {
+    return userRepository.findAll();
+  }
+
   public User getUser(String oauthId) {
     return userRepository
         .findByOauthId(oauthId)
-        .orElseThrow(() -> new NotFoundException("해당 사용자가 존재하지 않습니다."));
+        .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
   }
 
   public User getUserByUUID(UUID id) {
@@ -102,5 +112,21 @@ public class UserService {
   @Transactional
   public void saveAllUser(List<User> users) {
     userRepository.saveAll(users);
+  }
+
+  @Transactional
+  public UserColorChangeResponseDto changeColor(User user) {
+    if (user.getCoin() < COLOR_CHANGE_MONEY) {
+      throw new IllegalArgumentException("코인이 부족합니다.");
+    }
+    user.setCoin(user.getCoin() - COLOR_CHANGE_MONEY);
+
+    String colorName = profileBackgroundColorService.pickColor();
+    ProfileBackgroundColor profileBackgroundColor =
+        profileBackgroundColorRepository.findById(colorName).orElseThrow();
+    user.setProfileColor(colorName);
+
+    userRepository.save(user);
+    return UserColorChangeResponseDto.of(user.getCoin(), profileBackgroundColor);
   }
 }

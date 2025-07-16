@@ -11,16 +11,16 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class UserDetailResponseDto extends UserResponseDto {
   @Schema(description = "해결한 문제 수", example = "3")
-  private final Integer solvedCount;
+  private Integer solvedCount;
 
   @Schema(description = "연속문제 해결일 수", example = "2")
-  private final Integer consecutiveSolvedDays;
+  private Integer consecutiveSolvedDays;
 
   @Schema(description = "색상")
-  private final ColorResponseDto color;
+  private ColorResponseDto color;
 
   @Schema(description = "유저 생성 일자", example = "2024-03-04T19:37:55")
-  private final LocalDateTime createdAt;
+  private LocalDateTime createdAt;
 
   @Schema(description = "오늘 문제 해결 여부", example = "true")
   private boolean isTodaySolved;

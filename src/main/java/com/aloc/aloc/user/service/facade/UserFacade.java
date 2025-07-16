@@ -13,10 +13,10 @@ import com.aloc.aloc.global.image.ImageService;
 import com.aloc.aloc.global.image.enums.ImageType;
 import com.aloc.aloc.problem.dto.response.ProblemResponseDto;
 import com.aloc.aloc.problem.service.UserCourseProblemService;
-import com.aloc.aloc.profilebackgroundcolor.dto.response.ProfileBackgroundColorResponseDto;
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
 import com.aloc.aloc.scraper.BaekjoonRankScrapingService;
 import com.aloc.aloc.user.dto.request.UserRequestDto;
+import com.aloc.aloc.user.dto.response.UserColorChangeResponseDto;
 import com.aloc.aloc.user.dto.response.UserCourseResponseDto;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
@@ -68,6 +68,17 @@ public class UserFacade {
     return sortedUserList.stream()
         .map(userMapper::mapToUserDetailResponseDto)
         .collect(Collectors.toList());
+  }
+
+  public List<User> getAllUsers() {
+    List<User> users = userService.findAllUsers();
+
+    if (users.isEmpty()) {
+      throw new NoContentException("조회 가능한 유저가 없습니다.");
+    }
+
+    List<User> sortedUserList = userSortingService.sortUserList(users);
+    return sortedUserList;
   }
 
   public UserDetailResponseDto getUser(String oauthId) {
@@ -289,8 +300,8 @@ public class UserFacade {
   }
 
   @Transactional
-  public ProfileBackgroundColorResponseDto changeColor(String oauthId) {
+  public UserColorChangeResponseDto changeColor(String oauthId) {
     User user = userService.getUser(oauthId);
-    return profileBackgroundColorService.changeColor(user);
+    return userService.changeColor(user);
   }
 }

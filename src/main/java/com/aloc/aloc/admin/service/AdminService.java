@@ -4,6 +4,7 @@ import com.aloc.aloc.admin.dto.request.AdminCoinTransactionRequestDto;
 import com.aloc.aloc.admin.dto.request.AdminRoleChangeRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
+import com.aloc.aloc.admin.dto.response.AdminUserResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminWithdrawResponseDto;
 import com.aloc.aloc.coin.dto.response.CoinResponseDto;
 import com.aloc.aloc.coin.service.CoinService;
@@ -125,6 +126,13 @@ public class AdminService {
     return "success";
   }
 
+  @Transactional
+  public List<AdminUserResponseDto> getAllUsersForAdmin(String oauthId) {
+    userService.validateAdmin(oauthId);
+    return userFacade.getAllUsers().stream()
+        .map(AdminUserResponseDto::of)
+        .collect(Collectors.toList());
+  }
   // @Transactional
   // public CourseResponseDto addProblemToCourse(
   //    String username, AddProblemToCourseRequestDto requestDto) throws IOException {
