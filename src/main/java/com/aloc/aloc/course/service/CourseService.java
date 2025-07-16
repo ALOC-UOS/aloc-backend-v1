@@ -1,5 +1,6 @@
 package com.aloc.aloc.course.service;
 
+import com.aloc.aloc.admin.dto.request.EmptyCourseRequestDto;
 import com.aloc.aloc.course.dto.request.CourseRequestDto;
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.entity.Course;
@@ -7,7 +8,6 @@ import com.aloc.aloc.course.enums.CourseType;
 import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.repository.CourseRepository;
 import com.aloc.aloc.scraper.ProblemScrapingService;
-import com.aloc.aloc.user.service.UserService;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class CourseService {
   private final CourseRepository courseRepository;
   private final ProblemScrapingService problemScrapingService;
-  private final UserService userService;
 
   public Page<CourseResponseDto> getCourses(Pageable pageable, CourseType courseTypeOrNull) {
     Page<Course> courses = getCoursePageByCourseType(pageable, courseTypeOrNull);
@@ -30,13 +29,10 @@ public class CourseService {
   }
 
   @Transactional
-  public CourseResponseDto updateCourse(String user, Long courseId) {
-    userService.validateAdmin(user);
-
+  public Course updateCourse(Long courseId) {
     Course course = getCourseById(courseId);
     course.updateRankRange();
-    courseRepository.save(course);
-    return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
+    return courseRepository.save(course);
   }
 
   public Page<Course> getCoursePageByCourseType(Pageable pageable, CourseType courseTypeOrNull) {
@@ -46,26 +42,19 @@ public class CourseService {
   }
 
   @Transactional
-  public CourseResponseDto createCourse(String user, CourseRequestDto courseRequestDto)
-      throws IOException {
-    userService.validateAdmin(user); // user가 admin인지 검사
-
+  public Course createCourse(CourseRequestDto courseRequestDto) throws IOException {
     Course course = Course.of(courseRequestDto);
     courseRepository.save(course);
     problemScrapingService.createProblemsByCourse(course, courseRequestDto);
-    return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
+    return course;
   }
 
   @Transactional
-  public CourseResponseDto createEmptyCourse(String user, CourseRequestDto courseRequestDto)
-      throws IOException {
-    userService.validateAdmin(user);
-
-    Course course = Course.of(courseRequestDto);
+  public Course createEmptyCourse(EmptyCourseRequestDto emptyCourseRequestDto) {
+    Course course = Course.ofEmpty(emptyCourseRequestDto);
     course.calculateAverageRank();
-    courseRepository.save(course);
-    return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
-  } // 빈 코스를 생성
+    return courseRepository.save(course);
+  }
 
   public Course getCourseById(Long courseId) {
     return courseRepository
@@ -90,17 +79,5 @@ public class CourseService {
 
   public List<Course> getActiveCourses() {
     return courseRepository.findAll();
-  }
-
-  @Transactional
-  public CourseResponseDto addProblemToCourse(String username, Long courseId, Long problemId)
-      throws IOException {
-
-    userService.validateAdmin(username);
-
-    Course course = getCourseById(courseId);
-    problemScrapingService.createCourseByProblemId(course, Math.toIntExact(problemId));
-
-    return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
   }
 }

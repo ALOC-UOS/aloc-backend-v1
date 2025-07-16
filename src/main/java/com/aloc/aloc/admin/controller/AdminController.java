@@ -2,6 +2,7 @@ package com.aloc.aloc.admin.controller;
 
 import com.aloc.aloc.admin.dto.request.AdminCoinTransactionRequestDto;
 import com.aloc.aloc.admin.dto.request.AdminRoleChangeRequestDto;
+import com.aloc.aloc.admin.dto.request.EmptyCourseRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminUserResponseDto;
@@ -9,11 +10,9 @@ import com.aloc.aloc.admin.dto.response.AdminWithdrawResponseDto;
 import com.aloc.aloc.admin.service.AdminService;
 import com.aloc.aloc.course.dto.request.CourseRequestDto;
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
-import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import com.aloc.aloc.global.apipayload.status.SuccessStatus;
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
-import com.aloc.aloc.scraper.ProblemScrapingService;
 import com.aloc.aloc.user.dto.response.ColorResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,8 +39,6 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
   private final AdminService adminService;
   private final ProfileBackgroundColorService profileBackgroundColorService;
-  private final CourseService courseService;
-  private final ProblemScrapingService problemScrapingService;
 
   @GetMapping("/dashboard")
   @SecurityRequirement(name = "JWT Auth")
@@ -171,7 +168,7 @@ public class AdminController {
         adminService.processCoinTransactions(user.getUsername(), requestDto));
   }
 
-  @DeleteMapping("admin/withdraw")
+  @DeleteMapping("/withdraw")
   @SecurityRequirement(name = "JWT Auth")
   @Operation(summary = "유저 추방", description = "관리자가 유저를 추방합니다.")
   @ApiResponses(
@@ -245,7 +242,7 @@ public class AdminController {
       throws IOException {
 
     return CustomApiResponse.of(
-        SuccessStatus._CREATED, courseService.createCourse(user.getUsername(), courseRequestDto));
+        SuccessStatus._CREATED, adminService.createCourse(user.getUsername(), courseRequestDto));
   }
 
   @PreAuthorize("hasRole('ADMIN')")
@@ -261,13 +258,12 @@ public class AdminController {
   @PostMapping("/courses/empty")
   @SecurityRequirement(name = "JWT Auth")
   public CustomApiResponse<CourseResponseDto> createEmptyCourse(
-      @RequestBody @Valid CourseRequestDto courseRequestDto,
-      @Parameter(hidden = true) @AuthenticationPrincipal User user)
-      throws IOException {
+      @RequestBody @Valid EmptyCourseRequestDto emptyCourseRequestDto,
+      @Parameter(hidden = true) @AuthenticationPrincipal User user) {
 
     return CustomApiResponse.of(
         SuccessStatus._CREATED,
-        courseService.createEmptyCourse(user.getUsername(), courseRequestDto));
+        adminService.createEmptyCourse(user.getUsername(), emptyCourseRequestDto));
   }
 
   @PreAuthorize("hasRole('ADMIN')")
@@ -286,16 +282,16 @@ public class AdminController {
   @SecurityRequirement(name = "JWT Auth")
   public CustomApiResponse<CourseResponseDto> addProblemToCourse(
       @PathVariable Long courseId,
-      @PathVariable Long problemId,
+      @PathVariable int problemId,
       @Parameter(hidden = true) @AuthenticationPrincipal User user)
       throws IOException {
 
     return CustomApiResponse.onSuccess(
-        courseService.addProblemToCourse(user.getUsername(), courseId, problemId));
+        adminService.addProblemToCourse(user.getUsername(), courseId, problemId));
   }
 
   @PreAuthorize("hasRole('ADMIN')")
-  @PatchMapping("courses/{courseId}")
+  @PatchMapping("/courses/{courseId}")
   @Operation(
       summary = "코스 정보 업데이트",
       description = "지정한 코스의 랭크 범위를 업데이트합니다. 관리자 권한이 필요합니다.",
@@ -312,6 +308,6 @@ public class AdminController {
   @SecurityRequirement(name = "JWT Auth")
   public CustomApiResponse<CourseResponseDto> updateCourse(
       @PathVariable Long courseId, @Parameter(hidden = true) @AuthenticationPrincipal User user) {
-    return CustomApiResponse.onSuccess(courseService.updateCourse(user.getUsername(), courseId));
+    return CustomApiResponse.onSuccess(adminService.updateCourse(user.getUsername(), courseId));
   }
 }

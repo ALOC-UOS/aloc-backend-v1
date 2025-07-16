@@ -2,12 +2,15 @@ package com.aloc.aloc.admin.service;
 
 import com.aloc.aloc.admin.dto.request.AdminCoinTransactionRequestDto;
 import com.aloc.aloc.admin.dto.request.AdminRoleChangeRequestDto;
+import com.aloc.aloc.admin.dto.request.EmptyCourseRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminDashboardResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminUserResponseDto;
 import com.aloc.aloc.admin.dto.response.AdminWithdrawResponseDto;
 import com.aloc.aloc.coin.dto.response.CoinResponseDto;
 import com.aloc.aloc.coin.service.CoinService;
+import com.aloc.aloc.course.dto.request.CourseRequestDto;
+import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.course.dto.response.RankResponseDto;
 import com.aloc.aloc.course.entity.Course;
 import com.aloc.aloc.course.entity.CourseProblem;
@@ -19,13 +22,14 @@ import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
 import com.aloc.aloc.user.service.UserService;
 import com.aloc.aloc.user.service.facade.UserFacade;
-import jakarta.transaction.Transactional;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -133,15 +137,38 @@ public class AdminService {
         .map(AdminUserResponseDto::of)
         .collect(Collectors.toList());
   }
-  // @Transactional
-  // public CourseResponseDto addProblemToCourse(
-  //    String username, AddProblemToCourseRequestDto requestDto) throws IOException {
-  //
-  //  userService.validateAdmin(username);
-  //
-  //  Course course = courseService.getCourseById(requestDto.getCourseId());
-  //  problemScrapingService.createCourseByProblemId(course, requestDto.getProblemId());
-  //
-  //  return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
-  // }
+
+  @Transactional
+  public CourseResponseDto addProblemToCourse(String username, Long courseId, int problemId)
+      throws IOException {
+    userService.validateAdmin(username);
+
+    Course course = courseService.getCourseById(courseId);
+    problemScrapingService.createCourseByProblemId(course, problemId);
+
+    return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
+  }
+
+  public CourseResponseDto createCourse(String user, CourseRequestDto courseRequestDto)
+      throws IOException {
+    userService.validateAdmin(user); // user가 admin인지 검사
+    Course course = courseService.createCourse(courseRequestDto);
+
+    return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
+  }
+
+  @Transactional
+  public CourseResponseDto createEmptyCourse(
+      String user, EmptyCourseRequestDto emptyCourseRequestDto) {
+    userService.validateAdmin(user);
+    Course course = courseService.createEmptyCourse(emptyCourseRequestDto);
+    return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
+  }
+
+  public CourseResponseDto updateCourse(String user, Long courseId) {
+    userService.validateAdmin(user);
+
+    Course course = courseService.updateCourse(courseId);
+    return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
+  }
 }

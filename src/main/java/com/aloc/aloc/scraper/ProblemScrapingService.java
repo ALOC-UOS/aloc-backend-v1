@@ -92,9 +92,6 @@ public class ProblemScrapingService {
       courseProblemRepository.save(courseProblem);
       course.addCourseProblem(courseProblem);
 
-      long count = courseProblemRepository.countByCourseId(course.getId());
-      course.setProblemCnt((int) count);
-
       course.calculateAverageRank();
       course.updateRankRange();
 
