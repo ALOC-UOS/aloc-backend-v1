@@ -70,7 +70,9 @@ public class ProblemFacade {
       userCourse.updateUserCourseState(UserCourseState.SUCCESS);
       course.addSuccessCnt();
     } else if (course.getCourseType() == CourseType.DEADLINE) {
-      activateNextProblem(sorted, userCourseProblem.getProblemOrder() + 1);
+      // 다음 문제 활성화를 위해, 1-based인 problemOrder 값을 0-based 리스트 인덱스로 그대로 사용합니다.
+      // problemOrder=1 → sortedProblems.get(1) (problemOrder=2인 문제) 활성화
+      activateNextProblem(sorted, userCourseProblem.getProblemOrder());
     }
 
     return rewards;
