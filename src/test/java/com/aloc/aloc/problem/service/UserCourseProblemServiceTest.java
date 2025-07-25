@@ -103,7 +103,7 @@ class UserCourseProblemServiceTest {
     User user = TestFixture.getMockUserByOauthId("User");
     UserCourse uc1 = TestFixture.getMockUserCourse(user, CourseType.DAILY, 2, 2);
     UserCourse uc2 = TestFixture.getMockUserCourse(user, CourseType.DAILY, 2, 2);
-    Problem problem = TestFixture.getMockProblem(401, "중복문제", 4);
+    Problem problem = TestFixture.getMockProblem(401, "문제", 4);
     LocalDateTime t1 = LocalDateTime.now().minusDays(1);
     LocalDateTime t2 = LocalDateTime.now();
 

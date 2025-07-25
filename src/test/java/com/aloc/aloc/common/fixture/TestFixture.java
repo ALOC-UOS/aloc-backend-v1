@@ -55,7 +55,7 @@ public class TestFixture {
             .profileImageFileName("test-profile.png")
             .build();
     user.setAuthority(Authority.ROLE_USER);
-    user.setBaekjoonId("baekjoonid");
+    user.setBaekjoonId("baekjooid");
     user.setRank(32);
     return user;
   }

@@ -192,7 +192,7 @@ class ProblemFacadeTest {
   void checkProblemSolvedDailyLast() {
     // given
     User user = TestFixture.getMockUserByOauthId(oauthId);
-    Problem problem = TestFixture.getMockProblem(problemId, "제목", 1);
+    Problem problem = TestFixture.getMockProblem(problemId, "문제", 1);
     UserCourse userCourse = TestFixture.getMockUserCourse(user, CourseType.DAILY, 3, 3);
     UserCourseProblem ucp =
         TestFixture.getMockUserCourseProblem(
@@ -233,7 +233,7 @@ class ProblemFacadeTest {
   void checkProblemSolvedDailyGeneral() {
     // given
     User user = TestFixture.getMockUserByOauthId(oauthId);
-    Problem problem = TestFixture.getMockProblem(problemId, "제목", 1);
+    Problem problem = TestFixture.getMockProblem(problemId, "문제", 1);
     UserCourse userCourse = TestFixture.getMockUserCourse(user, CourseType.DAILY, 3, 3);
     UserCourseProblem ucpCurrent =
         TestFixture.getMockUserCourseProblem(

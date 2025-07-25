@@ -26,7 +26,7 @@ public class ProblemServiceTest {
   void findProblemByProblemIdSuccess() {
     // given
     Integer problemId = 100;
-    Problem mockProblem = TestFixture.getMockProblem(problemId, "샘플 문제", 1);
+    Problem mockProblem = TestFixture.getMockProblem(problemId, "문제", 1);
     given(problemRepository.findByProblemId(problemId)).willReturn(Optional.of(mockProblem));
 
     // when
@@ -56,7 +56,7 @@ public class ProblemServiceTest {
   void getProblemByProblemIdSuccess() {
     // given
     Integer problemId = 100;
-    Problem mockProblem = TestFixture.getMockProblem(problemId, "샘플 문제", 1);
+    Problem mockProblem = TestFixture.getMockProblem(problemId, "문제", 1);
     given(problemRepository.findByProblemId(problemId)).willReturn(Optional.of(mockProblem));
 
     // when
@@ -84,7 +84,7 @@ public class ProblemServiceTest {
   void saveProblemSuccess() {
     // given
     Integer problemId = 100;
-    Problem toSave = TestFixture.getMockProblem(problemId, "샘플 문제", 1);
+    Problem toSave = TestFixture.getMockProblem(problemId, "문제", 1);
     given(problemRepository.save(toSave)).willReturn(toSave);
 
     // when
