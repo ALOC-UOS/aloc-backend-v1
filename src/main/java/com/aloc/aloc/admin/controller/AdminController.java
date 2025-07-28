@@ -1,6 +1,7 @@
 package com.aloc.aloc.admin.controller;
 
 import com.aloc.aloc.admin.dto.request.AdminCoinTransactionRequestDto;
+import com.aloc.aloc.admin.dto.request.AdminReportRequestDto;
 import com.aloc.aloc.admin.dto.request.AdminRoleChangeRequestDto;
 import com.aloc.aloc.admin.dto.request.EmptyCourseRequestDto;
 import com.aloc.aloc.admin.dto.response.AdminCourseResponseDto;
@@ -13,6 +14,7 @@ import com.aloc.aloc.course.dto.response.CourseResponseDto;
 import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import com.aloc.aloc.global.apipayload.status.SuccessStatus;
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
+import com.aloc.aloc.report.dto.response.ReportResponseDto;
 import com.aloc.aloc.user.dto.response.ColorResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -214,6 +216,63 @@ public class AdminController {
       })
   public CustomApiResponse<List<ColorResponseDto>> getAllColors() {
     return CustomApiResponse.onSuccess(profileBackgroundColorService.getAllColors());
+  }
+
+  @GetMapping("/reports")
+  @SecurityRequirement(name = "JWT Auth")
+  @Operation(summary = "대시보드 문의사항 조회", description = "관리자가 모든 문의사항을 조회합니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "성공적으로 문의사항 목록을 반환합니다.",
+            content =
+                @Content(
+                    array =
+                        @ArraySchema(schema = @Schema(implementation = ReportResponseDto.class)))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "인증되지 않았거나 관리자 권한이 없는 경우",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "서버 내부 오류",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+      })
+  public CustomApiResponse<List<ReportResponseDto>> getAllReports(
+      @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+    return CustomApiResponse.onSuccess(adminService.getAllReports(user.getUsername()));
+  }
+
+  @PutMapping("/reports/{reportId}")
+  @SecurityRequirement(name = "JWT Auth")
+  @Operation(summary = "문의사항 답변하기", description = "관리자가 문의사항에 답변을 등록합니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "성공적으로 답변이 등록되었습니다.",
+            content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "인증되지 않았거나 관리자 권한이 없는 경우",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "문의사항을 찾을 수 없음",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+            responseCode = "500",
+            description = "서버 내부 오류",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+      })
+  public CustomApiResponse<String> answerReport(
+      @PathVariable Long reportId,
+      @RequestBody @Valid AdminReportRequestDto adminReportRequestDto,
+      @Parameter(hidden = true) @AuthenticationPrincipal User user) {
+    return CustomApiResponse.onSuccess(
+        adminService.answerReport(
+            reportId, user.getUsername(), adminReportRequestDto.getResponse()));
   }
 
   @Operation(
