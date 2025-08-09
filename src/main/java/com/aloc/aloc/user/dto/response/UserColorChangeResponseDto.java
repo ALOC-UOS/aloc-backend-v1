@@ -1,6 +1,7 @@
 package com.aloc.aloc.user.dto.response;
 
 import com.aloc.aloc.profilebackgroundcolor.entity.ProfileBackgroundColor;
+import com.aloc.aloc.profilebackgroundcolor.dto.response.ColorResponseDto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

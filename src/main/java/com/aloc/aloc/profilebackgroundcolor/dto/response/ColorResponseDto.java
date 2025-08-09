@@ -1,4 +1,4 @@
-package com.aloc.aloc.user.dto.response;
+package com.aloc.aloc.profilebackgroundcolor.dto.response;
 
 import com.aloc.aloc.profilebackgroundcolor.entity.ProfileBackgroundColor;
 
