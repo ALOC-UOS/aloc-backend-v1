@@ -41,3 +41,4 @@ out/
 /src/main/resources/**/*.yaml
 
 upload/
+/CLAUDE.md
