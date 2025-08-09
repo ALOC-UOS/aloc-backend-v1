@@ -1,4 +1,4 @@
-package com.aloc.aloc.profilebackgroundcolor;
+package com.aloc.aloc.profilebackgroundcolor.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

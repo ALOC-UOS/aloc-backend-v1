@@ -1,6 +1,6 @@
 package com.aloc.aloc.profilebackgroundcolor.service;
 
-import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
+import com.aloc.aloc.profilebackgroundcolor.entity.ProfileBackgroundColor;
 import com.aloc.aloc.profilebackgroundcolor.repository.ProfileBackgroundColorRepository;
 import com.aloc.aloc.user.dto.response.ColorResponseDto;
 import com.aloc.aloc.user.repository.UserRepository;
