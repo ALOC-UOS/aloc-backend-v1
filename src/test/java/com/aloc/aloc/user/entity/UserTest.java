@@ -49,7 +49,7 @@ class UserTest {
     }
 
     @Test
-    @DisplayName("연속성이 깨졌을 때(2일 이상 간격) 연속 일수가 1로 초기화됨")
+    @DisplayName("연속이 깨졌을 때(2일 이상 간격) 연속 일수가 1로 초기화됨")
     void updateUserBySolvingProblemResetStreak() {
       // given
       User user = createTestUser();
@@ -86,7 +86,7 @@ class UserTest {
   private User createTestUser() {
     return User.builder()
         .oauthId("test_oauth_id")
-        .name("테스트유저")
+        .name("tester123123")
         .email("test@example.com")
         .profileImageFileName("test.jpg")
         .build();

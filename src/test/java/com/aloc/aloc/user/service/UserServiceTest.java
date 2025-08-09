@@ -23,11 +23,43 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-  @Mock private UserRepository userRepository;
-  @Mock private ProfileBackgroundColorService profileBackgroundColorService;
-  @Mock private ProfileBackgroundColorRepository profileBackgroundColorRepository;
+  @Mock
+  private UserRepository userRepository;
+  @Mock
+  private ProfileBackgroundColorService profileBackgroundColorService;
+  @Mock
+  private ProfileBackgroundColorRepository profileBackgroundColorRepository;
 
-  @InjectMocks private UserService userService;
+  @InjectMocks
+  private UserService userService;
+
+  @Test
+  @DisplayName("유효한 oauthId로 유저 조회 성공")
+  void getUserSuccess() {
+    // given
+    String oauthId = "oauthId";
+    User user = TestFixture.getMockUserByOauthId(oauthId);
+    given(userRepository.findByOauthId(oauthId)).willReturn(Optional.of(user));
+
+    // when
+    User result = userService.getUser(oauthId);
+
+    // then
+    assertThat(result).isEqualTo(user);
+  }
+
+  @Test
+  @DisplayName("존재하지 않는 oauthId 조회 시 IllegalArgumentException 발생")
+  void getUserFail() {
+    // given
+    String invalidOauthId = "invalid_id";
+    given(userRepository.findByOauthId(invalidOauthId)).willReturn(Optional.empty());
+
+    // when & then
+    assertThatThrownBy(() -> userService.getUser(invalidOauthId))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("해당 사용자가 존재하지 않습니다.");
+  }
 
   @Nested
   @DisplayName("색상 변경 테스트")
@@ -38,7 +70,7 @@ class UserServiceTest {
     void changeColorSuccess() {
       // given
       User user = TestFixture.getMockNewUser();
-      user.setCoin(150); // 충분한 코인
+      user.setCoin(150); // 충분한 코인이 있을 때
 
       String newColorName = "Red";
       ProfileBackgroundColor newColor = createMockProfileBackgroundColor(newColorName);
@@ -63,7 +95,7 @@ class UserServiceTest {
     void changeColorInsufficientCoin() {
       // given
       User user = TestFixture.getMockNewUser();
-      user.setCoin(50); // 부족한 코인 (100 미만)
+      user.setCoin(50); // 코인이 부족할 때
 
       // when & then
       assertThatThrownBy(() -> userService.changeColor(user))
@@ -76,9 +108,9 @@ class UserServiceTest {
     @Test
     @DisplayName("정확히 100 코인일 때 색상 변경 성공")
     void changeColorExactlyCoin() {
-      // given
+      //given
       User user = TestFixture.getMockNewUser();
-      user.setCoin(100); // 정확히 100 코인
+      user.setCoin(100); // 정확히 100 코인일 때
 
       String newColorName = "Green";
       ProfileBackgroundColor newColor = createMockProfileBackgroundColor(newColorName);
@@ -87,10 +119,10 @@ class UserServiceTest {
       given(profileBackgroundColorRepository.findById(newColorName))
           .willReturn(Optional.of(newColor));
 
-      // when
+      //when
       UserColorChangeResponseDto result = userService.changeColor(user);
 
-      // then
+      //then
       assertThat(result).isNotNull();
       assertThat(result.getUserCoin()).isEqualTo(0); // 100 - 100 = 0
       assertThat(user.getProfileColor()).isEqualTo(newColorName);
@@ -100,18 +132,17 @@ class UserServiceTest {
   @Nested
   @DisplayName("백준 아이디 중복 체크 테스트")
   class CheckBaekjoonIdTest {
-
     @Test
     @DisplayName("이미 존재하는 백준 아이디일 때 예외 발생")
     void checkBaekjoonIdAlreadyExists() {
-      // given
+      //given
       String existingBaekjoonId = "existing_id";
       given(userRepository.existsByBaekjoonId(existingBaekjoonId)).willReturn(true);
 
       // when & then
       assertThatThrownBy(() -> userService.checkBaekjoonId(existingBaekjoonId))
-          .isInstanceOf(IllegalArgumentException.class)
-          .hasMessage("이미 존재하는 백준 아이디 입니다.");
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("이미 존재하는 백준 아이디 입니다.");
     }
 
     @Test
