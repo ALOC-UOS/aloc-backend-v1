@@ -8,8 +8,10 @@ import org.springframework.stereotype.Repository;
 import com.aloc.aloc.profilebackgroundcolor.entity.ProfileBackgroundColor;
 
 // 프로필 배경 색상 레포지토리
-// findByName 이름으로 조회
-// findByType 타입으로 조회
+
+// 조회
+// 1. findByName 이름으로 조회
+// 2. findByType 타입으로 조회
 @Repository
 public interface ProfileBackgroundColorRepository
     extends JpaRepository<ProfileBackgroundColor, String> {
