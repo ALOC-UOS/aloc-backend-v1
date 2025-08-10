@@ -23,6 +23,7 @@ public class ProfileBackgroundColor {
 
   @Column(nullable = false)
   private String color1;
+
   private String color2;
   private String color3;
   private String color4;
@@ -30,5 +31,6 @@ public class ProfileBackgroundColor {
 
   @Column(nullable = false)
   private String type;
+
   private Integer degree;
 }

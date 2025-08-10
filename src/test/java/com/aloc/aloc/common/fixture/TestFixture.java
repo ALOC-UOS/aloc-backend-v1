@@ -173,7 +173,8 @@ public class TestFixture {
         .build();
   }
 
-  public static ProfileBackgroundColor getMockProfileBackgroundColorByName(String name, String type) {
+  public static ProfileBackgroundColor getMockProfileBackgroundColorByName(
+      String name, String type) {
     return ProfileBackgroundColor.builder()
         .name(name)
         .color1("#FF5A5A")
