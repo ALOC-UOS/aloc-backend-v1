@@ -35,12 +35,11 @@ public class ReportController {
       description = "새로운 문의사항을 생성합니다.",
       responses = {
         @ApiResponse(
-            responseCode = "201",
+            responseCode = "200",
             description = "문의사항 생성 성공",
             content = @Content(schema = @Schema(implementation = String.class))),
         @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
-        @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
-        @ApiResponse(responseCode = "404", description = "사용자 정보 없음")
+        @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
       })
   public CustomApiResponse<String> createReport(
       @Parameter(hidden = true) @AuthenticationPrincipal User user,
@@ -62,8 +61,7 @@ public class ReportController {
                 @Content(
                     array =
                         @ArraySchema(schema = @Schema(implementation = ReportResponseDto.class)))),
-        @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
-        @ApiResponse(responseCode = "404", description = "사용자 정보 없음")
+        @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
       })
   public CustomApiResponse<List<ReportResponseDto>> getUserReports(
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
