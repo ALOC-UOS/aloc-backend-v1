@@ -5,7 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import com.aloc.aloc.common.fixture.TestFixture;
-import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
+import com.aloc.aloc.profilebackgroundcolor.entity.ProfileBackgroundColor;
 import com.aloc.aloc.profilebackgroundcolor.repository.ProfileBackgroundColorRepository;
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
 import com.aloc.aloc.user.dto.response.UserColorChangeResponseDto;
