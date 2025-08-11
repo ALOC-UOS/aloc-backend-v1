@@ -23,15 +23,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-  @Mock
-  private UserRepository userRepository;
-  @Mock
-  private ProfileBackgroundColorService profileBackgroundColorService;
-  @Mock
-  private ProfileBackgroundColorRepository profileBackgroundColorRepository;
+  @Mock private UserRepository userRepository;
+  @Mock private ProfileBackgroundColorService profileBackgroundColorService;
+  @Mock private ProfileBackgroundColorRepository profileBackgroundColorRepository;
 
-  @InjectMocks
-  private UserService userService;
+  @InjectMocks private UserService userService;
 
   @Test
   @DisplayName("유효한 oauthId로 유저 조회 성공")
@@ -108,7 +104,7 @@ class UserServiceTest {
     @Test
     @DisplayName("정확히 100 코인일 때 색상 변경 성공")
     void changeColorExactlyCoin() {
-      //given
+      // given
       User user = TestFixture.getMockNewUser();
       user.setCoin(100); // 정확히 100 코인일 때
 
@@ -119,10 +115,10 @@ class UserServiceTest {
       given(profileBackgroundColorRepository.findById(newColorName))
           .willReturn(Optional.of(newColor));
 
-      //when
+      // when
       UserColorChangeResponseDto result = userService.changeColor(user);
 
-      //then
+      // then
       assertThat(result).isNotNull();
       assertThat(result.getUserCoin()).isEqualTo(0); // 100 - 100 = 0
       assertThat(user.getProfileColor()).isEqualTo(newColorName);
@@ -135,14 +131,14 @@ class UserServiceTest {
     @Test
     @DisplayName("이미 존재하는 백준 아이디일 때 예외 발생")
     void checkBaekjoonIdAlreadyExists() {
-      //given
+      // given
       String existingBaekjoonId = "existing_id";
       given(userRepository.existsByBaekjoonId(existingBaekjoonId)).willReturn(true);
 
       // when & then
       assertThatThrownBy(() -> userService.checkBaekjoonId(existingBaekjoonId))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessage("이미 존재하는 백준 아이디 입니다.");
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessage("이미 존재하는 백준 아이디 입니다.");
     }
 
     @Test
