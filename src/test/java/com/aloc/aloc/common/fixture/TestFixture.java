@@ -11,6 +11,8 @@ import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.problem.dto.response.ProblemSolvedResponseDto;
 import com.aloc.aloc.problem.entity.Problem;
 import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
+import com.aloc.aloc.profilebackgroundcolor.dto.response.ColorResponseDto;
+import com.aloc.aloc.profilebackgroundcolor.entity.ProfileBackgroundColor;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
@@ -142,5 +144,51 @@ public class TestFixture {
         .solvedAt(solvedAt)
         .problemOrder(problemOrder)
         .build();
+  }
+
+  // ProfileBackgroundColor 관련 테스트 픽스처
+  public static ProfileBackgroundColor getMockProfileBackgroundColor() {
+    return ProfileBackgroundColor.builder()
+        .name("TestColor")
+        .color1("#0000FF")
+        .color2("#87CEEB")
+        .color3(null)
+        .color4(null)
+        .color5(null)
+        .type("common")
+        .degree(135)
+        .build();
+  }
+
+  public static ProfileBackgroundColor getMockProfileBackgroundColorByType(String type) {
+    return ProfileBackgroundColor.builder()
+        .name("Test" + type)
+        .color1("#FF0000")
+        .color2("#00FF00")
+        .color3("#0000FF")
+        .color4(null)
+        .color5(null)
+        .type(type)
+        .degree(180)
+        .build();
+  }
+
+  public static ProfileBackgroundColor getMockProfileBackgroundColorByName(
+      String name, String type) {
+    return ProfileBackgroundColor.builder()
+        .name(name)
+        .color1("#FF5A5A")
+        .color2("#FFB800")
+        .color3(null)
+        .color4(null)
+        .color5(null)
+        .type(type)
+        .degree(135)
+        .build();
+  }
+
+  public static ColorResponseDto getMockColorResponseDto() {
+    ProfileBackgroundColor color = getMockProfileBackgroundColor();
+    return ColorResponseDto.of(color);
   }
 }
