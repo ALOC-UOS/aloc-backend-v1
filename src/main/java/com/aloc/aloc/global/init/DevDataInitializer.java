@@ -1,6 +1,7 @@
 package com.aloc.aloc.global.init;
 
 import com.aloc.aloc.profilebackgroundcolor.entity.ProfileBackgroundColor;
+import com.aloc.aloc.profilebackgroundcolor.enums.ColorType;
 import com.aloc.aloc.profilebackgroundcolor.repository.ProfileBackgroundColorRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,41 +30,41 @@ public class DevDataInitializer implements CommandLineRunner {
 
     List<ProfileBackgroundColor> colors =
         List.of(
-            new ProfileBackgroundColor("Red", "#FF5A5A", null, null, null, null, "common", null),
-            new ProfileBackgroundColor("Yellow", "#FFB800", null, null, null, null, "common", null),
-            new ProfileBackgroundColor("Orange", "#FF9635", null, null, null, null, "common", null),
-            new ProfileBackgroundColor("Green", "#2ADC0D", null, null, null, null, "common", null),
+            new ProfileBackgroundColor("Red", "#FF5A5A", null, null, null, null, ColorType.COMMON.getValue(), null),
+            new ProfileBackgroundColor("Yellow", "#FFB800", null, null, null, null, ColorType.COMMON.getValue(), null),
+            new ProfileBackgroundColor("Orange", "#FF9635", null, null, null, null, ColorType.COMMON.getValue(), null),
+            new ProfileBackgroundColor("Green", "#2ADC0D", null, null, null, null, ColorType.COMMON.getValue(), null),
             new ProfileBackgroundColor(
-                "Emerald", "#00DC9A", null, null, null, null, "common", null),
+                "Emerald", "#00DC9A", null, null, null, null, ColorType.COMMON.getValue(), null),
             new ProfileBackgroundColor(
-                "Skyblue", "#00C2FF", null, null, null, null, "common", null),
-            new ProfileBackgroundColor("Blue", "#408CFF", null, null, null, null, "common", null),
-            new ProfileBackgroundColor("Indigo", "#4440FF", null, null, null, null, "common", null),
-            new ProfileBackgroundColor("Purple", "#BA63FF", null, null, null, null, "common", null),
-            new ProfileBackgroundColor("Pink", "#FF5AB3", null, null, null, null, "common", null),
+                "Skyblue", "#00C2FF", null, null, null, null, ColorType.COMMON.getValue(), null),
+            new ProfileBackgroundColor("Blue", "#408CFF", null, null, null, null, ColorType.COMMON.getValue(), null),
+            new ProfileBackgroundColor("Indigo", "#4440FF", null, null, null, null, ColorType.COMMON.getValue(), null),
+            new ProfileBackgroundColor("Purple", "#BA63FF", null, null, null, null, ColorType.COMMON.getValue(), null),
+            new ProfileBackgroundColor("Pink", "#FF5AB3", null, null, null, null, ColorType.COMMON.getValue(), null),
             new ProfileBackgroundColor(
-                "PurpleRed", "#BA63FF", "#FF5A5A", null, null, null, "rare", 135),
+                "PurpleRed", "#BA63FF", "#FF5A5A", null, null, null, ColorType.RARE.getValue(), 135),
             new ProfileBackgroundColor(
-                "BluePurple", "#408CFF", "#BA63FF", null, null, null, "rare", 135),
+                "BluePurple", "#408CFF", "#BA63FF", null, null, null, ColorType.RARE.getValue(), 135),
             new ProfileBackgroundColor(
-                "IndigoPink", "#4440FF", "#FF5AB3", null, null, null, "rare", 135),
+                "IndigoPink", "#4440FF", "#FF5AB3", null, null, null, ColorType.RARE.getValue(), 135),
             new ProfileBackgroundColor(
-                "SkyblueIndigo", "#00C2FF", "#4440FF", null, null, null, "rare", 135),
+                "SkyblueIndigo", "#00C2FF", "#4440FF", null, null, null, ColorType.RARE.getValue(), 135),
             new ProfileBackgroundColor(
-                "GreenSkyblue", "#2ADC0D", "#00C2FF", null, null, null, "rare", 135),
+                "GreenSkyblue", "#2ADC0D", "#00C2FF", null, null, null, ColorType.RARE.getValue(), 135),
             new ProfileBackgroundColor(
-                "RedYellow", "#FF5A5A", "#FFB800", null, null, null, "rare", 135),
+                "RedYellow", "#FF5A5A", "#FFB800", null, null, null, ColorType.RARE.getValue(), 135),
             new ProfileBackgroundColor(
-                "BeautifulYPB", "#FFB800", "#FF69F0", "#408CFF", "", "", "special", 135),
+                "BeautifulYPB", "#FFB800", "#FF69F0", "#408CFF", "", "", ColorType.SPECIAL.getValue(), 135),
             new ProfileBackgroundColor(
-                "BeautifulBPR", "#408CFF", "#E95FFF", "#FF5A5A", "", "", "special", 135),
+                "BeautifulBPR", "#408CFF", "#E95FFF", "#FF5A5A", "", "", ColorType.SPECIAL.getValue(), 135),
             new ProfileBackgroundColor(
-                "GreenTea", "#CED690", "#49985D", null, null, null, "rare", 180),
+                "GreenTea", "#CED690", "#49985D", null, null, null, ColorType.RARE.getValue(), 180),
             new ProfileBackgroundColor(
-                "TequilaSunrise", "#F2F1AF", "#EF3529", null, null, null, "rare", 180),
-            new ProfileBackgroundColor("10AM", "#759CFF", "#B2E3FF", null, null, null, "rare", 180),
+                "TequilaSunrise", "#F2F1AF", "#EF3529", null, null, null, ColorType.RARE.getValue(), 180),
+            new ProfileBackgroundColor("10AM", "#759CFF", "#B2E3FF", null, null, null, ColorType.RARE.getValue(), 180),
             new ProfileBackgroundColor(
-                "10PM", "#111579", "#0071C3", null, null, null, "rare", 180));
+                "10PM", "#111579", "#0071C3", null, null, null, ColorType.RARE.getValue(), 180));
 
     profileBackgroundColorRepository.saveAll(colors);
     log.info("✅ profile_background_color 초기 데이터 삽입 완료: {}개", colors.size());
