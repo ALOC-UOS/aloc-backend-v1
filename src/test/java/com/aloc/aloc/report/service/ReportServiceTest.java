@@ -11,10 +11,9 @@ import com.aloc.aloc.report.entity.Report;
 import com.aloc.aloc.report.enums.ReportState;
 import com.aloc.aloc.report.enums.ReportType;
 import com.aloc.aloc.report.repository.ReportRepository;
+import com.aloc.aloc.report.service.facade.ReportFacade;
 import com.aloc.aloc.user.entity.User;
-import com.aloc.aloc.user.repository.UserRepository;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class ReportServiceTest {
 
   @Mock private ReportRepository reportRepository;
-  @Mock private UserRepository userRepository;
+  @Mock private ReportFacade reportFacade;
 
   @InjectMocks private ReportService reportService;
 
@@ -49,7 +48,7 @@ class ReportServiceTest {
         TestFixture.getMockReport(
             user, requestDto.getReportType(), requestDto.getTitle(), requestDto.getContent());
 
-    given(userRepository.findByOauthId(username)).willReturn(Optional.of(user));
+    given(reportFacade.findUserByUsername(username)).willReturn(user);
     given(reportRepository.save(any(Report.class))).willReturn(report);
 
     // when
@@ -58,21 +57,6 @@ class ReportServiceTest {
     // then
     assertThat(result).isEqualTo("문의사항이 성공적으로 등록되었습니다.");
     then(reportRepository).should().save(any(Report.class));
-  }
-
-  @Test
-  @DisplayName("존재하지 않는 사용자로 문의사항 생성 실패")
-  void createReportUserNotFoundFail() {
-    // given
-    String invalidUsername = "invalid_user";
-    ReportRequestDto requestDto = mock(ReportRequestDto.class);
-
-    given(userRepository.findByOauthId(invalidUsername)).willReturn(Optional.empty());
-
-    // when & then
-    assertThatThrownBy(() -> reportService.createReport(invalidUsername, requestDto))
-        .isInstanceOf(NoSuchElementException.class)
-        .hasMessage("해당 사용자가 존재하지 않습니다.");
   }
 
   @Test
@@ -105,7 +89,7 @@ class ReportServiceTest {
     List<Report> reports =
         List.of(TestFixture.getMockReport(user, ReportType.QUESTION, "질문", "질문 내용"));
 
-    given(userRepository.findByOauthId(username)).willReturn(Optional.of(user));
+    given(reportFacade.findUserByUsername(username)).willReturn(user);
     given(reportRepository.findAllByUserExceptDeleted(user, ReportState.DELETED))
         .willReturn(reports);
 
@@ -131,7 +115,7 @@ class ReportServiceTest {
 
     given(reportRepository.findByIdExceptDeleted(reportId, ReportState.DELETED))
         .willReturn(Optional.of(report));
-    given(userRepository.findByOauthId(responderUsername)).willReturn(Optional.of(responder));
+    given(reportFacade.findUserByUsername(responderUsername)).willReturn(responder);
 
     // when
     String result = reportService.answerReport(reportId, responderUsername, responseContent);
@@ -152,7 +136,7 @@ class ReportServiceTest {
     User user = TestFixture.getMockUserByOauthId(username);
     Report report = TestFixture.getMockReport(user, ReportType.BUG, "버그 신고", "버그 내용");
 
-    given(userRepository.findByOauthId(username)).willReturn(Optional.of(user));
+    given(reportFacade.findUserByUsername(username)).willReturn(user);
     given(reportRepository.findByIdAndUserExceptDeleted(reportId, user, ReportState.DELETED))
         .willReturn(Optional.of(report));
 
@@ -174,7 +158,7 @@ class ReportServiceTest {
     Report deletedReport = TestFixture.getMockReport(user, ReportType.BUG, "버그 신고", "버그 내용");
     deletedReport.updateReportState(ReportState.DELETED);
 
-    given(userRepository.findByOauthId(username)).willReturn(Optional.of(user));
+    given(reportFacade.findUserByUsername(username)).willReturn(user);
     given(reportRepository.findByIdAndUserExceptDeleted(reportId, user, ReportState.DELETED))
         .willReturn(Optional.of(deletedReport));
 

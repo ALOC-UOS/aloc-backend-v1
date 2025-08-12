@@ -5,8 +5,8 @@ import com.aloc.aloc.report.dto.response.ReportResponseDto;
 import com.aloc.aloc.report.entity.Report;
 import com.aloc.aloc.report.enums.ReportState;
 import com.aloc.aloc.report.repository.ReportRepository;
+import com.aloc.aloc.report.service.facade.ReportFacade;
 import com.aloc.aloc.user.entity.User;
-import com.aloc.aloc.user.repository.UserRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -19,11 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReportService {
 
   private final ReportRepository reportRepository;
-  private final UserRepository userRepository;
+  private final ReportFacade reportFacade;
 
   @Transactional
   public String createReport(String username, ReportRequestDto reportRequestDto) {
-    User user = findUserByUsername(username);
+    User user = reportFacade.findUserByUsername(username);
     Report report = Report.of(user, reportRequestDto);
     reportRepository.save(report);
 
@@ -36,7 +36,7 @@ public class ReportService {
   }
 
   public List<ReportResponseDto> getUserReports(String username) {
-    User user = findUserByUsername(username);
+    User user = reportFacade.findUserByUsername(username);
     List<Report> reports = reportRepository.findAllByUserExceptDeleted(user, ReportState.DELETED);
     return reports.stream().map(ReportResponseDto::of).collect(Collectors.toList());
   }
@@ -44,7 +44,7 @@ public class ReportService {
   @Transactional
   public String answerReport(Long reportId, String responderUsername, String responseContent) {
     Report report = findReportById(reportId);
-    User responder = findUserByUsername(responderUsername);
+    User responder = reportFacade.findUserByUsername(responderUsername);
 
     report.addResponse(responder, responseContent);
     return "답변이 성공적으로 등록되었습니다.";
@@ -52,7 +52,7 @@ public class ReportService {
 
   @Transactional
   public String deleteReport(Long reportId, String username) {
-    User user = findUserByUsername(username);
+    User user = reportFacade.findUserByUsername(username);
     Report report = findReportByIdAndRequester(reportId, user);
 
     if (report.getReportState() == ReportState.DELETED) {
@@ -65,12 +65,6 @@ public class ReportService {
 
   public long countWaitingReports() {
     return reportRepository.countByReportState(ReportState.WAITING);
-  }
-
-  private User findUserByUsername(String username) {
-    return userRepository
-        .findByOauthId(username)
-        .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다."));
   }
 
   private Report findReportById(Long reportId) {

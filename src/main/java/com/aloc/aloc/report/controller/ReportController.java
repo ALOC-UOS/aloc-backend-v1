@@ -35,7 +35,7 @@ public class ReportController {
       description = "새로운 문의사항을 생성합니다.",
       responses = {
         @ApiResponse(
-            responseCode = "200",
+            responseCode = "201",
             description = "문의사항 생성 성공",
             content = @Content(schema = @Schema(implementation = String.class))),
         @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),

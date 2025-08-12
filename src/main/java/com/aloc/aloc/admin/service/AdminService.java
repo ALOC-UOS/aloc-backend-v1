@@ -51,7 +51,6 @@ public class AdminService {
         courseService.getActiveCourseCount(),
         userCourseService.getUserCourseCountByUserCourseState(UserCourseState.IN_PROGRESS),
         userCourseService.getUserCourseCountByUserCourseState(UserCourseState.SUCCESS),
-        0L,
         reportService.countWaitingReports());
   }
 

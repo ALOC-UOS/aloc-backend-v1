@@ -176,18 +176,11 @@ public class TestFixture {
   }
 
   public static ReportRequestDto getMockReportRequestDto() {
-    ReportRequestDto dto = new ReportRequestDto();
-    dto.setReportType(ReportType.BUG);
-    dto.setTitle("테스트 문의");
-    dto.setContent("테스트 내용입니다.");
-    dto.setIsPublic(false);
-    return dto;
+    return new ReportRequestDto(ReportType.BUG, "테스트 문의", "테스트 내용입니다.", false);
   }
 
   public static AdminReportRequestDto getMockAdminReportRequestDto() {
-    AdminReportRequestDto dto = new AdminReportRequestDto();
-    dto.setResponse("해당 문제는 서버 점검 중에 발생한 일시적 오류입니다. 현재 해결되었습니다.");
-    return dto;
+    return new AdminReportRequestDto("해당 문제는 서버 점검 중에 발생한 일시적 오류입니다. 현재 해결되었습니다.");
   }
 
   public static User getMockAdminUser() {
