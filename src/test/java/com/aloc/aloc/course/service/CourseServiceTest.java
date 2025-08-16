@@ -7,7 +7,12 @@ import java.util.Optional;
 import java.util.NoSuchElementException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-
+import org.mockito.ArgumentCaptor;
+import java.io.IOException;
+import java.util.Optional;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.aloc.aloc.course.dto.request.CourseRequestDto;
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
@@ -188,4 +193,62 @@ public class CourseServiceTest {
 		verify(courseRepository, times(1)).findAllByCourseType(type, pageable);
 		verify(courseRepository, never()).findAll(any(Pageable.class));
 	}
+
+	@Test
+	void createCourseNormalCase() throws IOException{
+		//given
+		CourseRequestDto req = new CourseRequestDto();
+		setFieldQuiet(req, "title", "title-1");
+		setFieldQuiet(req, "description", "desc");
+		setFieldQuiet(req, "type", CourseType.DAILY);
+		setFieldQuiet(req, "problemCnt", 10);
+		setFieldQuiet(req, "minRank", 800);
+		setFieldQuiet(req, "maxRank", 1200);
+		setFieldQuiet(req, "duration", 30);
+		setFieldQuiet(req, "algorithmIdList", java.util.List.of());
+
+		when(courseRepository.save(any(Course.class)))
+			.thenAnswer(inv -> inv.getArgument(0));
+
+		//when
+		Course created = courseService.createCourse(req);
+
+		//then
+		ArgumentCaptor<Course> captor = ArgumentCaptor.forClass(Course.class);
+		verify(courseRepository, times(1)).save(captor.capture());
+		Course saved = captor.getValue();
+
+		assertThat(created).isSameAs(saved);
+		verify(problemScrapingService, times(1)).createProblemsByCourse(saved, req);
+		verifyNoMoreInteractions(problemScrapingService);
+		//코스를 생성하여 save 한 후 순차적으로 스크래핑이 이어져야함.
+	}
+
+	@Test
+	void CreateEmptyCourseNormalCase(){
+		var emptyReq = new com.aloc.aloc.admin.dto.request.EmptyCourseRequestDto();
+		setFieldQuiet(emptyReq, "title", "empty-course");
+		setFieldQuiet(emptyReq, "description", "empty-desc");
+		setFieldQuiet(emptyReq, "type", CourseType.DAILY);
+		setFieldQuiet(emptyReq, "duration", 25);
+
+		when(courseRepository.save(any(Course.class)))
+			.thenAnswer(inv -> inv.getArgument(0));
+
+		// when
+		Course created = courseService.createEmptyCourse(emptyReq);
+
+		// then
+		ArgumentCaptor<Course> courseCaptor = ArgumentCaptor.forClass(Course.class);
+		verify(courseRepository, times(1)).save(courseCaptor.capture());
+		Course saved = courseCaptor.getValue();
+
+		// 동일 인스턴스 반환 확인
+		assertThat(created).isSameAs(saved);
+
+		// 스크래핑 서비스는 호출되지 않아야 함
+		verifyNoInteractions(problemScrapingService);
+	}
+
+
 }
