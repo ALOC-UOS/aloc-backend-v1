@@ -1,8 +1,13 @@
 package com.aloc.aloc.course.service;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Optional;
+import java.util.NoSuchElementException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+
 
 import com.aloc.aloc.course.dto.request.CourseRequestDto;
 import com.aloc.aloc.course.dto.response.CourseResponseDto;
@@ -114,5 +119,34 @@ public class CourseServiceTest {
 		assertThat(result).isNotNull();
 		assertThat(result.getContent()).isEmpty();
 		assertThat(result.getTotalElements()).isZero();
+	}
+
+	@Test
+	void updateCourseNormalCase(){
+		//given
+		Long id = 1L;
+		Course mockCourse = mock(Course.class);
+		when(courseRepository.findById(id)).thenReturn(Optional.of(mockCourse));
+		when(courseRepository.save(mockCourse)).thenReturn(mockCourse);
+
+		//when
+		Course updated = courseService.updateCourse(id);
+
+		//then
+		assertThat(updated).isSameAs(mockCourse);
+	}
+
+	@Test
+	void updateCourseEmptyCase(){
+		Long id = 1L;
+		when(courseRepository.findById(id)).thenReturn(Optional.empty());
+
+		// when & then
+		assertThatThrownBy(() -> courseService.updateCourse(id))
+			.isInstanceOf(NoSuchElementException.class)
+			.hasMessageContaining("해당 코스 아이디로 된 코스가 존재하지 않습니다.");
+
+		verify(courseRepository, times(1)).findById(id);
+		verify(courseRepository, never()).save(any());
 	}
 }
