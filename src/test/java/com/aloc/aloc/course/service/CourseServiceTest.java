@@ -7,6 +7,11 @@ import java.util.Optional;
 import java.util.NoSuchElementException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+
+import com.aloc.aloc.algorithm.entity.Algorithm;
+import com.aloc.aloc.course.entity.CourseProblem;
+import com.aloc.aloc.problem.entity.Problem;
+import com.aloc.aloc.problem.entity.ProblemAlgorithm;
 import org.mockito.ArgumentCaptor;
 import java.io.IOException;
 import java.util.Optional;
@@ -278,4 +283,63 @@ public class CourseServiceTest {
 
 		verify(courseRepository, times(1)).findById(id);
 	}
+
+	@Test
+	void getRecommendedCourseSuccessCase(){
+		// given
+		Algorithm algorithm = mock(Algorithm.class);
+		when(algorithm.getId()).thenReturn(1L);
+
+		ProblemAlgorithm problemAlgorithm = mock(ProblemAlgorithm.class);
+		when(problemAlgorithm.getAlgorithm()).thenReturn(algorithm);
+
+		Problem problem = mock(Problem.class);
+		when(problem.getProblemAlgorithmList()).thenReturn(List.of(problemAlgorithm));
+
+		CourseProblem courseProblem = mock(CourseProblem.class);
+		when(courseProblem.getProblem()).thenReturn(problem);
+
+		Course course = mock(Course.class);
+		when(course.getCourseProblemList()).thenReturn(List.of(courseProblem));
+
+		List<Course> expectedCourses = List.of(mock(Course.class));
+		when(courseRepository.findCoursesByAlgorithmIds(List.of(1L))).thenReturn(expectedCourses);
+
+		// when
+		List<Course> result = courseService.getRecommendedCourses(course);
+
+		// then
+		assertThat(result).isEqualTo(expectedCourses);
+		verify(courseRepository).findCoursesByAlgorithmIds(List.of(1L));
+	}
+
+	@Test
+	void getRecommendedCourseEmptyCase() {
+		// given
+		Algorithm algorithm = mock(Algorithm.class);
+		when(algorithm.getId()).thenReturn(1L);
+
+		ProblemAlgorithm problemAlgorithm = mock(ProblemAlgorithm.class);
+		when(problemAlgorithm.getAlgorithm()).thenReturn(algorithm);
+
+		Problem problem = mock(Problem.class);
+		when(problem.getProblemAlgorithmList()).thenReturn(List.of(problemAlgorithm));
+
+		CourseProblem courseProblem = mock(CourseProblem.class);
+		when(courseProblem.getProblem()).thenReturn(problem);
+
+		Course course = mock(Course.class);
+		when(course.getCourseProblemList()).thenReturn(List.of(courseProblem));
+
+		// repository가 빈 리스트 반환하도록 설정
+		when(courseRepository.findCoursesByAlgorithmIds(List.of(1L))).thenReturn(List.of());
+
+		// when
+		List<Course> result = courseService.getRecommendedCourses(course);
+
+		// then
+		assertThat(result).isEmpty();
+		verify(courseRepository, times(1)).findCoursesByAlgorithmIds(List.of(1L));
+	}
+
 }
