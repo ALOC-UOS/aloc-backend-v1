@@ -9,7 +9,6 @@ import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-
 // 프로필 배경 색상 서비스
 // 1. getColorByName 이름으로 조회
 // 2. pickColor 랜덤 컬러 선택
@@ -24,7 +23,6 @@ public class ProfileBackgroundColorService {
   private static final int MAX_PROBABILITY = 100;
   private static final int COMMON_THRESHOLD = 85;
   private static final int RARE_THRESHOLD = 95;
-
 
   // 1. getColorByName 이름으로 조회
   // input : 컬러 이름
@@ -49,7 +47,7 @@ public class ProfileBackgroundColorService {
   // output : 선택된 ColorType
   private ColorType determineColorTypeByProbability() {
     int randomNumber = randomNumberGenerator.nextInt(MAX_PROBABILITY) + 1;
-    
+
     if (randomNumber <= COMMON_THRESHOLD) {
       return ColorType.COMMON;
     } else if (randomNumber <= RARE_THRESHOLD) {
@@ -63,12 +61,13 @@ public class ProfileBackgroundColorService {
   // input : ColorType
   // output : 해당 타입의 색상 리스트
   private List<ProfileBackgroundColor> getColorsByType(ColorType colorType) {
-    List<ProfileBackgroundColor> colors = profileBackgroundColorRepository.findByType(colorType.getValue());
-    
+    List<ProfileBackgroundColor> colors =
+        profileBackgroundColorRepository.findByType(colorType.getValue());
+
     if (colors.isEmpty()) {
       throw new IllegalStateException("선택된 타입에 해당하는 색상이 없습니다: " + colorType.getValue());
     }
-    
+
     return colors;
   }
 
