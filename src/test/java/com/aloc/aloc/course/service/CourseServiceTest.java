@@ -75,7 +75,6 @@ public class CourseServiceTest {
 		}
 	}
 
-
 	@Test
 	void getCourseNormalCase(){
 		//given
