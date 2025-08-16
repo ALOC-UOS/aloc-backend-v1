@@ -149,4 +149,43 @@ public class CourseServiceTest {
 		verify(courseRepository, times(1)).findById(id);
 		verify(courseRepository, never()).save(any());
 	}
+
+	@Test
+	void getCoursePageByCourseTypeNullCase(){
+		//given
+		Pageable pageable = PageRequest.of(0, 2);
+		Course course1 = new Course();
+		Course course2 = new Course();
+		Page<Course> mockCoursePage = new PageImpl<>(List.of(course1, course2), pageable, 2);
+
+		when(courseRepository.findAll(pageable)).thenReturn(mockCoursePage);
+
+		//when
+		Page<Course> result = courseService.getCoursePageByCourseType(pageable, null);
+
+		//then
+		assertThat(result).isSameAs(mockCoursePage);
+		assertThat(result.getContent()).containsExactly(course1, course2);
+		verify(courseRepository, times(1)).findAll(pageable);
+		verify(courseRepository, never()).findAllByCourseType(any(), any());
+	}
+
+	@Test
+	void getCoursePageByCourseTypeNotNullCase(){
+		Pageable pageable = PageRequest.of(1, 2);
+		CourseType type = CourseType.DAILY;
+		Course course1 = new Course();
+		Page<Course> mockPage = new PageImpl<>(List.of(course1), pageable, 5);
+
+		when(courseRepository.findAllByCourseType(type, pageable)).thenReturn(mockPage);
+
+		// when
+		Page<Course> result = courseService.getCoursePageByCourseType(pageable, type);
+
+		//then
+		assertThat(result).isSameAs(mockPage);
+		assertThat(result.getTotalElements()).isEqualTo(5);
+		verify(courseRepository, times(1)).findAllByCourseType(type, pageable);
+		verify(courseRepository, never()).findAll(any(Pageable.class));
+	}
 }
