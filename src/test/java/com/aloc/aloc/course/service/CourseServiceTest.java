@@ -250,5 +250,32 @@ public class CourseServiceTest {
 		verifyNoInteractions(problemScrapingService);
 	}
 
+	@Test
+	void getCourseByIdSuccessCase(){
+		//given
+		Long id = 1L;
+		Course mockCourse = new Course();
+		when(courseRepository.findById(id)).thenReturn(Optional.of(mockCourse));
 
+		//when
+		Course result = courseService.getCourseById(id);
+
+		//then
+		assertThat(result).isEqualTo(mockCourse);
+		verify(courseRepository, times(1)).findById(id);
+	}
+
+	@Test
+	void getCourseByIdFailCase() {
+		// given
+		Long id = 1L;
+		when(courseRepository.findById(id)).thenReturn(Optional.empty());
+
+		// when & then
+		assertThatThrownBy(() -> courseService.getCourseById(id))
+			.isInstanceOf(NoSuchElementException.class)
+			.hasMessage("해당 코스 아이디로 된 코스가 존재하지 않습니다.");
+
+		verify(courseRepository, times(1)).findById(id);
+	}
 }
