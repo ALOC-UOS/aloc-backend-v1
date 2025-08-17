@@ -23,7 +23,7 @@ public class AlgorithmService {
     }
     return algorithms;
   }
-
+  //[refactor] 알고리즘 조회 및 생성 메서드 분리
   public Algorithm getOrCreateAlgorithm(
       Integer algorithmId, String koreanName, String englishName) {
     return algorithmRepository
