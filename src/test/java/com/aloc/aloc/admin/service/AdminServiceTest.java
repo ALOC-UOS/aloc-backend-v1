@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.*;
 
 import com.aloc.aloc.report.dto.response.ReportResponseDto;
 import com.aloc.aloc.report.service.ReportService;
+import com.aloc.aloc.report.service.facade.ReportFacade;
 import com.aloc.aloc.user.service.UserService;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +20,7 @@ class AdminServiceTest {
 
   @Mock private UserService userService;
   @Mock private ReportService reportService;
+  @Mock private ReportFacade reportFacade;
 
   @InjectMocks private AdminService adminService;
 
@@ -52,7 +54,7 @@ class AdminServiceTest {
     String expectedResult = "답변이 성공적으로 등록되었습니다.";
 
     willDoNothing().given(userService).validateAdmin(responderUsername);
-    given(reportService.answerReport(reportId, responderUsername, response))
+    given(reportFacade.answerReport(reportId, responderUsername, response))
         .willReturn(expectedResult);
 
     // when
@@ -61,7 +63,7 @@ class AdminServiceTest {
     // then
     assertThat(result).isEqualTo(expectedResult);
     then(userService).should().validateAdmin(responderUsername);
-    then(reportService).should().answerReport(reportId, responderUsername, response);
+    then(reportFacade).should().answerReport(reportId, responderUsername, response);
   }
 
   @Test
@@ -99,6 +101,6 @@ class AdminServiceTest {
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("관리자가 아닙니다.");
 
-    then(reportService).should(never()).answerReport(any(), any(), any());
+    then(reportFacade).should(never()).answerReport(any(), any(), any());
   }
 }

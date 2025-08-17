@@ -4,7 +4,7 @@ import com.aloc.aloc.global.apipayload.CustomApiResponse;
 import com.aloc.aloc.global.apipayload.status.SuccessStatus;
 import com.aloc.aloc.report.dto.request.ReportRequestDto;
 import com.aloc.aloc.report.dto.response.ReportResponseDto;
-import com.aloc.aloc.report.service.ReportService;
+import com.aloc.aloc.report.service.facade.ReportFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class ReportController {
 
-  private final ReportService reportService;
+  private final ReportFacade reportFacade;
 
   @PostMapping("/report")
   @SecurityRequirement(name = "JWT Auth")
@@ -45,7 +45,7 @@ public class ReportController {
       @Parameter(hidden = true) @AuthenticationPrincipal User user,
       @Valid @RequestBody ReportRequestDto reportRequestDto) {
     return CustomApiResponse.of(
-        SuccessStatus._CREATED, reportService.createReport(user.getUsername(), reportRequestDto));
+        SuccessStatus._CREATED, reportFacade.createReport(user.getUsername(), reportRequestDto));
   }
 
   @GetMapping("/reports")
@@ -65,7 +65,7 @@ public class ReportController {
       })
   public CustomApiResponse<List<ReportResponseDto>> getUserReports(
       @Parameter(hidden = true) @AuthenticationPrincipal User user) {
-    return CustomApiResponse.onSuccess(reportService.getUserReports(user.getUsername()));
+    return CustomApiResponse.onSuccess(reportFacade.getUserReports(user.getUsername()));
   }
 
   @DeleteMapping("/reports/{reportId}")
@@ -84,6 +84,6 @@ public class ReportController {
       })
   public CustomApiResponse<String> deleteReport(
       @PathVariable Long reportId, @Parameter(hidden = true) @AuthenticationPrincipal User user) {
-    return CustomApiResponse.onSuccess(reportService.deleteReport(reportId, user.getUsername()));
+    return CustomApiResponse.onSuccess(reportFacade.deleteReport(reportId, user.getUsername()));
   }
 }

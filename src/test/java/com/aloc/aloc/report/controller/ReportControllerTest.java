@@ -9,7 +9,7 @@ import com.aloc.aloc.common.fixture.TestFixture;
 import com.aloc.aloc.report.dto.response.ReportResponseDto;
 import com.aloc.aloc.report.enums.ReportState;
 import com.aloc.aloc.report.enums.ReportType;
-import com.aloc.aloc.report.service.ReportService;
+import com.aloc.aloc.report.service.facade.ReportFacade;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -32,7 +32,7 @@ class ReportControllerTest {
 
   @Autowired private ObjectMapper objectMapper;
 
-  @MockBean private ReportService reportService;
+  @MockBean private ReportFacade reportFacade;
 
   @MockBean private JpaMetamodelMappingContext jpaMetamodelMappingContext;
 
@@ -42,7 +42,7 @@ class ReportControllerTest {
   void createReportSuccess() throws Exception {
     // given
     String expectedResponse = "문의사항이 성공적으로 등록되었습니다.";
-    given(reportService.createReport(anyString(), any())).willReturn(expectedResponse);
+    given(reportFacade.createReport(anyString(), any())).willReturn(expectedResponse);
 
     String requestBody = objectMapper.writeValueAsString(TestFixture.getMockReportRequestDto());
 
@@ -84,7 +84,7 @@ class ReportControllerTest {
                 .isPublic(true)
                 .build());
 
-    given(reportService.getUserReports(anyString())).willReturn(mockReports);
+    given(reportFacade.getUserReports(anyString())).willReturn(mockReports);
 
     // when & then
     mockMvc
@@ -113,7 +113,7 @@ class ReportControllerTest {
     // given
     Long reportId = 1L;
     String expectedResponse = "문의사항이 삭제되었습니다.";
-    given(reportService.deleteReport(eq(reportId), anyString())).willReturn(expectedResponse);
+    given(reportFacade.deleteReport(eq(reportId), anyString())).willReturn(expectedResponse);
 
     // when & then
     mockMvc
@@ -129,7 +129,7 @@ class ReportControllerTest {
   void deleteReportNotFound() throws Exception {
     // given
     Long reportId = 999L;
-    given(reportService.deleteReport(eq(reportId), anyString()))
+    given(reportFacade.deleteReport(eq(reportId), anyString()))
         .willThrow(new NoSuchElementException("본인이 작성한 문의사항을 찾을 수 없습니다."));
 
     // when & then

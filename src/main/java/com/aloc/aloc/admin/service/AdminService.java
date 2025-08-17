@@ -19,6 +19,7 @@ import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.course.service.UserCourseService;
 import com.aloc.aloc.report.dto.response.ReportResponseDto;
 import com.aloc.aloc.report.service.ReportService;
+import com.aloc.aloc.report.service.facade.ReportFacade;
 import com.aloc.aloc.scraper.ProblemScrapingService;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
@@ -43,6 +44,7 @@ public class AdminService {
   private final CoinService coinService;
   private final ProblemScrapingService problemScrapingService;
   private final ReportService reportService;
+  private final ReportFacade reportFacade;
 
   public AdminDashboardResponseDto getDashboard(String oauthId) {
     userService.validateAdmin(oauthId);
@@ -186,6 +188,6 @@ public class AdminService {
   @Transactional
   public String answerReport(Long reportId, String responderUsername, String response) {
     userService.validateAdmin(responderUsername);
-    return reportService.answerReport(reportId, responderUsername, response);
+    return reportFacade.answerReport(reportId, responderUsername, response);
   }
 }

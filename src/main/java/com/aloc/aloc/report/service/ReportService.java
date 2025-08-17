@@ -5,7 +5,6 @@ import com.aloc.aloc.report.dto.response.ReportResponseDto;
 import com.aloc.aloc.report.entity.Report;
 import com.aloc.aloc.report.enums.ReportState;
 import com.aloc.aloc.report.repository.ReportRepository;
-import com.aloc.aloc.report.service.facade.ReportFacade;
 import com.aloc.aloc.user.entity.User;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -19,40 +18,35 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReportService {
 
   private final ReportRepository reportRepository;
-  private final ReportFacade reportFacade;
 
   @Transactional
-  public String createReport(String username, ReportRequestDto reportRequestDto) {
-    User user = reportFacade.findUserByUsername(username);
+  public String createReportWithUser(User user, ReportRequestDto reportRequestDto) {
     Report report = Report.of(user, reportRequestDto);
     reportRepository.save(report);
-
     return "문의사항이 성공적으로 등록되었습니다.";
   }
 
+  @Transactional(readOnly = true)
   public List<ReportResponseDto> getAllReports() {
     List<Report> reports = reportRepository.findAllExceptDeleted(ReportState.DELETED);
     return reports.stream().map(ReportResponseDto::of).collect(Collectors.toList());
   }
 
-  public List<ReportResponseDto> getUserReports(String username) {
-    User user = reportFacade.findUserByUsername(username);
+  @Transactional(readOnly = true)
+  public List<ReportResponseDto> getUserReportsWithUser(User user) {
     List<Report> reports = reportRepository.findAllByUserExceptDeleted(user, ReportState.DELETED);
     return reports.stream().map(ReportResponseDto::of).collect(Collectors.toList());
   }
 
   @Transactional
-  public String answerReport(Long reportId, String responderUsername, String responseContent) {
+  public String answerReportWithUser(Long reportId, User responder, String responseContent) {
     Report report = findReportById(reportId);
-    User responder = reportFacade.findUserByUsername(responderUsername);
-
     report.addResponse(responder, responseContent);
     return "답변이 성공적으로 등록되었습니다.";
   }
 
   @Transactional
-  public String deleteReport(Long reportId, String username) {
-    User user = reportFacade.findUserByUsername(username);
+  public String deleteReportWithUser(Long reportId, User user) {
     Report report = findReportByIdAndRequester(reportId, user);
 
     if (report.getReportState() == ReportState.DELETED) {
@@ -63,6 +57,7 @@ public class ReportService {
     return "문의사항이 삭제되었습니다.";
   }
 
+  @Transactional(readOnly = true)
   public long countWaitingReports() {
     return reportRepository.countByReportState(ReportState.WAITING);
   }
