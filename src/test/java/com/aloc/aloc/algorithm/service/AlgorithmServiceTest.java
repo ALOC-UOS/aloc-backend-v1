@@ -11,8 +11,8 @@ import com.aloc.aloc.algorithm.dto.response.AlgorithmResponseDto;
 import com.aloc.aloc.algorithm.entity.Algorithm;
 import com.aloc.aloc.algorithm.repository.AlgorithmRepository;
 import com.aloc.aloc.common.fixture.TestFixture;
+import com.aloc.aloc.global.apipayload.exception.NotFoundException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,31 +45,62 @@ public class AlgorithmServiceTest {
     Integer algorithmId = 1;
     Algorithm algorithm =
         Algorithm.builder().algorithmId(algorithmId).koreanName("테스트").englishName("test").build();
-    // algorithmRepository에서 algorithmId 1인 객체를 조회하면 algorithm 객체를 반환
-    given(algorithmRepository.findByAlgorithmId(algorithmId)).willReturn(Optional.of(algorithm));
+    List<Integer> algorithmIds = List.of(algorithmId);
+    // 새로운 findByAlgorithmIdIn 메서드 모킹
+    given(algorithmRepository.findByAlgorithmIdIn(algorithmIds)).willReturn(List.of(algorithm));
 
     // when
     // algorithmId를 List.of(algorithmId)로 넘겨서 조회하고 반환된 객체를 List<Algorithm> result에 저장
-    List<Algorithm> result = algorithmService.getAlgorithmsByIds(List.of(algorithmId));
+    List<Algorithm> result = algorithmService.getAlgorithmsByIds(algorithmIds);
 
     // then
     // result의 크기가 1이고, 첫 번째 요소의 algorithmId가 1인지 확인
     assertThat(result).containsExactly(algorithm);
+    verify(algorithmRepository).findByAlgorithmIdIn(algorithmIds);
   }
 
   // [getAlgorithmById] 없는 알고리즘 아이디 조회 테스트
   @Test
   void getAlgorithmsByIdNotFound() {
     // given
-    // mock에서는 존재하지 않는 아이디를 조회하면 Optional.empty()를 반환
+    // mock에서는 존재하지 않는 아이디를 조회하면 빈 리스트를 반환
     Integer nonExistentId = 999;
-    given(algorithmRepository.findByAlgorithmId(nonExistentId)).willReturn(Optional.empty());
+    List<Integer> nonExistentIds = List.of(nonExistentId);
+    given(algorithmRepository.findByAlgorithmIdIn(nonExistentIds)).willReturn(List.of());
 
     // when&then
-    assertThatThrownBy(() -> algorithmService.getAlgorithmsByIds(List.of(nonExistentId)))
-        // NoSuchElementException 예외가 발생하고, 메시지에 "존재하지 않은 알고리즘 아이디가 포함되어 있습니다."가 포함되어 있는지 확인
-        .isInstanceOf(NoSuchElementException.class)
-        .hasMessageContaining("존재하지 않은 알고리즘 아이디가 포함되어 있습니다.");
+    assertThatThrownBy(() -> algorithmService.getAlgorithmsByIds(nonExistentIds))
+        // NotFoundException 예외가 발생하고, 메시지에 "존재하지 않은 알고리즘 아이디가 포함되어 있습니다."가 포함되어 있는지 확인
+        .isInstanceOf(NotFoundException.class)
+        .hasMessageContaining("존재하지 않은 알고리즘 아이디가 포함되어 있습니다")
+        .hasMessageContaining("[999]");
+  }
+
+  // [getAlgorithmsByIds] 여러 ID 조회 테스트
+  @Test
+  void getAlgorithmsByIdsMultipleIds() {
+    // given
+    List<Integer> algorithmIds = List.of(1, 2, 3);
+    List<Algorithm> algorithms =
+        List.of(
+            Algorithm.builder().algorithmId(1).koreanName("정렬").englishName("Sort").build(),
+            Algorithm.builder().algorithmId(2).koreanName("그래프").englishName("Graph").build(),
+            Algorithm.builder()
+                .algorithmId(3)
+                .koreanName("DP")
+                .englishName("Dynamic Programming")
+                .build());
+    given(algorithmRepository.findByAlgorithmIdIn(algorithmIds)).willReturn(algorithms);
+
+    // when
+    List<Algorithm> result = algorithmService.getAlgorithmsByIds(algorithmIds);
+
+    // then
+    assertThat(result).hasSize(3);
+    assertThat(result.get(0).getAlgorithmId()).isEqualTo(1);
+    assertThat(result.get(1).getAlgorithmId()).isEqualTo(2);
+    assertThat(result.get(2).getAlgorithmId()).isEqualTo(3);
+    verify(algorithmRepository).findByAlgorithmIdIn(algorithmIds);
   }
 
   // [getOrCreateAlgorithm] 기존 알고리즘 조회 테스트
@@ -133,9 +164,11 @@ public class AlgorithmServiceTest {
     // then
     assertThat(result).hasSize(2);
     assertThat(result.get(0).getAlgorithmId()).isEqualTo(1);
-    assertThat(result.get(0).getName()).isEqualTo("정렬");
+    assertThat(result.get(0).getKoreanName()).isEqualTo("정렬");
+    assertThat(result.get(0).getEnglishName()).isEqualTo("Sort");
     assertThat(result.get(1).getAlgorithmId()).isEqualTo(2);
-    assertThat(result.get(1).getName()).isEqualTo("그래프");
+    assertThat(result.get(1).getKoreanName()).isEqualTo("그래프");
+    assertThat(result.get(1).getEnglishName()).isEqualTo("Graph");
     verify(algorithmRepository).findAll();
   }
 
