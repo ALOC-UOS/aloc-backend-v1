@@ -247,7 +247,13 @@ public class ProblemScrapingService {
 
   private Algorithm getOrCreateAlgorithm(
       Integer algorithmId, String koreanName, String englishName) {
-    return algorithmService.getOrCreateAlgorithm(algorithmId, koreanName, englishName);
+    // 1. 먼저 기존 알고리즘 조회
+    Optional<Algorithm> existingAlgorithm =
+        algorithmService.findAlgorithmByAlgorithmId(algorithmId);
+
+    // 2. 존재하면 반환, 없으면 새로 생성
+    return existingAlgorithm.orElseGet(
+        () -> algorithmService.createAlgorithm(algorithmId, koreanName, englishName));
   }
 
   private String getProblemUrl(int problemNumber) {

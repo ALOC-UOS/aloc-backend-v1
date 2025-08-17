@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.aloc.aloc.algorithm.dto.response.AlgorithmResponseDto;
@@ -23,8 +22,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 // 테스트 함수 목록
 // [getAlgorithmsByIds] 메서드 테스트
 // [getAlgorithmsByIds] 없는 알고리즘 아이디 조회 테스트
-// [getOrCreateAlgorithm] 기존 알고리즘 조회 테스트
-// [getOrCreateAlgorithm] 새 알고리즘 생성 테스트
+// [findAlgorithmByAlgorithmId] 기존 알고리즘 조회 테스트
+// [createAlgorithm] 새 알고리즘 생성 테스트
 // [getAlgorithms] 정상 케이스 테스트
 // [getAlgorithms] 빈 목록 케이스 테스트
 
@@ -103,31 +102,43 @@ public class AlgorithmServiceTest {
     verify(algorithmRepository).findByAlgorithmIdIn(algorithmIds);
   }
 
-  // [getOrCreateAlgorithm] 기존 알고리즘 조회 테스트
+  // [findAlgorithmByAlgorithmId] 기존 알고리즘 조회 테스트
   @Test
-  void getOrCreateAlgorithmExistingAlgorithm() {
+  void findAlgorithmByAlgorithmIdExisting() {
     // given
     Integer algorithmId = 1;
-    String koreanName = "정렬";
-    String englishName = "Sort";
-
-    Algorithm existingAlgorithm =
-        TestFixture.getMockAlgorithm(algorithmId, koreanName, englishName);
+    Algorithm existingAlgorithm = TestFixture.getMockAlgorithm(algorithmId, "정렬", "Sort");
 
     given(algorithmRepository.findByAlgorithmId(algorithmId))
         .willReturn(Optional.of(existingAlgorithm));
 
     // when
-    Algorithm result = algorithmService.getOrCreateAlgorithm(algorithmId, koreanName, englishName);
+    Optional<Algorithm> result = algorithmService.findAlgorithmByAlgorithmId(algorithmId);
 
     // then
-    assertThat(result).isEqualTo(existingAlgorithm);
-    verify(algorithmRepository, never()).save(any(Algorithm.class)); // save는 호출되지 않음
+    assertThat(result).isPresent();
+    assertThat(result.get()).isEqualTo(existingAlgorithm);
+    verify(algorithmRepository).findByAlgorithmId(algorithmId);
   }
 
-  // [getOrCreateAlgorithm] 새 알고리즘 생성 테스트
+  // [findAlgorithmByAlgorithmId] 존재하지 않는 알고리즘 조회 테스트
   @Test
-  void getOrCreateAlgorithmNewAlgorithm() {
+  void findAlgorithmByAlgorithmIdNotFound() {
+    // given
+    Integer algorithmId = 999;
+    given(algorithmRepository.findByAlgorithmId(algorithmId)).willReturn(Optional.empty());
+
+    // when
+    Optional<Algorithm> result = algorithmService.findAlgorithmByAlgorithmId(algorithmId);
+
+    // then
+    assertThat(result).isEmpty();
+    verify(algorithmRepository).findByAlgorithmId(algorithmId);
+  }
+
+  // [createAlgorithm] 새 알고리즘 생성 테스트
+  @Test
+  void createAlgorithmSuccess() {
     // given
     Integer algorithmId = 2;
     String koreanName = "그래프";
@@ -135,16 +146,17 @@ public class AlgorithmServiceTest {
 
     Algorithm newAlgorithm = TestFixture.getMockAlgorithm(algorithmId, koreanName, englishName);
 
-    // algorithmRepository에서 algorithmId 2인 객체를 조회하면 Optional.empty()를 반환
-    given(algorithmRepository.findByAlgorithmId(algorithmId)).willReturn(Optional.empty());
     // algorithmRepository에서 save 메서드를 호출하면 newAlgorithm 객체를 반환
     given(algorithmRepository.save(any(Algorithm.class))).willReturn(newAlgorithm);
 
     // when
-    Algorithm result = algorithmService.getOrCreateAlgorithm(algorithmId, koreanName, englishName);
+    Algorithm result = algorithmService.createAlgorithm(algorithmId, koreanName, englishName);
 
     // then
     assertThat(result).isEqualTo(newAlgorithm);
+    assertThat(result.getAlgorithmId()).isEqualTo(algorithmId);
+    assertThat(result.getKoreanName()).isEqualTo(koreanName);
+    assertThat(result.getEnglishName()).isEqualTo(englishName);
     verify(algorithmRepository).save(any(Algorithm.class)); // save가 호출됨
   }
 
@@ -187,5 +199,35 @@ public class AlgorithmServiceTest {
     // result가 빈 리스트인지 확인
     assertThat(result).isEmpty();
     verify(algorithmRepository).findAll();
+  }
+
+  // [통합 테스트] findAlgorithmByAlgorithmId + createAlgorithm 조합 패턴
+  @Test
+  void findOrCreateAlgorithmPattern() {
+    // given
+    Integer algorithmId = 3;
+    String koreanName = "동적계획법";
+    String englishName = "Dynamic Programming";
+
+    Algorithm newAlgorithm = TestFixture.getMockAlgorithm(algorithmId, koreanName, englishName);
+
+    // 첫 번째 호출: 존재하지 않음
+    given(algorithmRepository.findByAlgorithmId(algorithmId)).willReturn(Optional.empty());
+
+    // 두 번째 호출: 생성 성공
+    given(algorithmRepository.save(any(Algorithm.class))).willReturn(newAlgorithm);
+
+    // when - 분리된 로직 조합
+    Optional<Algorithm> existingAlgorithm =
+        algorithmService.findAlgorithmByAlgorithmId(algorithmId);
+    Algorithm result =
+        existingAlgorithm.orElseGet(
+            () -> algorithmService.createAlgorithm(algorithmId, koreanName, englishName));
+
+    // then
+    assertThat(result).isEqualTo(newAlgorithm);
+    assertThat(result.getAlgorithmId()).isEqualTo(algorithmId);
+    verify(algorithmRepository).findByAlgorithmId(algorithmId);
+    verify(algorithmRepository).save(any(Algorithm.class));
   }
 }

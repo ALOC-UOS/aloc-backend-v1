@@ -43,7 +43,6 @@ public class AlgorithmService {
     return algorithmIdList.stream().map(algorithmMap::get).collect(Collectors.toList());
   }
 
-
   // 알고리즘 조회 메서드
   public Optional<Algorithm> findAlgorithmByAlgorithmId(Integer algorithmId) {
     return algorithmRepository.findByAlgorithmId(algorithmId);
