@@ -53,9 +53,9 @@ public class AlgorithmControllerTest {
         .andExpect(jsonPath("$.result").isArray())
         .andExpect(jsonPath("$.result.length()").value(2))
         .andExpect(jsonPath("$.result[0].algorithmId").value(1))
-        .andExpect(jsonPath("$.result[0].name").value("정렬"))
+        .andExpect(jsonPath("$.result[0].koreanName").value("정렬"))
         .andExpect(jsonPath("$.result[1].algorithmId").value(2))
-        .andExpect(jsonPath("$.result[1].name").value("그래프"));
+        .andExpect(jsonPath("$.result[1].koreanName").value("그래프"));
   }
 
   // [getAlgorithms] 빈 알고리즘 목록 반환 테스트

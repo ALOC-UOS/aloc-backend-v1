@@ -12,11 +12,6 @@ public class AlgorithmResponseDto {
   private String koreanName;
   private String englishName;
 
-  // 한국어 이름을 기본으로 반환하는 getName 메서드
-  public String getName() {
-    return koreanName;
-  }
-
   // Algorithm 엔티티 객체를 AlgorithmResponseDto 객체로 변환하는 메서드
   public static AlgorithmResponseDto of(Algorithm algorithm) {
     return AlgorithmResponseDto.builder()
