@@ -43,19 +43,20 @@ public class AlgorithmService {
     return algorithmIdList.stream().map(algorithmMap::get).collect(Collectors.toList());
   }
 
-  // [refactor] 알고리즘 조회 및 생성 메서드 분리
-  public Algorithm getOrCreateAlgorithm(
-      Integer algorithmId, String koreanName, String englishName) {
-    return algorithmRepository
-        .findByAlgorithmId(algorithmId)
-        .orElseGet(
-            () ->
-                algorithmRepository.save(
-                    Algorithm.builder()
-                        .algorithmId(algorithmId)
-                        .koreanName(koreanName)
-                        .englishName(englishName)
-                        .build()));
+
+  // 알고리즘 조회 메서드
+  public Optional<Algorithm> findAlgorithmByAlgorithmId(Integer algorithmId) {
+    return algorithmRepository.findByAlgorithmId(algorithmId);
+  }
+
+  // 알고리즘 생성 메서드
+  public Algorithm createAlgorithm(Integer algorithmId, String koreanName, String englishName) {
+    return algorithmRepository.save(
+        Algorithm.builder()
+            .algorithmId(algorithmId)
+            .koreanName(koreanName)
+            .englishName(englishName)
+            .build());
   }
 
   public List<AlgorithmResponseDto> getAlgorithms() {
