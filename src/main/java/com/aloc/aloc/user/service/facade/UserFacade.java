@@ -276,18 +276,17 @@ public class UserFacade {
   public Page<CourseResponseDto> getCoursesByUser(
       Pageable pageable, String oauthId, CourseType courseTypeOrNull) {
     User user = userService.getUser(oauthId);
-    
     Page<Course> courses = courseService.getCoursePageByCourseType(pageable, courseTypeOrNull);
-    
-    List<Long> courseIds = courses.getContent().stream()
-        .map(Course::getId)
-        .toList();
 
-    Map<Long, UserCourseState> userCourseStateMap = userCourseService.getLatestUserCourseStates(user, courseIds);
+    List<Long> courseIds = courses.getContent().stream().map(Course::getId).toList();
+
+    Map<Long, UserCourseState> userCourseStateMap =
+        userCourseService.getLatestUserCourseStates(user, courseIds);
 
     return courses.map(
         course -> {
-          UserCourseState state = userCourseStateMap.getOrDefault(course.getId(), UserCourseState.NOT_STARTED);
+          UserCourseState state =
+              userCourseStateMap.getOrDefault(course.getId(), UserCourseState.NOT_STARTED);
           return CourseResponseDto.of(course, state);
         });
   }

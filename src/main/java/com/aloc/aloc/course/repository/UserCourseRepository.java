@@ -46,7 +46,8 @@ public interface UserCourseRepository extends JpaRepository<UserCourse, Long> {
 
   long countByUserCourseState(UserCourseState userCourseState);
 
-  @Query("""
+  @Query(
+      """
     SELECT uc FROM UserCourse uc
     WHERE uc.user = :user AND uc.course.id IN :courseIds
     AND uc.createdAt = (
@@ -54,8 +55,7 @@ public interface UserCourseRepository extends JpaRepository<UserCourse, Long> {
       FROM UserCourse uc2
       WHERE uc2.user = :user AND uc2.course.id = uc.course.id
     )
-    """)
+  """)
   List<UserCourse> findLatestUserCoursesByUserAndCourseIds(
-      @Param("user") User user, 
-      @Param("courseIds") List<Long> courseIds);
+      @Param("user") User user, @Param("courseIds") List<Long> courseIds);
 }

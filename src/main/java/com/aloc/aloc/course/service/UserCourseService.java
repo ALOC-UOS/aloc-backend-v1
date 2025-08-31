@@ -131,12 +131,10 @@ public class UserCourseService {
   }
 
   public Map<Long, UserCourseState> getLatestUserCourseStates(User user, List<Long> courseIds) {
-    List<UserCourse> latestUserCourses = userCourseRepository.findLatestUserCoursesByUserAndCourseIds(user, courseIds);
-    
+    List<UserCourse> latestUserCourses =
+        userCourseRepository.findLatestUserCoursesByUserAndCourseIds(user, courseIds);
+
     return latestUserCourses.stream()
-        .collect(Collectors.toMap(
-            uc -> uc.getCourse().getId(),
-            UserCourse::getUserCourseState
-        ));
+        .collect(Collectors.toMap(uc -> uc.getCourse().getId(), UserCourse::getUserCourseState));
   }
 }
