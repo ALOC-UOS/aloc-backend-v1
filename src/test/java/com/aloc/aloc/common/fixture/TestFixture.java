@@ -1,5 +1,6 @@
 package com.aloc.aloc.common.fixture;
 
+import com.aloc.aloc.admin.dto.request.AdminReportRequestDto;
 import com.aloc.aloc.algorithm.entity.Algorithm;
 import com.aloc.aloc.coin.dto.response.CoinResponseDto;
 import com.aloc.aloc.coin.enums.CoinType;
@@ -13,6 +14,10 @@ import com.aloc.aloc.problem.entity.Problem;
 import com.aloc.aloc.problem.enums.UserCourseProblemStatus;
 import com.aloc.aloc.profilebackgroundcolor.dto.response.ColorResponseDto;
 import com.aloc.aloc.profilebackgroundcolor.entity.ProfileBackgroundColor;
+import com.aloc.aloc.report.dto.request.ReportRequestDto;
+import com.aloc.aloc.report.entity.Report;
+import com.aloc.aloc.report.enums.ReportState;
+import com.aloc.aloc.report.enums.ReportType;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
@@ -144,6 +149,52 @@ public class TestFixture {
         .solvedAt(solvedAt)
         .problemOrder(problemOrder)
         .build();
+  }
+
+  public static Report getMockReport(
+      User requester, ReportType reportType, String title, String content) {
+    return Report.builder()
+        .reportType(reportType)
+        .title(title)
+        .content(content)
+        .requester(requester)
+        .reportState(ReportState.WAITING)
+        .isPublic(false)
+        .build();
+  }
+
+  public static Report getMockAnsweredReport(User requester, User responder, String response) {
+    return Report.builder()
+        .reportType(ReportType.BUG)
+        .title("테스트 문의")
+        .content("테스트 내용")
+        .requester(requester)
+        .responder(responder)
+        .response(response)
+        .reportState(ReportState.ANSWERED)
+        .isPublic(false)
+        .respondAt(LocalDateTime.now())
+        .build();
+  }
+
+  public static ReportRequestDto getMockReportRequestDto() {
+    return new ReportRequestDto(ReportType.BUG, "테스트 문의", "테스트 내용입니다.", false);
+  }
+
+  public static AdminReportRequestDto getMockAdminReportRequestDto() {
+    return new AdminReportRequestDto("해당 문제는 서버 점검 중에 발생한 일시적 오류입니다. 현재 해결되었습니다.");
+  }
+
+  public static User getMockAdminUser() {
+    User user =
+        User.builder()
+            .oauthId("admin_123")
+            .name("관리자")
+            .email("admin@example.com")
+            .profileImageFileName("admin-profile.png")
+            .build();
+    user.setAuthority(Authority.ROLE_ADMIN);
+    return user;
   }
 
   // ProfileBackgroundColor 관련 테스트 픽스처

@@ -17,6 +17,9 @@ import com.aloc.aloc.course.entity.CourseProblem;
 import com.aloc.aloc.course.enums.UserCourseState;
 import com.aloc.aloc.course.service.CourseService;
 import com.aloc.aloc.course.service.UserCourseService;
+import com.aloc.aloc.report.dto.response.ReportResponseDto;
+import com.aloc.aloc.report.service.ReportService;
+import com.aloc.aloc.report.service.facade.ReportFacade;
 import com.aloc.aloc.scraper.ProblemScrapingService;
 import com.aloc.aloc.user.entity.User;
 import com.aloc.aloc.user.enums.Authority;
@@ -40,6 +43,8 @@ public class AdminService {
   private final UserFacade userFacade;
   private final CoinService coinService;
   private final ProblemScrapingService problemScrapingService;
+  private final ReportService reportService;
+  private final ReportFacade reportFacade;
 
   public AdminDashboardResponseDto getDashboard(String oauthId) {
     userService.validateAdmin(oauthId);
@@ -48,7 +53,7 @@ public class AdminService {
         courseService.getActiveCourseCount(),
         userCourseService.getUserCourseCountByUserCourseState(UserCourseState.IN_PROGRESS),
         userCourseService.getUserCourseCountByUserCourseState(UserCourseState.SUCCESS),
-        0L);
+        reportService.countWaitingReports());
   }
 
   private AdminCourseResponseDto toAdminCourseListResponseDto(Course course) {
@@ -172,5 +177,17 @@ public class AdminService {
 
     Course course = courseService.updateCourse(courseId);
     return CourseResponseDto.of(course, UserCourseState.NOT_STARTED);
+  }
+
+  @Transactional
+  public List<ReportResponseDto> getAllReports(String oauthId) {
+    userService.validateAdmin(oauthId);
+    return reportService.getAllReports();
+  }
+
+  @Transactional
+  public String answerReport(Long reportId, String responderUsername, String response) {
+    userService.validateAdmin(responderUsername);
+    return reportFacade.answerReport(reportId, responderUsername, response);
   }
 }
