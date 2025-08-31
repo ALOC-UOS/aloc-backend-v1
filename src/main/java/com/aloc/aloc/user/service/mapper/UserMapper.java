@@ -1,6 +1,6 @@
 package com.aloc.aloc.user.service.mapper;
 
-import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
+import com.aloc.aloc.profilebackgroundcolor.entity.ProfileBackgroundColor;
 import com.aloc.aloc.profilebackgroundcolor.service.ProfileBackgroundColorService;
 import com.aloc.aloc.user.dto.response.UserDetailResponseDto;
 import com.aloc.aloc.user.entity.User;

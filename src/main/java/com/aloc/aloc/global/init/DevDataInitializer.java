@@ -1,6 +1,6 @@
 package com.aloc.aloc.global.init;
 
-import com.aloc.aloc.profilebackgroundcolor.ProfileBackgroundColor;
+import com.aloc.aloc.profilebackgroundcolor.entity.ProfileBackgroundColor;
 import com.aloc.aloc.profilebackgroundcolor.repository.ProfileBackgroundColorRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
