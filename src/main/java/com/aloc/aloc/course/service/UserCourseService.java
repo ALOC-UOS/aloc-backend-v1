@@ -14,7 +14,9 @@ import com.aloc.aloc.usercourse.entity.UserCourseProblem;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -126,5 +128,13 @@ public class UserCourseService {
 
   public long getUserCourseCountByUserCourseState(UserCourseState userCourseState) {
     return userCourseRepository.countByUserCourseState(userCourseState);
+  }
+
+  public Map<Long, UserCourseState> getLatestUserCourseStates(User user, List<Long> courseIds) {
+    List<UserCourse> latestUserCourses =
+        userCourseRepository.findLatestUserCoursesByUserAndCourseIds(user, courseIds);
+
+    return latestUserCourses.stream()
+        .collect(Collectors.toMap(uc -> uc.getCourse().getId(), UserCourse::getUserCourseState));
   }
 }

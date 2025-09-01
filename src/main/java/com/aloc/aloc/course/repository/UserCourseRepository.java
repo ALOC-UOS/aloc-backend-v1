@@ -45,4 +45,17 @@ public interface UserCourseRepository extends JpaRepository<UserCourse, Long> {
   int findClearRank(@Param("course") Course course, @Param("updatedAt") LocalDateTime updatedAt);
 
   long countByUserCourseState(UserCourseState userCourseState);
+
+  @Query(
+      """
+    SELECT uc FROM UserCourse uc
+    WHERE uc.user = :user AND uc.course.id IN :courseIds
+    AND uc.createdAt = (
+      SELECT MAX(uc2.createdAt)
+      FROM UserCourse uc2
+      WHERE uc2.user = :user AND uc2.course.id = uc.course.id
+    )
+  """)
+  List<UserCourse> findLatestUserCoursesByUserAndCourseIds(
+      @Param("user") User user, @Param("courseIds") List<Long> courseIds);
 }
